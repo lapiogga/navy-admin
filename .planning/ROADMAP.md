@@ -33,7 +33,11 @@ Decimal phases는 숫자 순서대로 정수 Phase 사이에 실행된다.
   3. MSW가 활성화된 상태에서 Mock API 응답이 네트워크 탭에 보이며, 컴포넌트가 해당 데이터를 렌더링한다
   4. `/sys01/`, `/sys02/` 등 URL 컨벤션 문서에 정의된 경로로 접근하면 lazy-loaded 서브시스템 레이아웃이 로드된다
   5. Zustand AuthStore에 Mock 사용자를 설정하면 ProtectedRoute가 접근을 허용하고, 미인증 시 로그인으로 리다이렉트한다
-**Plans**: TBD
+**Plans**: 3 plans
+Plans:
+- [ ] 00-01-PLAN.md -- Vite+FSD 프로젝트 초기화, Tailwind+antd 테마, 공통 타입
+- [ ] 00-02-PLAN.md -- Zustand/MSW/TanStack Query, React Router 라우팅, ProLayout 레이아웃, 인증
+- [ ] 00-03-PLAN.md -- 공통 UI 컴포넌트 6개, 데모 페이지, URL 컨벤션 문서
 **UI hint**: yes
 
 ### Phase 1: 공통 기능 (99_공통기능)
