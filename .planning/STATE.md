@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: verifying
-stopped_at: Phase 1 UI-SPEC approved
-last_updated: "2026-04-05T05:00:46.400Z"
+status: executing
+stopped_at: Completed 01-99-01-PLAN.md
+last_updated: "2026-04-05T09:20:43.017Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 8
   completed_phases: 1
   total_plans: 7
-  completed_plans: 3
+  completed_plans: 4
   percent: 12
 ---
 
@@ -21,13 +21,13 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** 인증된 사용자가 메인 포탈에서 모든 행정 서브시스템에 원활하게 접속하여 업무를 처리할 수 있어야 한다
-**Current focus:** Phase 01 — 공통 기능 (99_공통기능)
+**Current focus:** Phase 01 — 99
 
 ## Current Position
 
-Phase: 01 (99_공통기능) — PLANNED
-Plan: 0 of 4 (ready for execution)
-Status: 4 plans verified, ready for execution
+Phase: 01 (99) — EXECUTING
+Plan: 2 of 4
+Status: Ready to execute
 Last activity: 2026-04-05
 
 Progress: [█░░░░░░░░░] 12%
@@ -55,6 +55,7 @@ Progress: [█░░░░░░░░░] 12%
 | Phase 00 P01 | 12 | 2 tasks | 35 files |
 | Phase 00 P02 | 22 | 2 tasks | 20 files |
 | Phase 00 P03 | 7 | 2 tasks | 20 files |
+| Phase 01-99 P01 | 9 | 2 tasks | 15 files |
 
 ## Accumulated Context
 
@@ -74,6 +75,8 @@ Recent decisions affecting current work:
 - [Phase 00]: marine-admin 독립 git 저장소 확인 — 모든 커밋을 marine-admin/.git에 수행
 - [Phase 00]: Phase 0 frozen contract: shared/ui 6개 컴포넌트 인터페이스 동결 — 845개 화면이 이 인터페이스에 의존
 - [Phase 00]: DataTable page 변환 내부화: ProTable 1-based current를 PageRequest 0-based로 DataTable 내부에서 처리
+- [Phase 01-99]: DataTable에 onRow prop 추가 — 코드그룹 행 클릭 시 코드목록 연동 (Phase 0 frozen contract 최소 확장)
+- [Phase 01-99]: apiClient interceptor 이중 래핑 방어 패턴 — (res as ApiResult).data ?? res 추출 방식 확립
 
 ### Pending Todos
 
@@ -87,7 +90,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-05T14:35:00.000Z
-Stopped at: Phase 1 계획 완료 — 실행 대기
+Last session: 2026-04-05T09:20:43.008Z
+Stopped at: Completed 01-99-01-PLAN.md
 Resume command: /gsd:execute-phase 1
-Resume file: .planning/phases/01-99/01-01-PLAN.md
+Resume file: None
