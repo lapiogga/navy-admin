@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 00-01-PLAN.md
-last_updated: "2026-04-05T01:35:44.688Z"
+stopped_at: Completed 00-02-PLAN.md
+last_updated: "2026-04-05T01:45:57.539Z"
 last_activity: 2026-04-05
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 1
+  completed_plans: 2
   percent: 0
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 00 (project-foundation) — EXECUTING
-Plan: 2 of 3
+Plan: 3 of 3
 Status: Ready to execute
 Last activity: 2026-04-05
 
@@ -53,6 +53,7 @@ Progress: [░░░░░░░░░░] 0%
 
 *Updated after each plan completion*
 | Phase 00 P01 | 12 | 2 tasks | 35 files |
+| Phase 00 P02 | 22 | 2 tasks | 20 files |
 
 ## Accumulated Context
 
@@ -68,6 +69,8 @@ Recent decisions affecting current work:
 - [Phase 00]: antd@5.29.3 채택 (6.x 아닌 5.x) — ProComponents 2.x와 안정적 호환, React 18 환경
 - [Phase 00]: Tailwind preflight:false — antd CSS reset 충돌 방지, Tailwind는 외부 레이아웃 전용
 - [Phase 00]: MSW enableMocking() 비동기 패턴 — Service Worker 등록 완료 후 React 마운트
+- [Phase 00]: ROUTES 상수를 Task 1에서 선행 생성 — useSessionCheck.ts 의존성 순서 조정
+- [Phase 00]: marine-admin 독립 git 저장소 확인 — 모든 커밋을 marine-admin/.git에 수행
 
 ### Pending Todos
 
@@ -81,6 +84,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-05T01:35:44.682Z
-Stopped at: Completed 00-01-PLAN.md
+Last session: 2026-04-05T01:45:57.534Z
+Stopped at: Completed 00-02-PLAN.md
 Resume file: None

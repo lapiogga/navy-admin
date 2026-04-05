@@ -11,13 +11,13 @@
 
 - [x] **BASE-01**: React + TypeScript + Vite 프로젝트 초기화 및 FSD 구조 설정
 - [x] **BASE-02**: Tailwind CSS + Ant Design 5 통합 설정
-- [ ] **BASE-03**: React Router v7 라우팅 구조 (포탈 + 18개 서브시스템 lazy loading)
-- [ ] **BASE-04**: Zustand 전역 상태 관리 (세션, 권한) 설정
-- [ ] **BASE-05**: TanStack Query + MSW Mock API 인프라 설정
-- [ ] **BASE-06**: 공통 레이아웃 (포탈 레이아웃, 서브시스템 레이아웃, 사이드바)
+- [x] **BASE-03**: React Router v7 라우팅 구조 (포탈 + 18개 서브시스템 lazy loading)
+- [x] **BASE-04**: Zustand 전역 상태 관리 (세션, 권한) 설정
+- [x] **BASE-05**: TanStack Query + MSW Mock API 인프라 설정
+- [x] **BASE-06**: 공통 레이아웃 (포탈 레이아웃, 서브시스템 레이아웃, 사이드바)
 - [ ] **BASE-07**: 공통 컴포넌트 라이브러리 (ProTable, ProForm, 모달, 검색폼)
-- [ ] **BASE-08**: Mock 인증/세션 관리 구조
-- [ ] **BASE-09**: URL 컨벤션 및 라우트 설정 문서화
+- [x] **BASE-08**: Mock 인증/세션 관리 구조
+- [x] **BASE-09**: URL 컨벤션 및 라우트 설정 문서화
 
 ### Phase 1: 공통 기능 (99_공통기능, 82개 프로세스)
 

@@ -36,7 +36,7 @@ Decimal phases는 숫자 순서대로 정수 Phase 사이에 실행된다.
 **Plans**: 3 plans
 Plans:
 - [x] 00-01-PLAN.md -- Vite+FSD 프로젝트 초기화, Tailwind+antd 테마, 공통 타입
-- [ ] 00-02-PLAN.md -- Zustand/MSW/TanStack Query, React Router 라우팅, ProLayout 레이아웃, 인증
+- [x] 00-02-PLAN.md -- Zustand/MSW/TanStack Query, React Router 라우팅, ProLayout 레이아웃, 인증
 - [ ] 00-03-PLAN.md -- 공통 UI 컴포넌트 6개, 데모 페이지, URL 컨벤션 문서
 **UI hint**: yes
 
@@ -134,7 +134,7 @@ Phases execute in numeric order: 0 → 1 → 2 → 3 → 4 → 5 → 6 → 7
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. 프로젝트 기반 구축 | 1/3 | In Progress|  |
+| 0. 프로젝트 기반 구축 | 2/3 | In Progress|  |
 | 1. 공통 기능 (99_공통기능) | 0/TBD | Not started | - |
 | 2. 메인 포탈 (00_포탈) | 0/TBD | Not started | - |
 | 3. 저복잡도 서브시스템 5개 | 0/TBD | Not started | - |
