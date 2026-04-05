@@ -54,7 +54,7 @@ Plans:
 Plans:
 - [x] 01-01-PLAN.md (W1) -- 코드관리(코드그룹/코드 CRUD, 마스터-디테일 2패널) + useCodeOptions 훅 + 공통 라우팅 인프라
 - [x] 01-02-PLAN.md (W2, depends: 01-01) -- 권한관리(그룹CRUD, 메뉴별/그룹별 메뉴배정 Tree, 사용자/부대배정) + usePermission 훅
-- [ ] 01-03-PLAN.md (W3, depends: 01-01, 01-02) -- 결재선관리(Transfer 결재자 선택) + 시스템관리(체계담당자/메뉴/메시지/접속로그CSV/장애로그) + CSV 유틸
+- [x] 01-03-PLAN.md (W3, depends: 01-01, 01-02) -- 결재선관리(Transfer 결재자 선택) + 시스템관리(체계담당자/메뉴/메시지/접속로그CSV/장애로그) + CSV 유틸
 - [ ] 01-04-PLAN.md (W4, depends: 01-01, 01-02, 01-03) -- 공통게시판(설정/카테고리/게시글/댓글/첨부파일/관리자설정/사용자설정/부대설정) 8개 서브도메인
 **UI hint**: yes
 
@@ -140,7 +140,7 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
 | 0. 프로젝트 기반 구축 | 3/3 | Complete   | 2026-04-05 |
-| 1. 공통 기능 (99_공통기능) | 2/4 | In Progress|  |
+| 1. 공통 기능 (99_공통기능) | 3/4 | In Progress|  |
 | 2. 메인 포탈 (00_포탈) | 0/TBD | Not started | - |
 | 3. 저복잡도 서브시스템 5개 | 0/TBD | Not started | - |
 | 4. 중복잡도 서브시스템 A 6개 | 0/TBD | Not started | - |
