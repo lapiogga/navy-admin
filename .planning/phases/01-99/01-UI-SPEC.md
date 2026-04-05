@@ -1,7 +1,7 @@
 ---
 phase: 1
 slug: 99-common-features
-status: draft
+status: approved
 shadcn_initialized: false
 preset: none
 created: 2026-04-05
@@ -276,11 +276,11 @@ PageContainer title="공통게시판"
 
 ## Checker Sign-Off
 
-- [ ] Dimension 1 Copywriting: PASS
-- [ ] Dimension 2 Visuals: PASS
-- [ ] Dimension 3 Color: PASS
-- [ ] Dimension 4 Typography: PASS
-- [ ] Dimension 5 Spacing: PASS
-- [ ] Dimension 6 Registry Safety: PASS
+- [x] Dimension 1 Copywriting: FLAG (CTA 단일 동사 — 군 행정 컨텍스트 수용)
+- [x] Dimension 2 Visuals: FLAG (focal point 미명시 — PageContainer title이 암시적 앵커)
+- [x] Dimension 3 Color: PASS
+- [x] Dimension 4 Typography: FLAG (Display/Body 2px 차이 — antd 기본값 수용)
+- [x] Dimension 5 Spacing: PASS
+- [x] Dimension 6 Registry Safety: PASS
 
-**Approval:** pending
+**Approval:** approved 2026-04-05
