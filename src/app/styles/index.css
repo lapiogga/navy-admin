@@ -1,0 +1,10 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* antd preflight 비활성화 후 최소 reset */
+*,
+*::before,
+*::after {
+  box-sizing: border-box;
+}
