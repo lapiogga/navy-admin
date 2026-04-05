@@ -2,15 +2,15 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: planned
-stopped_at: Phase 0 plans ready (3 plans, 3 waves)
-last_updated: "2026-04-05T03:00:00.000Z"
-last_activity: 2026-04-05 — Phase 0 계획 수립 완료 (research → plan → verify)
+status: executing
+stopped_at: Completed 00-01-PLAN.md
+last_updated: "2026-04-05T01:35:44.688Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 8
   completed_phases: 0
   total_plans: 3
-  completed_plans: 0
+  completed_plans: 1
   percent: 0
 ---
 
@@ -21,14 +21,14 @@ progress:
 See: .planning/PROJECT.md (updated 2026-04-05)
 
 **Core value:** 인증된 사용자가 메인 포탈에서 모든 행정 서브시스템에 원활하게 접속하여 업무를 처리할 수 있어야 한다
-**Current focus:** Phase 0 — 프로젝트 기반 구축
+**Current focus:** Phase 00 — project-foundation
 
 ## Current Position
 
-Phase: 0 of 8 (프로젝트 기반 구���)
-Plan: 0 of 3 in current phase
+Phase: 00 (project-foundation) — EXECUTING
+Plan: 2 of 3
 Status: Ready to execute
-Last activity: 2026-04-05 — Phase 0 계획 수립 완료 (3 plans, 3 waves)
+Last activity: 2026-04-05
 
 Progress: [░░░░░░░░░░] 0%
 
@@ -52,6 +52,7 @@ Progress: [░░░░░░░░░░] 0%
 - Trend: -
 
 *Updated after each plan completion*
+| Phase 00 P01 | 12 | 2 tasks | 35 files |
 
 ## Accumulated Context
 
@@ -64,6 +65,9 @@ Recent decisions affecting current work:
 - [Init]: Ant Design 5 ProComponents 채택 — 행정 데이터 화면 개발 속도 극대화
 - [Init]: MSW 2.x Mock API — 백엔드 없는 MVP, 실 API 전환 시 코드 무수정
 - [Init]: Phase 0 컨벤션 동결 — 공통 컴포넌트/URL/권한 인터페이스/API 타입을 Phase 0에서 확정해야 845개 화면 소급 수정 방지
+- [Phase 00]: antd@5.29.3 채택 (6.x 아닌 5.x) — ProComponents 2.x와 안정적 호환, React 18 환경
+- [Phase 00]: Tailwind preflight:false — antd CSS reset 충돌 방지, Tailwind는 외부 레이아웃 전용
+- [Phase 00]: MSW enableMocking() 비동기 패턴 — Service Worker 등록 완료 후 React 마운트
 
 ### Pending Todos
 
@@ -77,6 +81,6 @@ None yet.
 
 ## Session Continuity
 
-Last session: 2026-04-04T16:18:02.424Z
-Stopped at: Phase 0 plans ready
-Resume file: .planning/phases/00-project-foundation/00-01-PLAN.md
+Last session: 2026-04-05T01:35:44.682Z
+Stopped at: Completed 00-01-PLAN.md
+Resume file: None

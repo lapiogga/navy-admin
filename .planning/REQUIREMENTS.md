@@ -9,8 +9,8 @@
 
 ### Phase 0: 프로젝트 기반 구축
 
-- [ ] **BASE-01**: React + TypeScript + Vite 프로젝트 초기화 및 FSD 구조 설정
-- [ ] **BASE-02**: Tailwind CSS + Ant Design 5 통합 설정
+- [x] **BASE-01**: React + TypeScript + Vite 프로젝트 초기화 및 FSD 구조 설정
+- [x] **BASE-02**: Tailwind CSS + Ant Design 5 통합 설정
 - [ ] **BASE-03**: React Router v7 라우팅 구조 (포탈 + 18개 서브시스템 lazy loading)
 - [ ] **BASE-04**: Zustand 전역 상태 관리 (세션, 권한) 설정
 - [ ] **BASE-05**: TanStack Query + MSW Mock API 인프라 설정
