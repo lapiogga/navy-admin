@@ -14,7 +14,7 @@ Decimal phases는 숫자 순서대로 정수 Phase 사이에 실행된다.
 
 - [x] **Phase 0: 프로젝트 기반 구축** - FSD 구조, 공통 컴포넌트 라이브러리, MSW/라우팅/상태관리 기반 동결 (completed 2026-04-05)
 - [x] **Phase 1: 공통 기능 (99_공통기능)** - 권한관리, 결재선, 코드관리, 공통게시판, 시스템관리 82개 프로세스 (completed 2026-04-05)
-- [ ] **Phase 2: 메인 포탈 (00_포탈)** - 로그인/로그아웃, 대시보드, 세션관리 완전 동작
+- [x] **Phase 2: 메인 포탈 (00_포탈)** - 로그인/로그아웃, 대시보드, 세션관리 완전 동작 (completed 2026-04-05)
 - [ ] **Phase 3: 저복잡도 서브시스템 5개** - 인증서/행정규칙/나의제언/연구자료/회의실 85개 프로세스
 - [ ] **Phase 4: 중복잡도 서브시스템 A 6개** - 지식/검열/규정/설문/지시건의/영현보훈 176개 프로세스
 - [ ] **Phase 5: 중복잡도 서브시스템 B 3개** - 군사자료/주말버스/직무기술서 131개 프로세스
@@ -69,8 +69,8 @@ Plans:
   4. 로그아웃 버튼을 클릭하면 세션이 초기화되고 로그인 화면으로 이동한다
 **Plans**: 2 plans
 Plans:
-- [ ] 02-01-PLAN.md (W1) -- 공지사항 feature slice(타입/훅/컴포넌트/MSW) + 대시보드 보강 + 로그인/로그아웃 메시지
-- [ ] 02-02-PLAN.md (W1) -- useSessionCheck Idle 이중 타이머 리팩토링 + SessionWarningModal + RequireAuth 연동
+- [x] 02-01-PLAN.md (W1) -- 공지사항 feature slice(타입/훅/컴포넌트/MSW) + 대시보드 보강 + 로그인/로그아웃 메시지
+- [x] 02-02-PLAN.md (W1) -- useSessionCheck Idle 이중 타이머 리팩토링 + SessionWarningModal + RequireAuth 연동
 **UI hint**: yes
 
 ### Phase 3: 저복잡도 서브시스템 5개
@@ -144,7 +144,7 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 |-------|----------------|--------|-----------|
 | 0. 프로젝트 기반 구축 | 3/3 | Complete   | 2026-04-05 |
 | 1. 공통 기능 (99_공통기능) | 4/4 | Complete   | 2026-04-05 |
-| 2. 메인 포탈 (00_포탈) | 0/2 | Planning complete | - |
+| 2. 메인 포탈 (00_포탈) | 2/2 | Complete   | 2026-04-05 |
 | 3. 저복잡도 서브시스템 5개 | 0/TBD | Not started | - |
 | 4. 중복잡도 서브시스템 A 6개 | 0/TBD | Not started | - |
 | 5. 중복잡도 서브시스템 B 3개 | 0/TBD | Not started | - |

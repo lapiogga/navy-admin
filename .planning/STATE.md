@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Phase 2 plans verified
-last_updated: "2026-04-05T14:00:15.195Z"
-last_activity: 2026-04-05 -- Phase 02 execution started
+stopped_at: Completed 02-00/02-01-PLAN.md
+last_updated: "2026-04-05T14:08:17.166Z"
+last_activity: 2026-04-05
 progress:
   total_phases: 8
-  completed_phases: 2
+  completed_phases: 3
   total_plans: 9
-  completed_plans: 7
+  completed_plans: 9
   percent: 12
 ---
 
@@ -26,9 +26,9 @@ See: .planning/PROJECT.md (updated 2026-04-05)
 ## Current Position
 
 Phase: 02 (메인 포탈) — EXECUTING
-Plan: 1 of 2
-Status: Executing Phase 02
-Last activity: 2026-04-05 -- Phase 02 execution started
+Plan: 2 of 2
+Status: Ready to execute
+Last activity: 2026-04-05
 
 Progress: [█░░░░░░░░░] 12%
 
@@ -59,6 +59,7 @@ Progress: [█░░░░░░░░░] 12%
 | Phase 01-99 P02 | 18 | 2 tasks | 15 files |
 | Phase 01-99 P03 | 30 | 3 tasks | 17 files |
 | Phase 01-99 P04 | 9 | 2 tasks | 15 files |
+| Phase 02 P01 | 5 | 2 tasks | 10 files |
 
 ## Accumulated Context
 
@@ -85,6 +86,7 @@ Recent decisions affecting current work:
 - [Phase 01-99]: Transfer + orderedApproverIds 분리: Transfer targetKeys만으로는 순서 유지 불가. RESEARCH Pitfall 3 대응으로 별도 상태 관리
 - [Phase 01-99]: 비페이지 list API는 requestFn 래퍼로 PageResponse 변환 (DataTable 인터페이스 호환)
 - [Phase 01-99]: BoardPostPage는 별도 Route 없이 BoardListPage 내부 Modal로 구현 (라우팅 복잡성 최소화)
+- [Phase 02]: 테스트 indexOf 범위 제한: handleGoPortal 블록 슬라이싱으로 window.close 순서 검증 정확도 보장
 
 ### Pending Todos
 
@@ -98,7 +100,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-05T13:57:23.234Z
-Stopped at: Phase 2 plans verified
+Last session: 2026-04-05T14:08:17.162Z
+Stopped at: Completed 02-00/02-01-PLAN.md
 Resume command: /gsd:execute-phase 1
-Resume file: .planning/phases/02-00/02-01-PLAN.md
+Resume file: None
