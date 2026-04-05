@@ -3,6 +3,7 @@ import { lazy, Suspense } from 'react'
 import { PageSpinner } from '@/app/components/PageSpinner'
 
 const CodeManagementPage = lazy(() => import('./code-mgmt/CodeManagementPage'))
+const AuthGroupIndex = lazy(() => import('./auth-group'))
 
 // 아직 구현되지 않은 페이지들은 임시 컴포넌트로 표시
 function NotImplemented() {
@@ -24,7 +25,14 @@ export default function Page() {
           </Suspense>
         }
       />
-      <Route path="auth-group" element={<NotImplemented />} />
+      <Route
+        path="auth-group/*"
+        element={
+          <Suspense fallback={<PageSpinner />}>
+            <AuthGroupIndex />
+          </Suspense>
+        }
+      />
       <Route path="board" element={<NotImplemented />} />
       <Route path="approval" element={<NotImplemented />} />
       <Route path="system-mgr" element={<NotImplemented />} />
