@@ -1,0 +1,128 @@
+import { Popconfirm, Button, message } from 'antd'
+import { PageContainer } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
+import axios from 'axios'
+import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+
+interface Reservation {
+  id: string
+  roomId: string
+  roomName: string
+  applicant: string
+  unit: string
+  purpose: string
+  date: string
+  startTime: string
+  endTime: string
+  status: 'pending' | 'approved' | 'rejected'
+  createdAt: string
+  processedAt?: string
+}
+
+const STATUS_COLOR_MAP = { pending: 'orange', approved: 'green', rejected: 'red' }
+const STATUS_LABEL_MAP = { pending: '대기', approved: '승인', rejected: '반려' }
+
+export default function ReservationMgmtPage() {
+  const queryClient = useQueryClient()
+
+  // 전체 예약 목록 request 함수
+  const fetchReservations = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
+    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/api/sys16/reservations', {
+      params: { page: params.page, size: params.size },
+    })
+    return res.data.data
+  }
+
+  // 승인 뮤테이션
+  const approveMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await axios.patch<ApiResult>(`/api/sys16/reservations/${id}/approve`)
+      return res.data
+    },
+    onSuccess: () => {
+      message.success('예약이 승인되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['sys16', 'reservations'] })
+    },
+    onError: () => {
+      message.error('승인 처리에 실패했습니다')
+    },
+  })
+
+  // 반려 뮤테이션
+  const rejectMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await axios.patch<ApiResult>(`/api/sys16/reservations/${id}/reject`)
+      return res.data
+    },
+    onSuccess: () => {
+      message.success('예약이 반려되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['sys16', 'reservations'] })
+    },
+    onError: () => {
+      message.error('반려 처리에 실패했습니다')
+    },
+  })
+
+  const columns: ProColumns<Reservation>[] = [
+    { title: '번호', dataIndex: 'id', width: 80, render: (_, __, index) => index + 1 },
+    { title: '신청자', dataIndex: 'applicant', width: 100 },
+    { title: '소속', dataIndex: 'unit', width: 100 },
+    { title: '회의실', dataIndex: 'roomName', width: 120 },
+    { title: '예약일', dataIndex: 'date', width: 110 },
+    {
+      title: '시간',
+      width: 130,
+      render: (_, record) => `${record.startTime} ~ ${record.endTime}`,
+    },
+    { title: '목적', dataIndex: 'purpose', ellipsis: true },
+    {
+      title: '처리',
+      width: 180,
+      render: (_, record) => {
+        if (record.status === 'pending') {
+          return (
+            <span>
+              <Popconfirm
+                title="승인하시겠습니까?"
+                onConfirm={() => approveMutation.mutate(record.id)}
+              >
+                <Button type="primary" size="small" style={{ marginRight: 8 }}>
+                  승인
+                </Button>
+              </Popconfirm>
+              <Popconfirm
+                title="반려하시겠습니까?"
+                onConfirm={() => rejectMutation.mutate(record.id)}
+              >
+                <Button danger size="small">
+                  반려
+                </Button>
+              </Popconfirm>
+            </span>
+          )
+        }
+        return (
+          <StatusBadge
+            status={record.status}
+            colorMap={STATUS_COLOR_MAP}
+            labelMap={STATUS_LABEL_MAP}
+          />
+        )
+      },
+    },
+  ]
+
+  return (
+    <PageContainer title="회의예약관리">
+      <DataTable<Reservation>
+        columns={columns}
+        request={fetchReservations}
+        rowKey="id"
+        headerTitle="예약 목록"
+      />
+    </PageContainer>
+  )
+}
