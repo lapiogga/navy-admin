@@ -1,3 +1,5 @@
-export default function Sys02SurveyPage() {
-  return <div>설문종합관리체계</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

@@ -1,3 +1,5 @@
-export default function Sys04CertificatePage() {
-  return <div>인증서발급신청체계</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

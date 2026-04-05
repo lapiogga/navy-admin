@@ -1,5 +1,6 @@
-import { Card, Row, Col, Typography } from 'antd'
 import { useNavigate } from 'react-router-dom'
+import { Card, Row, Col, Typography } from 'antd'
+import { AppstoreOutlined } from '@ant-design/icons'
 import { SUBSYSTEM_META } from '@/entities/subsystem/config'
 
 const { Title, Text } = Typography
@@ -7,6 +8,10 @@ const { Title, Text } = Typography
 export default function PortalPage() {
   const navigate = useNavigate()
   const subsystems = Object.values(SUBSYSTEM_META)
+
+  const handleOpen = (path: string) => {
+    window.open(path, '_blank')
+  }
 
   return (
     <div>
@@ -16,7 +21,7 @@ export default function PortalPage() {
           <Col key={sys.code} xs={24} sm={12} md={8} lg={6}>
             <Card
               hoverable
-              onClick={() => navigate(sys.path)}
+              onClick={() => handleOpen(sys.path)}
               className="text-center"
             >
               <Title level={5}>{sys.name}</Title>
@@ -24,6 +29,18 @@ export default function PortalPage() {
             </Card>
           </Col>
         ))}
+        <Col xs={24} sm={12} md={8} lg={6}>
+          <Card
+            hoverable
+            onClick={() => navigate('/demo')}
+            className="text-center"
+            style={{ borderStyle: 'dashed' }}
+          >
+            <AppstoreOutlined style={{ fontSize: 24, color: '#1677ff', marginBottom: 8 }} />
+            <Title level={5}>컴포넌트 데모</Title>
+            <Text type="secondary">공통 UI 컴포넌트 확인</Text>
+          </Card>
+        </Col>
       </Row>
     </div>
   )

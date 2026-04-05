@@ -1,3 +1,5 @@
-export default function Sys07MilDataPage() {
-  return <div>군사자료관리체계</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

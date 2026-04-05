@@ -49,7 +49,7 @@ const formFields: CrudFormField[] = [
     label: '소속부대',
     type: 'select',
     options: [
-      { label: '해병대사령부', value: '해병대사령부' },
+      { label: '해군본부', value: '해군본부' },
       { label: '1사단', value: '1사단' },
       { label: '2사단', value: '2사단' },
     ],
@@ -130,7 +130,7 @@ export default function DemoPage() {
               title: '상태',
               dataIndex: 'status',
               width: 80,
-              render: (status: string) => <StatusBadge status={status} />,
+              render: (_, record) => <StatusBadge status={record.status} />,
             },
             { title: '작성일', dataIndex: 'createdAt', width: 110 },
             {

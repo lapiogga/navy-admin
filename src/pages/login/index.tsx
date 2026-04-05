@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { useNavigate, useLocation } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 import { Form, Input, Button, Card, message, Typography } from 'antd'
 import { UserOutlined, LockOutlined } from '@ant-design/icons'
 import { useAuthStore } from '@/features/auth/store/authStore'
@@ -12,15 +12,14 @@ export default function LoginPage() {
   const [loading, setLoading] = useState(false)
   const login = useAuthStore((s) => s.login)
   const navigate = useNavigate()
-  const location = useLocation()
-  const from = (location.state as { from?: { pathname: string } })?.from?.pathname ?? ROUTES.PORTAL
 
   const handleSubmit = async (values: LoginCredentials) => {
     setLoading(true)
     try {
       await login(values)
       message.success('로그인 성공')
-      navigate(from, { replace: true })
+      // 로그아웃 후 재로그인 시 항상 메인포탈로 이동 (이전 서브시스템 경로 무시)
+      navigate(ROUTES.PORTAL, { replace: true })
     } catch (error) {
       message.error(error instanceof Error ? error.message : '로그인 실패')
     } finally {
@@ -32,7 +31,7 @@ export default function LoginPage() {
     <div className="flex items-center justify-center min-h-screen bg-gray-100">
       <Card className="w-[400px] shadow-lg">
         <div className="text-center mb-8">
-          <Title level={3}>해병대 행정포탈</Title>
+          <Title level={3}>해군 행정포탈</Title>
           <p className="text-gray-500">시스템에 로그인하세요</p>
         </div>
         <Form onFinish={handleSubmit} autoComplete="off" size="large">

@@ -1,3 +1,5 @@
-export default function Sys14SuggestionPage() {
-  return <div>나의 제언</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

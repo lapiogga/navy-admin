@@ -1,3 +1,5 @@
-export default function Sys09MemorialPage() {
-  return <div>영현보훈체계</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

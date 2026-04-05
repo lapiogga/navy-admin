@@ -1,3 +1,5 @@
-export default function CommonPage() {
-  return <div>공통 기능</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }

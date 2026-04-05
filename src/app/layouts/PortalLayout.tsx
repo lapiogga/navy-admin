@@ -1,35 +1,21 @@
 import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { ProLayout } from '@ant-design/pro-components'
-import { LogoutOutlined, UserOutlined } from '@ant-design/icons'
-import { Dropdown, Avatar } from 'antd'
+import type { MenuDataItem } from '@ant-design/pro-components'
+import { LogoutOutlined, UserOutlined, HomeOutlined } from '@ant-design/icons'
+import { Dropdown } from 'antd'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { useUiStore } from '@/features/auth/store/uiStore'
-import { SUBSYSTEM_META } from '@/entities/subsystem/config'
 import { ROUTES } from '@/shared/config/routes'
+import { SUBSYSTEM_MENUS } from '@/entities/subsystem/menus'
+import { SUBSYSTEM_META } from '@/entities/subsystem/config'
 
-// Avatar import 사용 여부 lint 방지용 (실제 avatarProps render에서 dom 파라미터로 처리됨)
-void Avatar
-
-const menuData = [
-  { path: ROUTES.PORTAL, name: '대시보드' },
-  ...Object.values(SUBSYSTEM_META).map((sys) => ({
-    path: sys.path,
-    name: sys.name,
-  })),
-  {
-    path: ROUTES.COMMON.ROOT,
-    name: '공통 기능',
-    children: [
-      { path: ROUTES.COMMON.AUTH_GROUP, name: '권한관리' },
-      { path: ROUTES.COMMON.CODE_MGMT, name: '코드관리' },
-      { path: ROUTES.COMMON.BOARD, name: '공통게시판' },
-      { path: ROUTES.COMMON.APPROVAL, name: '결재관리' },
-      { path: ROUTES.COMMON.SYSTEM_MGR, name: '시스템관리' },
-    ],
-  },
-]
-
-export function PortalLayout() {
+/**
+ * 서브시스템 전용 레이아웃.
+ * - 상단 헤더: 대메뉴 (풀다운)
+ * - 좌측 사이드바: 소메뉴 (선택된 대메뉴의 하위 메뉴)
+ * - layout="mix" + splitMenus로 자동 분리
+ */
+export function SubsystemProLayout() {
   const navigate = useNavigate()
   const location = useLocation()
   const user = useAuthStore((s) => s.user)
@@ -37,32 +23,54 @@ export function PortalLayout() {
   const collapsed = useUiStore((s) => s.sidebarCollapsed)
   const setSidebarCollapsed = useUiStore((s) => s.setSidebarCollapsed)
 
+  // URL에서 서브시스템 코드 추출 (/sys01/... → sys01)
+  const sysCode = location.pathname.split('/')[1] ?? ''
+  const sysMeta = SUBSYSTEM_META[sysCode]
+  const menuData = SUBSYSTEM_MENUS[sysCode] ?? []
+
   const handleLogout = () => {
     logout()
-    navigate(ROUTES.LOGIN)
+    if (window.opener) {
+      window.close()
+    } else {
+      navigate(ROUTES.LOGIN)
+    }
+  }
+
+  const handleGoPortal = () => {
+    if (window.opener) {
+      window.opener.focus()
+      window.close()
+    } else {
+      navigate(ROUTES.PORTAL)
+    }
   }
 
   return (
     <ProLayout
-      title="해병대 행정포탈"
+      title={sysMeta?.name ?? '서브시스템'}
       logo={false}
       layout="mix"
+      splitMenus
       fixSiderbar
+      fixedHeader
       collapsed={collapsed}
       onCollapse={setSidebarCollapsed}
       location={{ pathname: location.pathname }}
-      route={{ path: '/', routes: menuData }}
-      menuItemRender={(item, dom) => (
+      route={{ path: `/${sysCode}`, children: menuData }}
+      menuItemRender={(item: MenuDataItem, dom: React.ReactNode) => (
         <div onClick={() => item.path && navigate(item.path)}>{dom}</div>
       )}
+      subMenuItemRender={(_item: MenuDataItem, dom: React.ReactNode) => dom}
       avatarProps={{
         src: undefined,
         icon: <UserOutlined />,
         title: user ? `${user.rank} ${user.name} (${user.unit})` : '',
-        render: (_props, dom) => (
+        render: (_props: unknown, dom: React.ReactNode) => (
           <Dropdown
             menu={{
               items: [
+                { key: 'portal', icon: <HomeOutlined />, label: '메인포탈로 돌아가기', onClick: handleGoPortal },
                 { key: 'logout', icon: <LogoutOutlined />, label: '로그아웃', onClick: handleLogout },
               ],
             }}

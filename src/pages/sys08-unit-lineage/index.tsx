@@ -1,3 +1,5 @@
-export default function Sys08UnitLineagePage() {
-  return <div>부대계보관리체계</div>
+import { SubsystemPage } from '@/shared/ui/SubsystemPage'
+
+export default function Page() {
+  return <SubsystemPage />
 }
