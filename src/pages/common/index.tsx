@@ -6,6 +6,7 @@ const CodeManagementPage = lazy(() => import('./code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('./auth-group'))
 const ApprovalLinePage = lazy(() => import('./approval/ApprovalLinePage'))
 const SystemMgrIndex = lazy(() => import('./system-mgr'))
+const BoardIndex = lazy(() => import('./board'))
 
 // 아직 구현되지 않은 페이지들은 임시 컴포넌트로 표시
 function NotImplemented() {
@@ -51,7 +52,14 @@ export default function Page() {
           </Suspense>
         }
       />
-      <Route path="board" element={<NotImplemented />} />
+      <Route
+        path="board"
+        element={
+          <Suspense fallback={<PageSpinner />}>
+            <BoardIndex />
+          </Suspense>
+        }
+      />
       <Route path="menu-mgmt" element={<NotImplemented />} />
       <Route path="access-log" element={<NotImplemented />} />
       <Route path="error-log" element={<NotImplemented />} />
