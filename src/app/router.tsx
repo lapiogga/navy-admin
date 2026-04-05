@@ -26,6 +26,7 @@ const Sys16Page = lazy(() => import('@/pages/sys16-meeting-room'))
 const Sys17Page = lazy(() => import('@/pages/sys17-inspection'))
 const Sys18Page = lazy(() => import('@/pages/sys18-job-desc'))
 const CommonPage = lazy(() => import('@/pages/common'))
+const DemoPage = lazy(() => import('@/pages/portal/DemoPage'))
 
 function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   return (
@@ -46,6 +47,7 @@ export const router = createBrowserRouter([
     ),
     children: [
       { index: true, element: <PortalPage /> },
+      { path: 'demo', element: withSuspense(DemoPage) },
       { path: 'sys01/*', element: withSuspense(Sys01Page) },
       { path: 'sys02/*', element: withSuspense(Sys02Page) },
       { path: 'sys03/*', element: withSuspense(Sys03Page) },
