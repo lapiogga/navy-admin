@@ -143,16 +143,18 @@
 
 **다음 세션에서 실행할 명령:**
 ```
-/gsd:discuss-phase 4 --auto
+/gsd:plan-phase 4 --auto
 ```
-**주의:** 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것.
+**주의:** 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것. Phase 4 discuss 완료, CONTEXT.md 생성됨. plan-phase부터 재시작 필요.
 
 **현재 상태:**
 - Phase 0: 실행 완료 (프로젝트 기반, 공통 컴포넌트)
 - Phase 1: **실행 완료** + 검증 통과 (공통 기능 82개 프로세스)
 - Phase 2: **실행 완료** + 검증 통과 (메인 포탈)
 - Phase 3: **실행 완료** + 검증 통과 (저복잡도 서브시스템 5개, 250 tests)
-- Phase 4: **대기** (중복잡도 서브시스템 A 6개, 176개 프로세스)
+- Phase 4: **Discuss 완료, Plan 대기** (중복잡도 서브시스템 A 6개, 176개 프로세스)
+  - 04-CONTEXT.md 생성됨 (27 decisions), 04-DISCUSSION-LOG.md 생성됨
+  - Research/Plan/Execute 필요
 
 **산출물 위치:**
 - `.planning/phases/01-99/01-VERIFICATION.md` — Phase 1 검증 리포트
