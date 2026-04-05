@@ -20,7 +20,7 @@
 
 ### Active
 
-- [ ] 저복잡도 서브시스템 5개 (인증서, 행정규칙, 나의제언, 연구자료, 회의실) 85개 프로세스
+- [x] 저복잡도 서브시스템 5개 (인증서, 행정규칙, 나의제언, 연구자료, 회의실) 85개 프로세스 — Validated in Phase 3
 - [ ] 중복잡도 서브시스템 A 6개 (지식, 검열, 규정, 설문, 지시건의, 영현보훈) 176개 프로세스
 - [ ] 중복잡도 서브시스템 B 3개 (군사자료, 주말버스, 직무기술서) 131개 프로세스
 - [ ] 고복잡도 서브시스템 2개 (부대계보, 초과근무) 158개 프로세스
@@ -77,4 +77,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 after Phase 2 completion*
+*Last updated: 2026-04-06 after Phase 3 completion*
