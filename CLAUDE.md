@@ -68,6 +68,7 @@
 ### 의사결정 원칙
 
 의사결정 필요 시 recommender 기반 자동 결정 후 진행
+각각의 워크플로우가 완료가 되면 "/compact"를 한 후, 자동으로 다음 워크플로우로 실행
 
 ## 개발 순서 (Phase)
 
@@ -127,12 +128,40 @@
 | 2026-04-05 01:35 | 2026-04-05 01:40 | - | 로드맵 생성 | ROADMAP.md (8 Phase), STATE.md | 완료 |
 | 2026-04-05 01:40 | 2026-04-05 01:45 | 0 | Phase 0 Context | 24개 구현 결정 수집 (FSD/URL/테마/MSW/상태관리/라우팅/IME) | 완료 |
 | 2026-04-05 01:50 | 2026-04-05 02:15 | 0 | Phase 0 Plan | Research→Plan(3 plans, 3 waves)→Verify(2회) 완료 | 완료 |
+| 2026-04-05 11:44 | 2026-04-05 12:46 | 0 | Phase 0 검증/개선 | 빌드에러, 크로스탭 로그아웃, 메뉴구조, 네비게이션 수정 | 완료 |
+| 2026-04-05 13:00 | 2026-04-05 14:31 | 1 | Phase 1 Plan | Research→Plan(4)→UI-SPEC→Replan→Verify PASSED | 완료 |
+
+## 재개 방법 (Resume Instructions)
+
+**다음 세션에서 실행할 명령:**
+```
+/gsd:execute-phase 1
+```
+
+**현재 상태:**
+- Phase 0: 실행 완료 (프로젝트 기반, 공통 컴포넌트)
+- Phase 1: 계획 완료, **실행 대기** (공통 기능 82개 프로세스)
+  - 4개 Plan, 4개 Wave (순차 실행)
+  - Wave 1: 코드관리 (01-01)
+  - Wave 2: 권한관리 (01-02)
+  - Wave 3: 결재선+시스템관리 (01-03)
+  - Wave 4: 공통게시판 (01-04)
+
+**계획 산출물 위치:**
+- `.planning/phases/01-99/01-RESEARCH.md` — 기술 리서치
+- `.planning/phases/01-99/01-UI-SPEC.md` — UI 디자인 계약
+- `.planning/phases/01-99/01-VALIDATION.md` — 검증 전략
+- `.planning/phases/01-99/01-01-PLAN.md` ~ `01-04-PLAN.md` — 실행 계획 4개
+
+**GitHub:** https://github.com/lapiogga/navy-admin.git (master branch)
 
 ## 참조 문서
 
 - `개발 spec.txt`: 시스템 개발 요건 명세
 - `req_func/*.xls`: 서브시스템별 기능 요구사항
 - `req_analysis.txt`: XLS 추출 요구사항 (텍스트)
+- `WORK-LOG.md`: 모든 작업의 시계열 기록 (시작/종료/Duration/작업명/내용)
+- `TERMINAL-LOG.md`: 터미널 출력 결과 전체 기록
 
 <!-- GSD:project-start source:PROJECT.md -->
 ## Project
