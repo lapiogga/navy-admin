@@ -12,13 +12,13 @@
 
 ### Validated
 
-(None yet -- ship to validate)
+- [x] 공통 기능 모듈 (시스템관리, 결재관리, 코드관리, 게시판, 권한관리) 82개 프로세스 — Validated in Phase 1
 
 ### Active
 
 - [ ] 메인 포탈 로그인/로그아웃 및 세션 관리
 - [ ] 메인 대시보드에서 18개 서브시스템 링크 접속
-- [ ] 공통 기능 모듈 (시스템관리, 결재관리, 코드관리, 게시판, 권한관리) 82개 프로세스
+
 - [ ] 저복잡도 서브시스템 5개 (인증서, 행정규칙, 나의제언, 연구자료, 회의실) 85개 프로세스
 - [ ] 중복잡도 서브시스템 A 6개 (지식, 검열, 규정, 설문, 지시건의, 영현보훈) 176개 프로세스
 - [ ] 중복잡도 서브시스템 B 3개 (군사자료, 주말버스, 직무기술서) 131개 프로세스
@@ -78,4 +78,4 @@ This document evolves at phase transitions and milestone boundaries.
 4. Update Context with current state
 
 ---
-*Last updated: 2026-04-05 after initialization*
+*Last updated: 2026-04-05 after Phase 1 completion*
