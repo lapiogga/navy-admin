@@ -128,7 +128,7 @@ Plans:
 **Plans**: 5 plans (2 waves)
 Plans:
 - [ ] 05-01-PLAN.md (W1) -- SYS07 군사자료관리체계 (보안등급 Tag + CRUD + 일괄등록 Upload + 대출 Steps + 통계 차트 4종 + 해기단자료)
-- [ ] 05-02-PLAN.md (W1) -- SYS10 주말버스 Part 1 (SeatGrid 좌석선택 + 예약 + 승차권 + 배차 + 시간관리 + 현황 + 게시판)
+- [x] 05-02-PLAN.md (W1) -- SYS10 주말버스 Part 1 (SeatGrid 좌석선택 + 예약 + 승차권 + 배차 + 시간관리 + 현황 + 게시판)
 - [ ] 05-03-PLAN.md (W2, depends: 05-02) -- SYS10 주말버스 Part 2 (대기자 자동/수동배정 + 위규자 제재 + 타군 전용 로그인/회원등록/관리)
 - [ ] 05-04-PLAN.md (W1) -- SYS18 직무기술서 Part 1 (5단계 Steps 폼 + Form.List 비율검증 + Tabs 3종 + 결재 Steps + 조직진단)
 - [ ] 05-05-PLAN.md (W2, depends: 05-04) -- SYS18 직무기술서 Part 2 (관리자 조회/검토/통계 차트 3종 + 표준업무시간 + 게시판/코드/권한 재사용)
@@ -171,6 +171,6 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 2. 메인 포탈 (00_포탈) | 2/2 | Complete   | 2026-04-05 |
 | 3. 저복잡도 서브시스템 5개 | 5/10 | GAP Closure | - |
 | 4. 중복잡도 서브시스템 A 6개 | 4/6 | In Progress|  |
-| 5. 중복잡도 서브시스템 B 3개 | 0/5 | Planned | - |
+| 5. 중복잡도 서브시스템 B 3개 | 1/5 | In Progress|  |
 | 6. 고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
 | 7. 최고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
