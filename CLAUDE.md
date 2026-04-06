@@ -144,54 +144,51 @@
 | 2026-04-06 09:22 | 2026-04-06 09:29 | - | 요건 변경 | req_analysis.txt 컬럼 반영 + UI-SPEC 필수 생성 규칙 추가 | 완료 |
 | 2026-04-06 09:29 | 2026-04-06 09:45 | 3,4 | UI-SPEC 병렬 생성 | Phase 3 소급 UI-SPEC(31 GAP) + Phase 4 UI-SPEC(176 프로세스) | 완료 |
 | 2026-04-06 09:45 | 2026-04-06 10:00 | 3 | Phase 3 패치 Plan | 03-06~10 (5 plans, Wave 1 병렬, 31 GAP 100% 커버) | 완료 |
+| 2026-04-06 10:40 | 2026-04-06 11:10 | 3,1 | Phase 3 패치 실행 + 빌드수정 | 03-06~10 병렬 실행 + common 타입에러 수정 | 완료 |
+| 2026-04-06 11:10 | 2026-04-06 12:04 | 4 | Phase 4 Execute | 6 plans 1 wave 병렬 (SYS13/17/06/02/12/09), 574 tests | 완료 |
+| 2026-04-06 12:04 | 2026-04-06 12:25 | 4 | Phase 4 Verify | Verifier 통과, Phase 4 완료 | 완료 |
+| 2026-04-06 12:25 | 2026-04-06 13:00 | 5 | Phase 5 Discuss | 12개 gray area, 38 decisions | 완료 |
+| 2026-04-06 13:00 | 2026-04-06 13:06 | - | 문서 현행화 + Push | 전체 현행화, GitHub 배포 | 완료 |
 
 ## 재개 방법 (Resume Instructions)
 
 **다음 세션 순서 (자동 실행):**
 
-### Step 1: Phase 3 패치 실행
+### Step 1: Phase 5 Plan
 ```
-Phase 3 패치 계획 5개(03-06~10)를 병렬 실행. Wave 1, autonomous=true.
-각 플랜은 독립된 서브시스템만 수정하므로 충돌 없음.
-```
-- 03-06: SYS04 인증서 (G01-G05, 신청폼/회수/반려/엑셀/통계)
-- 03-07: SYS05 행정규칙 (G06-G10, CRUD 추가/조직도/예하부대)
-- 03-08: SYS14 나의제언 (G17-G27, 컬럼/상태/댓글/서식관리/엑셀)
-- 03-09: SYS11 연구자료 (G11-G16, 메인통계/컬럼/폼/검색/이력)
-- 03-10: SYS16 회의실예약 (G28-G31, 예약폼/검색/엑셀/권한)
-
-### Step 2: Phase 4 Plan 재수립
-```
-Phase 4의 기존 plans(04-01~05)를 삭제하고, 04-UI-SPEC.md를 반영하여 재계획.
-04-UI-SPEC.md에 req_analysis.txt 컬럼이 이미 반영되어 있음.
+/gsd:plan-phase 5 --auto
+05-CONTEXT.md (38 decisions) 기반으로 계획 수립.
+UI-SPEC 필수 생성 규칙 적용.
 ```
 
-### Step 3: Phase 4 Execute + Verify
+### Step 2: Phase 5 Execute + Verify
+```
+/gsd:execute-phase 5 --auto
+3개 서브시스템: 군사자료관리(40), 주말버스예약(44), 직무기술서관리(47)
+총 131개 프로세스
+```
+
+### Step 3: Phase 6~7 순차 진행
 
 **주의사항:**
 - 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것.
-- **신규 규칙**: 모든 화면은 req_analysis.txt의 단위프로세스 설명에 있는 컬럼/입력값을 최대한 반영
-- **신규 규칙**: 모든 Phase에서 UI-SPEC 필수 생성 (자동수행의 예외)
-- 향후 Phase 5~7도 동일 규칙 적용
+- **규칙**: 모든 화면은 req_analysis.txt의 단위프로세스 설명의 컬럼/입력값 최대한 반영
+- **규칙**: 모든 Phase에서 UI-SPEC 필수 생성
 
 **현재 상태:**
 - Phase 0: 실행 완료 (프로젝트 기반, 공통 컴포넌트)
 - Phase 1: **실행 완료** + 검증 통과 (공통 기능 82개 프로세스)
 - Phase 2: **실행 완료** + 검증 통과 (메인 포탈)
-- Phase 3: **실행 완료** + 검증 통과 + **패치 계획 생성 완료** (31 GAP, 5 plans)
-  - 03-UI-SPEC.md 소급 생성, 03-06~10-PLAN.md 패치 계획 생성
-  - **패치 실행 대기**
-- Phase 4: **Plan 생성 완료** + **UI-SPEC 생성 완료** + **Plan 재수립 필요**
-  - 04-CONTEXT.md (27 decisions), 04-RESEARCH.md, 04-VALIDATION.md
-  - 04-UI-SPEC.md (26 테이블 + 14 폼 + 9 검색폼 + 8 차트 + 7 보고서)
-  - 04-01~05-PLAN.md 존재하나 UI-SPEC 반영 전이므로 재수립 필요
+- Phase 3: **실행 완료** + 검증 통과 + **패치 완료** (저복잡도 5개, 85개 프로세스)
+- Phase 4: **실행 완료** + 검증 통과 (중복잡도 A 6개, 176개 프로세스)
+- Phase 5: **Discuss 완료** → Plan 대기 (중복잡도 B 3개, 131개 프로세스)
+  - 05-CONTEXT.md (38 decisions), 05-DISCUSSION-LOG.md
+- Phase 6: 미착수 (고복잡도 2개, 158개 프로세스)
+- Phase 7: 미착수 (최고복잡도 2개, 214개 프로세스)
 
 **산출물 위치:**
-- `.planning/phases/03-5/03-UI-SPEC.md` — Phase 3 소급 UI-SPEC (31 GAP 포함)
-- `.planning/phases/03-5/03-06~10-PLAN.md` — Phase 3 패치 계획 5개
-- `.planning/phases/04-a-6/04-UI-SPEC.md` — Phase 4 UI-SPEC
-- `.planning/phases/04-a-6/04-RESEARCH.md` — Phase 4 리서치
-- `.planning/phases/04-a-6/04-01~05-PLAN.md` — Phase 4 계획 (재수립 필요)
+- `.planning/phases/05-b-3/05-CONTEXT.md` — Phase 5 구현 결정 38개
+- `.planning/phases/05-b-3/05-DISCUSSION-LOG.md` — Phase 5 토론 기록
 
 **GitHub:** https://github.com/lapiogga/navy-admin.git (master branch)
 
