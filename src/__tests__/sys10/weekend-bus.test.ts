@@ -184,3 +184,75 @@ describe('BusUsagePage 컴포넌트', () => {
     expect(content).toContain('usedSeats')
   })
 })
+
+describe('BusWaitlistPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusWaitlistPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('waitingNo 컬럼을 포함한다', () => {
+    expect(content).toContain('waitingNo')
+  })
+
+  it('auto-assign API를 포함한다', () => {
+    expect(content).toContain('auto-assign')
+  })
+
+  it('manual-assign API를 포함한다', () => {
+    expect(content).toContain('manual-assign')
+  })
+
+  it('StatusBadge를 사용한다', () => {
+    expect(content).toContain('StatusBadge')
+  })
+})
+
+describe('BusViolatorPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusViolatorPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('sanctionPeriod 필드를 포함한다', () => {
+    expect(content).toContain('sanctionPeriod')
+  })
+
+  it('RangePicker를 사용한다', () => {
+    expect(content).toContain('RangePicker')
+  })
+
+  it('violationType 필드를 포함한다', () => {
+    expect(content).toContain('violationType')
+  })
+
+  it('CrudForm 또는 Form을 사용한다', () => {
+    expect(content).toContain('Form')
+  })
+})
+
+describe('sys10 MSW 핸들러 - Task 1 확장', () => {
+  const content = readFileSync(resolve(HANDLERS_BASE, 'sys10.ts'), 'utf-8')
+
+  it('/api/sys10/waitlist 핸들러를 포함한다', () => {
+    expect(content).toContain('/api/sys10/waitlist')
+  })
+
+  it('/api/sys10/violators 핸들러를 포함한다', () => {
+    expect(content).toContain('/api/sys10/violators')
+  })
+})
+
+describe('sys10 index.tsx - BusWaitlistPage, BusViolatorPage 연결', () => {
+  const content = readFileSync(resolve(BASE, 'index.tsx'), 'utf-8')
+
+  it('BusWaitlistPage를 포함한다', () => {
+    expect(content).toContain('BusWaitlistPage')
+  })
+
+  it('BusViolatorPage를 포함한다', () => {
+    expect(content).toContain('BusViolatorPage')
+  })
+})

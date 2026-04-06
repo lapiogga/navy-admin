@@ -6,6 +6,8 @@ import { BusReservationStatusPage } from './BusReservationStatusPage'
 import { BusDispatchPage } from './BusDispatchPage'
 import { BusSchedulePage } from './BusSchedulePage'
 import { BusUsagePage } from './BusUsagePage'
+import { BusWaitlistPage } from './BusWaitlistPage'
+import { BusViolatorPage } from './BusViolatorPage'
 
 // 공통 게시판 lazy import (sysCode=sys10)
 const BoardListPage = lazy(() =>
@@ -47,8 +49,8 @@ export default function Page() {
         {/* /sys10/1/2 - 주말버스 예약 */}
         <Route path="1/2" element={<BusReservationPage />} />
 
-        {/* /sys10/1/3 - 대기자관리 (Plan 03에서 구현) */}
-        <Route path="1/3" element={<PlaceholderPage title="대기자관리 준비중" />} />
+        {/* /sys10/1/3 - 대기자관리 */}
+        <Route path="1/3" element={<BusWaitlistPage />} />
 
         {/* /sys10/1/4 - 예약현황 */}
         <Route path="1/4" element={<BusReservationStatusPage />} />
@@ -62,8 +64,8 @@ export default function Page() {
         {/* /sys10/1/7 - 사용현황 */}
         <Route path="1/7" element={<BusUsagePage />} />
 
-        {/* /sys10/1/8 - 위규자관리 (Plan 03에서 구현) */}
-        <Route path="1/8" element={<PlaceholderPage title="위규자관리 준비중" />} />
+        {/* /sys10/1/8 - 위규자관리 */}
+        <Route path="1/8" element={<BusViolatorPage />} />
 
         {/* /sys10/1/9 - 타군 사용자관리 (Plan 03에서 구현) */}
         <Route path="1/9" element={<PlaceholderPage title="타군 사용자관리 준비중" />} />
