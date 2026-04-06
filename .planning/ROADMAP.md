@@ -165,7 +165,7 @@ Plans:
 - [ ] 07-01-PLAN.md (W1) -- SYS03 기준정보관리4종 + 메인화면(Gauge+Bar+Bar) + 과제검색 + MSW
 - [x] 07-02-PLAN.md (W1) -- SYS15 비밀/매체/보안자재 3종(SecretMediaPage type prop) + 예고문 + 인계/인수 + MSW
 - [ ] 07-03-PLAN.md (W2, dep:07-01) -- SYS03 연간과제관리6종(과제등록/실적입력/승인Steps/평가/추진진도율Bar)
-- [ ] 07-04-PLAN.md (W2, dep:07-02) -- SYS15 보안일일결산6종(Checkbox체크리스트/Calendar메인/보안수준평가/결재) 
+- [x] 07-04-PLAN.md (W2, dep:07-02) -- SYS15 보안일일결산6종(Checkbox체크리스트/Calendar메인/보안수준평가/결재) 
 - [ ] 07-05-PLAN.md (W3, dep:07-03) -- SYS03 평가결과2종(Bar+Progress) + 게시판3(lazy) + 라우터완성
 - [ ] 07-06-PLAN.md (W3, dep:07-04) -- SYS15 종합현황4+관리자5(점검항목Tabs5/예외처리Tree3)+개인설정+게시판2+시스템2+라우터완성
 **UI hint**: yes
@@ -184,4 +184,4 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 4. 중복잡도 서브시스템 A 6개 | 4/6 | In Progress|  |
 | 5. 중복잡도 서브시스템 B 3개 | 5/5 | Complete   | 2026-04-06 |
 | 6. 고복잡도 서브시스템 2개 | 3/3 | Complete   | 2026-04-06 |
-| 7. 최고복잡도 서브시스템 2개 | 1/6 | In Progress|  |
+| 7. 최고복잡도 서브시스템 2개 | 3/6 | In Progress|  |
