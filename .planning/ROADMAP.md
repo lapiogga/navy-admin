@@ -111,7 +111,7 @@ Plans:
 Plans:
 - [ ] 04-01-PLAN.md (W1) -- SYS13 지식관리체계 (CRUD+추천/평점/댓글+통계Pie/Bar차트) + npm 의존성 설치(@ant-design/charts, @dnd-kit)
 - [ ] 04-02-PLAN.md (W1) -- SYS17 검열결과관리체계 (검열부대지정+검열계획+조치과제+결재Steps+추진현황Stacked Bar)
-- [ ] 04-03-PLAN.md (W1) -- SYS06 해병대규정관리체계 (sys05 페이지 재사용+공통게시판 재사용, 최소 신규 코드)
+- [x] 04-03-PLAN.md (W1) -- SYS06 해병대규정관리체계 (sys05 페이지 재사용+공통게시판 재사용, 최소 신규 코드)
 - [ ] 04-04-PLAN.md (W1) -- SYS02 설문종합관리체계 (문항편집기 dnd-kit+설문참여+결과분석Bar차트+체계관리)
 - [ ] 04-05-PLAN.md (W1) -- SYS12 지시건의사항관리체계 (지시/건의 추진현황+목록+CRUD+Timeline+관리자통계)
 - [ ] 04-06-PLAN.md (W1) -- SYS09 영현보훈체계 (CRUD 3종+현황차트 6종+보고서/확인서 7종 Print CSS)
@@ -164,7 +164,7 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. 공통 기능 (99_공통기능) | 4/4 | Complete   | 2026-04-05 |
 | 2. 메인 포탈 (00_포탈) | 2/2 | Complete   | 2026-04-05 |
 | 3. 저복잡도 서브시스템 5개 | 5/10 | GAP Closure | - |
-| 4. 중복잡도 서브시스템 A 6개 | 0/6 | Planned    | - |
+| 4. 중복잡도 서브시스템 A 6개 | 1/6 | In Progress|  |
 | 5. 중복잡도 서브시스템 B 3개 | 0/TBD | Not started | - |
 | 6. 고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
 | 7. 최고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
