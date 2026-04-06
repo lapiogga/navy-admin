@@ -209,6 +209,69 @@ describe('OrgDiagnosisPage', () => {
   })
 })
 
+describe('JobDescAdminPage', () => {
+  const content = readFileSync(resolve(BASE, 'JobDescAdminPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(120)
+  })
+
+  it('@ant-design/charts에서 Bar, Column, Pie를 import한다', () => {
+    expect(content).toContain('@ant-design/charts')
+    expect(content).toContain('Bar')
+    expect(content).toContain('Column')
+    expect(content).toContain('Pie')
+  })
+
+  it('검토결과 입력 기능을 포함한다', () => {
+    expect(content).toContain('reviewResult')
+    expect(content).toContain('검토결과 입력')
+  })
+
+  it('의견보내기 기능을 포함한다', () => {
+    expect(content).toContain('opinionContent')
+    expect(content).toContain('의견 보내기')
+  })
+
+  it('반송 기능을 포함한다', () => {
+    expect(content).toContain('returnReason')
+    expect(content).toContain('반송')
+  })
+
+  it('인쇄(출력) 기능을 포함한다', () => {
+    expect(content).toContain('인쇄')
+    expect(content).toContain('PrintableReport')
+  })
+})
+
+describe('sys18.ts 관리자/통계/표준업무시간 API', () => {
+  const content = readFileSync(resolve(HANDLERS_BASE, 'sys18.ts'), 'utf-8')
+
+  it('관리자 직무기술서 목록 API를 포함한다', () => {
+    expect(content).toContain('/api/sys18/job-descs/admin')
+  })
+
+  it('통계 API를 포함한다', () => {
+    expect(content).toContain('/api/sys18/stats')
+  })
+
+  it('검토결과 입력 API를 포함한다', () => {
+    expect(content).toContain('/review')
+  })
+
+  it('의견보내기 API를 포함한다', () => {
+    expect(content).toContain('/opinion')
+  })
+
+  it('반송 API를 포함한다', () => {
+    expect(content).toContain('/return')
+  })
+
+  it('표준업무시간 CRUD API를 포함한다', () => {
+    expect(content).toContain('/api/sys18/standard-work-hours')
+  })
+})
+
 describe('index.tsx 라우트 분기', () => {
   const content = readFileSync(resolve(BASE, 'index.tsx'), 'utf-8')
 

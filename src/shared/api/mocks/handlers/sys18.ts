@@ -199,6 +199,35 @@ function makeApprovalItem(i: number, jd: JobDesc): ApprovalItem {
   }
 }
 
+export type RankCategory = '장관' | '영관' | '부사관' | '원사' | '병'
+
+export interface StandardWorkHour extends Record<string, unknown> {
+  id: string
+  rankCategory: RankCategory
+  standardHours: number
+  periodStart: string
+  periodEnd: string
+}
+
+function makeStandardWorkHour(rankCategory: RankCategory, standardHours: number, periodStart: string, periodEnd: string): StandardWorkHour {
+  return {
+    id: `swh-${rankCategory}`,
+    rankCategory,
+    standardHours,
+    periodStart,
+    periodEnd,
+  }
+}
+
+// 표준업무시간 Mock 5건 (만료1, 적용중3, 예정1)
+let standardWorkHours: StandardWorkHour[] = [
+  makeStandardWorkHour('장관', 40, '2023-01-01', '2023-12-31'), // 만료
+  makeStandardWorkHour('영관', 42, '2024-01-01', '2026-12-31'), // 적용중
+  makeStandardWorkHour('부사관', 44, '2024-01-01', '2026-12-31'), // 적용중
+  makeStandardWorkHour('원사', 44, '2024-06-01', '2026-06-30'), // 적용중
+  makeStandardWorkHour('병', 40, '2027-01-01', '2027-12-31'), // 예정
+]
+
 // Mock 데이터 초기화
 let jobDescs: JobDesc[] = Array.from({ length: 20 }, (_, i) => makeJobDesc(i))
 let orgDiagnoses: OrgDiagnosis[] = Array.from({ length: 5 }, (_, i) => makeOrgDiagnosis(i))
@@ -400,6 +429,124 @@ export const sys18Handlers = [
   // 결재자 삭제
   http.delete('/api/sys18/approvers/:id', ({ params }) => {
     approvers = approvers.filter((a) => a.id !== params.id)
+    return HttpResponse.json({ success: true } as ApiResult<null>)
+  }),
+
+  // 관리자용 직무기술서 목록
+  http.get('/api/sys18/job-descs/admin', ({ request }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') ?? '0')
+    const size = parseInt(url.searchParams.get('size') ?? '10')
+    const type = url.searchParams.get('type')
+    const status = url.searchParams.get('status')
+    const keyword = url.searchParams.get('keyword')
+    const unit = url.searchParams.get('unit')
+    let filtered = [...jobDescs]
+    if (type) filtered = filtered.filter((j) => j.type === type)
+    if (status) filtered = filtered.filter((j) => j.status === status)
+    if (keyword) filtered = filtered.filter((j) => j.writerName.includes(keyword) || j.diagnosisName.includes(keyword))
+    if (unit) filtered = filtered.filter((j) => j.unit.includes(unit) || j.department.includes(unit))
+    const result: ApiResult<PageResponse<JobDesc>> = { success: true, data: paginate(filtered, page, size) }
+    return HttpResponse.json(result)
+  }),
+
+  // 검토결과 입력
+  http.put('/api/sys18/job-descs/:id/review', async ({ params, request }) => {
+    const body = await request.json() as { reviewResult: string; reviewComment: string }
+    jobDescs = jobDescs.map((j) =>
+      j.id === params.id ? { ...j, ...body } : j,
+    )
+    return HttpResponse.json({ success: true } as ApiResult<null>)
+  }),
+
+  // 의견보내기
+  http.post('/api/sys18/job-descs/:id/opinion', async ({ params, request }) => {
+    await request.json()
+    const exists = jobDescs.find((j) => j.id === params.id)
+    if (!exists) return HttpResponse.json({ success: false }, { status: 404 })
+    return HttpResponse.json({ success: true } as ApiResult<null>)
+  }),
+
+  // 반송
+  http.put('/api/sys18/job-descs/:id/return', async ({ params, request }) => {
+    const body = await request.json() as { returnReason: string }
+    jobDescs = jobDescs.map((j) =>
+      j.id === params.id ? { ...j, status: 'rejected' as const, returnReason: body.returnReason } : j,
+    )
+    return HttpResponse.json({ success: true } as ApiResult<null>)
+  }),
+
+  // 통계: 부대별 작성현황
+  http.get('/api/sys18/stats/by-unit', () => {
+    const unitStats = UNITS.map((unit) => {
+      const unitJds = jobDescs.filter((j) => j.unit === unit)
+      return {
+        unit,
+        completed: unitJds.filter((j) => j.status === 'completed').length,
+        inProgress: unitJds.filter((j) => ['submitted', 'approved_1st', 'draft'].includes(j.status)).length,
+        notStarted: faker.number.int({ min: 0, max: 5 }),
+      }
+    })
+    return HttpResponse.json({ success: true, data: unitStats } as ApiResult<typeof unitStats>)
+  }),
+
+  // 통계: 직급별 현황
+  http.get('/api/sys18/stats/by-rank', () => {
+    const rankStats = RANKS.map((rank) => ({
+      rank,
+      count: jobDescs.filter((j) => j.rank === rank).length,
+    }))
+    return HttpResponse.json({ success: true, data: rankStats } as ApiResult<typeof rankStats>)
+  }),
+
+  // 통계: 업무분류별 분포
+  http.get('/api/sys18/stats/by-task-type', () => {
+    const taskTypeMap: Record<string, number> = { '정책': 0, '관리': 0, '지원': 0, '기타': 0 }
+    jobDescs.forEach((jd) => {
+      jd.tasks.forEach((task) => {
+        if (taskTypeMap[task.taskType] !== undefined) {
+          taskTypeMap[task.taskType] = (taskTypeMap[task.taskType] ?? 0) + 1
+        }
+      })
+    })
+    const data = Object.entries(taskTypeMap).map(([taskType, count]) => ({ taskType, count }))
+    return HttpResponse.json({ success: true, data } as ApiResult<typeof data>)
+  }),
+
+  // 표준업무시간 목록 (CRUD용)
+  http.get('/api/sys18/standard-work-hours', ({ request }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') ?? '0')
+    const size = parseInt(url.searchParams.get('size') ?? '10')
+    const result: ApiResult<PageResponse<StandardWorkHour>> = { success: true, data: paginate(standardWorkHours, page, size) }
+    return HttpResponse.json(result)
+  }),
+
+  // 표준업무시간 등록
+  http.post('/api/sys18/standard-work-hours', async ({ request }) => {
+    const body = await request.json() as Partial<StandardWorkHour>
+    const newItem: StandardWorkHour = {
+      id: `swh-${Date.now()}`,
+      rankCategory: body.rankCategory ?? '병',
+      standardHours: body.standardHours ?? 40,
+      periodStart: body.periodStart ?? new Date().toISOString().split('T')[0],
+      periodEnd: body.periodEnd ?? new Date().toISOString().split('T')[0],
+    }
+    standardWorkHours = [newItem, ...standardWorkHours]
+    return HttpResponse.json({ success: true, data: newItem } as ApiResult<StandardWorkHour>)
+  }),
+
+  // 표준업무시간 수정
+  http.put('/api/sys18/standard-work-hours/:id', async ({ params, request }) => {
+    const body = await request.json() as Partial<StandardWorkHour>
+    standardWorkHours = standardWorkHours.map((s) => s.id === params.id ? { ...s, ...body } : s)
+    const updated = standardWorkHours.find((s) => s.id === params.id)
+    return HttpResponse.json({ success: true, data: updated } as ApiResult<StandardWorkHour>)
+  }),
+
+  // 표준업무시간 삭제
+  http.delete('/api/sys18/standard-work-hours/:id', ({ params }) => {
+    standardWorkHours = standardWorkHours.filter((s) => s.id !== params.id)
     return HttpResponse.json({ success: true } as ApiResult<null>)
   }),
 ]
