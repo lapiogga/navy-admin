@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 04-a-6-03-PLAN.md
-last_updated: "2026-04-06T03:09:15.701Z"
+stopped_at: Completed 04-a-6-05-PLAN.md (SYS12 지시건의사항관리체계)
+last_updated: "2026-04-06T03:14:31.943Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 8
   completed_phases: 3
   total_plans: 25
-  completed_plans: 15
+  completed_plans: 17
   percent: 12
 ---
 
@@ -26,7 +26,7 @@ See: .planning/PROJECT.md (updated 2026-04-06)
 ## Current Position
 
 Phase: 04 (a-6) — EXECUTING
-Plan: 2 of 6
+Plan: 4 of 6
 Status: Ready to execute
 Last activity: 2026-04-06
 
@@ -64,6 +64,8 @@ Progress: [█░░░░░░░░░] 12%
 | Phase 03-5 P05 | 11min 39sec | 3 tasks | 9 files |
 | Phase 03-5 P03 | 14 | 2 tasks | 7 files |
 | Phase 04-a-6 P03 | 5 | 2 tasks | 4 files |
+| Phase 04-a-6 P06 | 15 | 3 tasks | 22 files |
+| Phase 04-a-6 P05 | 9 | 2 tasks | 8 files |
 
 ## Accumulated Context
 
@@ -95,6 +97,9 @@ Recent decisions affecting current work:
 - [Phase 03-5]: 회의실 관리 Tabs 4개 구조: 기본정보/시간대설정/장비관리/사진관리 — 단일 페이지 통합 관리
 - [Phase 03-5]: 추천/신고를 독립 useMutation으로 구현 — 상세 Modal 내 버튼에서 별개 API 호출
 - [Phase 04-a-6]: sys06 index.tsx는 sys05 페이지를 직접 import하여 래퍼로 재사용 — sysCode prop 확장은 백엔드 연동 시 수행
+- [Phase 04-a-6]: PrintableReport 공통 래퍼 + print.css로 7종 보고서/확인서 인쇄 통일
+- [Phase 04-a-6]: HONOR-17 게시판은 Phase 1 공통게시판 lazy 재사용 (sysCode=sys09)
+- [Phase 04-a-6]: 지시/건의 대칭 구조: DirectiveX/ProposalX 쌍으로 코드 재사용 극대화
 
 ### Pending Todos
 
@@ -108,7 +113,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-06T03:09:15.693Z
-Stopped at: Completed 04-a-6-03-PLAN.md
+Last session: 2026-04-06T03:14:31.930Z
+Stopped at: Completed 04-a-6-05-PLAN.md (SYS12 지시건의사항관리체계)
 Resume command: /gsd:discuss-phase 4 --auto
 Resume file: None
