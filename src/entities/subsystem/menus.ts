@@ -254,6 +254,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '해기단자료', path: '/sys07/2/1' },
       ],
     },
+    {
+      name: '관리자',
+      path: '/sys07/3',
+      children: [
+        { name: '코드관리', path: '/sys07/3/1' },
+        { name: '권한관리', path: '/sys07/3/2' },
+      ],
+    },
   ],
   sys08: [
     {
@@ -367,6 +375,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '주말버스 사용현황', path: '/sys10/1/7' },
         { name: '주말버스 위규자관리', path: '/sys10/1/8' },
         { name: '타군 사용자 관리', path: '/sys10/1/9' },
+      ],
+    },
+    {
+      name: '관리자',
+      path: '/sys10/2',
+      children: [
+        { name: '코드관리', path: '/sys10/2/1' },
+        { name: '권한관리', path: '/sys10/2/2' },
       ],
     },
   ],
@@ -631,7 +647,7 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
+      name: '관리자',
       path: '/sys18/2',
       children: [
         { name: '공통코드관리', path: '/sys18/2/1' },

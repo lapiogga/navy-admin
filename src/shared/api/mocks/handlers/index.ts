@@ -6,6 +6,7 @@ import { sys02Handlers } from './sys02'
 import { sys04Handlers } from './sys04'
 import { sys05Handlers } from './sys05'
 import { sys06Handlers } from './sys06'
+import { sys07Handlers } from './sys07'
 import { sys09Handlers } from './sys09'
 import { sys11Handlers } from './sys11'
 import { sys12Handlers } from './sys12'
@@ -13,5 +14,7 @@ import { sys13Handlers } from './sys13'
 import { sys14Handlers } from './sys14'
 import { sys16Handlers } from './sys16'
 import { sys17Handlers } from './sys17'
+import { sys10Handlers } from './sys10'
+import { sys18Handlers } from './sys18'
 
-export const handlers = [...authHandlers, ...demoHandlers, ...commonHandlers, ...announcementHandlers, ...sys02Handlers, ...sys04Handlers, ...sys05Handlers, ...sys06Handlers, ...sys09Handlers, ...sys11Handlers, ...sys12Handlers, ...sys13Handlers, ...sys14Handlers, ...sys16Handlers, ...sys17Handlers]
+export const handlers = [...authHandlers, ...demoHandlers, ...commonHandlers, ...announcementHandlers, ...sys02Handlers, ...sys04Handlers, ...sys05Handlers, ...sys06Handlers, ...sys07Handlers, ...sys09Handlers, ...sys10Handlers, ...sys11Handlers, ...sys12Handlers, ...sys13Handlers, ...sys14Handlers, ...sys16Handlers, ...sys17Handlers, ...sys18Handlers]
