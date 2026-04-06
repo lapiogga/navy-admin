@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 06-2-01-PLAN.md (SYS08 부대계보관리체계 59개)
-last_updated: "2026-04-06T08:30:08.044Z"
+stopped_at: Completed 06-2-03-PLAN.md (SYS01 초과근무관리체계 99개)
+last_updated: "2026-04-06T08:43:54.695Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 8
-  completed_phases: 5
+  completed_phases: 6
   total_plans: 33
-  completed_plans: 27
+  completed_plans: 28
   percent: 63
 ---
 
@@ -73,6 +73,7 @@ Progress: [██████░░░░] 63%
 | Phase 05-b-3 P05 | 6 | 2 tasks | 5 files |
 | Phase 06-2 P02 | 664 | 2 tasks | 13 files |
 | Phase 06-2 P01 | 13 | 2 tasks | 16 files |
+| Phase 06-2 P03 | 30 | 2 tasks | 14 files |
 
 ## Accumulated Context
 
@@ -114,6 +115,7 @@ Recent decisions affecting current work:
 - [Phase 05-b-3]: CodeManagementPage를 CodeGroupPage 대신 사용 — 독립 실행 가능한 부모 래퍼 선택
 - [Phase 06-2]: SYS08 Tree Master-Detail: antd Tree(좌측 Card) + DataTable(우측) selectedUnit queryKey 연동 패턴 확립
 - [Phase 06-2]: Upload.Dragger + FileReader.readAsDataURL: beforeUpload에서 Base64 변환, return false로 자동업로드 방지
+- [Phase 06-2]: antd Calendar onPanelChange 월 네비게이션 / onSelect 날짜 클릭 분리 (Pitfall 2 대응)
 
 ### Pending Todos
 
@@ -127,7 +129,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-06T08:30:08.027Z
-Stopped at: Completed 06-2-01-PLAN.md (SYS08 부대계보관리체계 59개)
+Last session: 2026-04-06T08:43:44.039Z
+Stopped at: Completed 06-2-03-PLAN.md (SYS01 초과근무관리체계 99개)
 Resume command: /gsd:discuss-phase 6
 Resume file: None
