@@ -58,7 +58,7 @@ export function MenuPermissionPage() {
       if (!selectedGroupId) return null
       const res = await menuPermissionApi.getByGroup(selectedGroupId)
       // apiClient interceptor가 response.data를 추출하므로 res는 ApiResult 또는 배열일 수 있음
-      const perms = (res as { data?: { menuPath: string }[] }).data ?? (res as { menuPath: string }[])
+      const perms = (res as { data?: { menuPath: string }[] }).data ?? (res as unknown as { menuPath: string }[])
       const paths = Array.isArray(perms) ? perms.map((p) => p.menuPath) : []
       setCheckedKeys(paths)
       return perms
@@ -145,7 +145,7 @@ export function MenuPermissionPage() {
               <Tree
                 checkable
                 checkStrictly={false}
-                defaultExpandDepth={1}
+                defaultExpandAll={false}
                 treeData={treeData}
                 checkedKeys={checkedKeys}
                 onCheck={handleCheck}

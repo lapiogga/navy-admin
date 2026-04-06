@@ -21,7 +21,7 @@ describe('useAuthStore', () => {
 
   it('logout 호출 시 인증 상태가 초기화된다', () => {
     useAuthStore.setState({
-      user: { id: '1', name: '홍길동', rank: '대위', unit: '해병대사령부', username: 'admin', roles: ['ADMIN'] },
+      user: { id: '1', name: '홍길동', rank: '대위', unit: '해군본부', username: 'admin', roles: ['ADMIN'] },
       token: 'test-token',
       isAuthenticated: true,
       sessionExpiry: Date.now() + 1800000,
@@ -52,7 +52,7 @@ describe('useAuthStore', () => {
 
   it('checkSession: 세션이 만료되면 false를 반환하고 로그아웃된다', () => {
     useAuthStore.setState({
-      user: { id: '1', name: '홍길동', rank: '대위', unit: '해병대사령부', username: 'admin', roles: ['ADMIN'] },
+      user: { id: '1', name: '홍길동', rank: '대위', unit: '해군본부', username: 'admin', roles: ['ADMIN'] },
       token: 'test-token',
       isAuthenticated: true,
       sessionExpiry: Date.now() - 1000, // 이미 만료됨

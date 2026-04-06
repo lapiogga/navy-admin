@@ -171,7 +171,7 @@ export function CodeListPanel({ groupId, groupCode }: CodeListPanelProps) {
         <CrudForm<Record<string, unknown>>
           fields={formFields}
           onFinish={handleFinish}
-          initialValues={editTarget ?? undefined}
+          initialValues={(editTarget as unknown as Partial<Record<string, unknown>>) ?? undefined}
           mode={editTarget ? 'edit' : 'create'}
         />
       </Modal>

@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
 import { Select, Button, Modal, Space, Table, Input, message } from 'antd'
+import type { InputRef } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
@@ -9,7 +10,7 @@ import type { DetailField } from '@/shared/ui'
 import { permissionGroupApi, groupUserApi } from '@/entities/permission/api'
 import { apiClient } from '@/shared/api/client'
 import type { GroupUser } from '@/entities/permission/types'
-import type { PageResponse, ApiResult } from '@/shared/api/types'
+import type { PageResponse } from '@/shared/api/types'
 
 interface GroupUserRecord extends GroupUser, Record<string, unknown> {}
 
@@ -36,7 +37,7 @@ export function GroupUserPage() {
   const [detailRecord, setDetailRecord] = useState<GroupUserRecord | null>(null)
   const [userSearchKeyword, setUserSearchKeyword] = useState('')
   const [selectedUserIds, setSelectedUserIds] = useState<string[]>([])
-  const searchInputRef = useRef<HTMLInputElement>(null)
+  const searchInputRef = useRef<InputRef>(null)
 
   const { data: groupsData, isLoading: groupsLoading } = useQuery({
     queryKey: ['permission-groups', 'all'],
@@ -46,11 +47,11 @@ export function GroupUserPage() {
   const { data: allUsersData, isLoading: usersLoading } = useQuery({
     queryKey: ['all-users', userSearchKeyword],
     queryFn: async () => {
-      const res = await apiClient.get<unknown, ApiResult<PageResponse<AllUserItem>>>(
+      const res = await apiClient.get(
         '/common/users',
         { params: { page: 0, size: 50, keyword: userSearchKeyword } },
       )
-      const data = (res as { data?: PageResponse<AllUserItem> }).data ?? (res as PageResponse<AllUserItem>)
+      const data = (res as { data?: PageResponse<AllUserItem> }).data ?? (res as unknown as PageResponse<AllUserItem>)
       return data
     },
     enabled: addModalOpen,
@@ -86,7 +87,7 @@ export function GroupUserPage() {
       title: '삭제 확인',
       content: '선택한 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다',
       danger: true,
-      onConfirm: () => removeMutation.mutateAsync(record.userId),
+      onConfirm: async () => { await removeMutation.mutateAsync(record.userId) },
     })
   }
 
@@ -152,7 +153,7 @@ export function GroupUserPage() {
         <DataTable<GroupUserRecord>
           columns={columns}
           rowKey="id"
-          request={(params) => groupUserApi.list(selectedGroupId, params)}
+          request={(params) => groupUserApi.list(selectedGroupId, params) as Promise<PageResponse<GroupUserRecord>>}
           headerTitle="배정된 사용자"
           onRow={(record) => ({
             onClick: () => {
@@ -187,7 +188,7 @@ export function GroupUserPage() {
       >
         <div style={{ marginBottom: 8 }}>
           <Input.Search
-            ref={searchInputRef as React.RefObject<HTMLInputElement>}
+            ref={searchInputRef}
             placeholder="이름, 부대, 계급 검색"
             allowClear
             onSearch={(val) => setUserSearchKeyword(val)}

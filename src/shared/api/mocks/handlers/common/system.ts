@@ -5,7 +5,7 @@ import type { PageResponse, ApiResult } from '@/shared/api/types'
 // ===== 공통 =====
 
 const RANKS = ['중위', '대위', '소령', '중령', '대령', '준위', '원사', '상사', '중사', '하사']
-const UNITS = ['해군본부', '1함대', '2함대', '3함대', '교육사령부', '해병대사령부', '1사단', '2사단']
+void ['해군본부', '1함대', '2함대', '3함대', '교육사령부', '해병대사령부', '1사단', '2사단']
 const SUBSYSTEM_CODES = ['SYS01', 'SYS02', 'SYS03', 'SYS04', 'SYS05', 'SYS06', 'SYS07', 'SYS08', 'SYS09', 'SYS10']
 
 // ===== 체계담당자 (COM-01) =====
@@ -214,12 +214,12 @@ export const systemHandlers = [
 
   http.post('/api/common/system-managers', async ({ request }) => {
     const body = await request.json() as Omit<SystemManager, 'id' | 'createdAt' | 'updatedAt'>
-    const newManager: SystemManager = {
+    const newManager = {
       id: faker.string.uuid(),
       ...body,
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
-    }
+    } as SystemManager
     mockManagers = [newManager, ...mockManagers]
     return HttpResponse.json({ success: true, data: newManager, message: '등록되었습니다' } satisfies ApiResult<SystemManager>, { status: 201 })
   }),
@@ -252,7 +252,7 @@ export const systemHandlers = [
 
   http.post('/api/common/menus', async ({ request }) => {
     const body = await request.json() as Omit<MenuItem, 'id'>
-    const newMenu: MenuItem = { id: faker.string.uuid(), ...body }
+    const newMenu: MenuItem = { id: faker.string.uuid(), ...body } as MenuItem
     mockMenus = [...mockMenus, newMenu]
     return HttpResponse.json({ success: true, data: newMenu, message: '등록되었습니다' } satisfies ApiResult<MenuItem>, { status: 201 })
   }),
@@ -307,12 +307,12 @@ export const systemHandlers = [
 
   http.post('/api/common/messages', async ({ request }) => {
     const body = await request.json() as Omit<MessageItem, 'id' | 'createdAt' | 'updatedAt'>
-    const newMsg: MessageItem = {
+    const newMsg = {
       id: faker.string.uuid(),
       ...body,
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
-    }
+    } as MessageItem
     mockMessages = [newMsg, ...mockMessages]
     return HttpResponse.json({ success: true, data: newMsg, message: '등록되었습니다' } satisfies ApiResult<MessageItem>, { status: 201 })
   }),

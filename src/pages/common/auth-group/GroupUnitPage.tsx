@@ -7,6 +7,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import { permissionGroupApi, groupUnitApi } from '@/entities/permission/api'
 import type { GroupUnit } from '@/entities/permission/types'
+import type { PageResponse } from '@/shared/api/types'
 
 interface GroupUnitRecord extends GroupUnit, Record<string, unknown> {}
 
@@ -54,7 +55,7 @@ export function GroupUnitPage() {
       title: '삭제 확인',
       content: '선택한 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다',
       danger: true,
-      onConfirm: () => removeMutation.mutateAsync(record.id),
+      onConfirm: async () => { await removeMutation.mutateAsync(record.id) },
     })
   }
 
@@ -116,7 +117,7 @@ export function GroupUnitPage() {
         <DataTable<GroupUnitRecord>
           columns={columns}
           rowKey="id"
-          request={(params) => groupUnitApi.list(selectedGroupId, params)}
+          request={(params) => groupUnitApi.list(selectedGroupId, params) as Promise<PageResponse<GroupUnitRecord>>}
           headerTitle="배정된 부대"
         />
       )}

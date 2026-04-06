@@ -106,7 +106,7 @@ export function BoardCategoryPage({ boardId }: BoardCategoryPageProps) {
       title: '삭제 확인',
       content: '선택한 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다',
       danger: true,
-      onConfirm: () => deleteMutation.mutateAsync(record.id),
+      onConfirm: async () => { await deleteMutation.mutateAsync(record.id) },
     })
   }
 

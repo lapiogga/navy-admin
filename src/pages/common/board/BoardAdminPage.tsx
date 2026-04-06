@@ -8,7 +8,7 @@ import { DataTable, showConfirmDialog } from '@/shared/ui'
 import { boardAdminApi } from '@/entities/board/api'
 import { apiClient } from '@/shared/api/client'
 import type { BoardAdmin } from '@/entities/board/types'
-import type { PageResponse, ApiResult } from '@/shared/api/types'
+import type { PageResponse } from '@/shared/api/types'
 
 interface BoardAdminRecord extends BoardAdmin, Record<string, unknown> {}
 
@@ -41,11 +41,11 @@ export function BoardAdminPage({ boardId }: BoardAdminPageProps) {
   const { data: allUsersData, isLoading: usersLoading } = useQuery({
     queryKey: ['all-users', userSearchKeyword],
     queryFn: async () => {
-      const res = await apiClient.get<unknown, ApiResult<PageResponse<AllUserItem>>>(
+      const res = await apiClient.get(
         '/common/users',
         { params: { page: 0, size: 50, keyword: userSearchKeyword } },
       )
-      const data = (res as { data?: PageResponse<AllUserItem> }).data ?? (res as PageResponse<AllUserItem>)
+      const data = (res as { data?: PageResponse<AllUserItem> }).data ?? (res as unknown as PageResponse<AllUserItem>)
       return data
     },
     enabled: addModalOpen,
@@ -82,7 +82,7 @@ export function BoardAdminPage({ boardId }: BoardAdminPageProps) {
       title: '삭제 확인',
       content: '선택한 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다',
       danger: true,
-      onConfirm: () => removeMutation.mutateAsync(record.id),
+      onConfirm: async () => { await removeMutation.mutateAsync(record.id) },
     })
   }
 

@@ -1,4 +1,4 @@
-# URL Convention (해병대 행정포탈)
+# URL Convention (해군 행정포탈)
 
 ## 기본 경로
 

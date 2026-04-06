@@ -18,7 +18,7 @@ function generateDemoItems(count: number): DemoItem[] {
     author: faker.person.fullName(),
     status: faker.helpers.arrayElement(['승인', '반려', '대기', '완료', '진행']),
     createdAt: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
-    unit: faker.helpers.arrayElement(['해병대사령부', '1사단', '2사단', '교육훈련단']),
+    unit: faker.helpers.arrayElement(['해군본부', '1함대', '2함대', '교육사령부']),
   }))
 }
 

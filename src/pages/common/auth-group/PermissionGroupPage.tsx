@@ -7,6 +7,7 @@ import type { CrudFormField } from '@/shared/ui'
 import type { ProColumns } from '@ant-design/pro-components'
 import { permissionGroupApi } from '@/entities/permission/api'
 import type { PermissionGroup } from '@/entities/permission/types'
+import type { PageResponse } from '@/shared/api/types'
 
 interface PermissionGroupRecord extends PermissionGroup, Record<string, unknown> {}
 
@@ -21,7 +22,7 @@ export function PermissionGroupPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<PermissionGroup | null>(null)
 
-  const { refetch } = useQuery({
+  const { refetch: _refetch } = useQuery({
     queryKey: ['permission-groups'],
     queryFn: () => permissionGroupApi.list({ page: 0, size: 100 }),
     enabled: false,
@@ -123,7 +124,7 @@ export function PermissionGroupPage() {
       <DataTable<PermissionGroupRecord>
         columns={columns}
         rowKey="id"
-        request={(params) => permissionGroupApi.list(params)}
+        request={(params) => permissionGroupApi.list(params) as Promise<PageResponse<PermissionGroupRecord>>}
         toolBarRender={() => [
           <Button
             key="add"

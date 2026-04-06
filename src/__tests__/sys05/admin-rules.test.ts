@@ -4,6 +4,7 @@ import { describe, it, expect } from 'vitest'
 
 const BASE = resolve(__dirname, '../../pages/sys05-admin-rules')
 const HANDLERS = resolve(__dirname, '../../shared/api/mocks/handlers/sys05.ts')
+const HANDLERS_BASE = resolve(__dirname, '../../shared/api/mocks/handlers')
 const INDEX = resolve(BASE, 'index.tsx')
 
 function read(filePath: string): string {
@@ -47,12 +48,12 @@ describe('sys05 행정규칙포탈체계', () => {
   describe('PrecedentUnitPage.tsx', () => {
     const content = read(resolve(BASE, 'PrecedentUnitPage.tsx'))
 
-    it('DataTable 컴포넌트 사용', () => {
-      expect(content).toContain('DataTable')
+    it('Card 레이아웃 사용 (G10 패치)', () => {
+      expect(content).toContain('Card')
     })
 
-    it('/api/sys05/precedents/unit 엔드포인트 사용', () => {
-      expect(content).toContain('precedents/unit')
+    it('부대별 카드 링크가 존재한다 (G10 패치)', () => {
+      expect(content).toMatch(/1사단|2사단|교육훈련단/)
     })
   })
 
@@ -118,6 +119,103 @@ describe('sys05 행정규칙포탈체계', () => {
 
     it('Navigate to="/sys05/1/1" 포함', () => {
       expect(content).toContain('/sys05/1/1')
+    })
+  })
+
+  // GAP 패치 테스트 (G06-G10)
+  describe('RegulationListPage GAP 패치', () => {
+    const content = read(resolve(BASE, 'RegulationListPage.tsx'))
+
+    it('G06: CrudForm으로 등록/수정 기능이 존재한다', () => {
+      expect(content).toContain('CrudForm')
+    })
+
+    it('G06: 분류 컬럼이 존재한다', () => {
+      expect(content).toContain('category')
+    })
+
+    it('G06: 등록 버튼이 존재한다', () => {
+      expect(content).toMatch(/규정 등록|등록/)
+    })
+
+    it('G09: 조직도 트리가 존재한다', () => {
+      expect(content).toContain('Tree')
+    })
+
+    it('G09: 조직도 트리 데이터가 존재한다', () => {
+      expect(content).toContain('ORG_TREE_DATA')
+    })
+
+    it('G06: POST 요청이 존재한다', () => {
+      expect(content).toContain("method: 'POST'")
+    })
+
+    it('G06: 소관부서 컬럼이 존재한다', () => {
+      expect(content).toContain('소관부서')
+    })
+  })
+
+  describe('PrecedentHQPage GAP 패치', () => {
+    const content = read(resolve(BASE, 'PrecedentHQPage.tsx'))
+
+    it('G07: CrudForm으로 등록/수정 기능이 존재한다', () => {
+      expect(content).toContain('CrudForm')
+    })
+
+    it('G07: 등록 버튼이 존재한다', () => {
+      expect(content).toMatch(/예규 등록|등록/)
+    })
+
+    it('G07: POST 요청이 존재한다', () => {
+      expect(content).toContain("method: 'POST'")
+    })
+  })
+
+  describe('DirectiveListPage GAP 패치', () => {
+    const content = read(resolve(BASE, 'DirectiveListPage.tsx'))
+
+    it('G08: CrudForm으로 등록/수정 기능이 존재한다', () => {
+      expect(content).toContain('CrudForm')
+    })
+
+    it('G08: 등록 버튼이 존재한다', () => {
+      expect(content).toMatch(/지시문서 등록|등록/)
+    })
+
+    it('G08: POST 요청이 존재한다', () => {
+      expect(content).toContain("method: 'POST'")
+    })
+  })
+
+  describe('PrecedentUnitPage GAP 패치', () => {
+    const content = read(resolve(BASE, 'PrecedentUnitPage.tsx'))
+
+    it('G10: Card 레이아웃으로 변환되었다', () => {
+      expect(content).toContain('Card')
+    })
+
+    it('G10: 부대 링크가 존재한다', () => {
+      expect(content).toMatch(/1사단|2사단|교육훈련단/)
+    })
+
+    it('G10: DataTable이 제거되었다', () => {
+      expect(content).not.toContain('DataTable')
+    })
+  })
+
+  describe('sys05 MSW 핸들러 GAP 패치', () => {
+    const content = read(resolve(HANDLERS_BASE, 'sys05.ts'))
+
+    it('POST 핸들러가 존재한다', () => {
+      expect(content).toContain('http.post')
+    })
+
+    it('PUT 핸들러가 존재한다', () => {
+      expect(content).toContain('http.put')
+    })
+
+    it('DELETE 핸들러가 존재한다', () => {
+      expect(content).toContain('http.delete')
     })
   })
 })

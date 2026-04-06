@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Button, Modal, message, Space } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
-import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
+import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import type { ProColumns } from '@ant-design/pro-components'

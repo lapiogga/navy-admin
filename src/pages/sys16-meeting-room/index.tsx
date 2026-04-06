@@ -7,9 +7,10 @@ import MeetingStatusPage from './MeetingStatusPage'
 import ReservationMgmtPage from './ReservationMgmtPage'
 import MeetingRoomMgmtPage from './MeetingRoomMgmtPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (ROOM-06, ROOM-07)
+// 공통 기능 Phase 1 페이지 재사용 (ROOM-06, ROOM-07, ROOM-08)
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
+const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
 export default function Sys16Page() {
   return (
@@ -48,6 +49,16 @@ export default function Sys16Page() {
         element={
           <Suspense fallback={<PageSpinner />}>
             <CodeMgmtIndex />
+          </Suspense>
+        }
+      />
+
+      {/* 사용자별권한등록 (공통 페이지 재사용 - ROOM-08) */}
+      <Route
+        path="2/2"
+        element={
+          <Suspense fallback={<PageSpinner />}>
+            <AuthGroupIndex />
           </Suspense>
         }
       />

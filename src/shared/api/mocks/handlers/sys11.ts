@@ -13,6 +13,9 @@ interface ResearchItem {
   fileName: string
   downloadCount: number
   viewCount: number
+  researchYear: number
+  budget: number
+  progressStatus: string
   createdAt: string
   updatedAt: string
 }
@@ -36,6 +39,8 @@ const categories: ResearchCategory[] = [
 
 const CATEGORY_NAMES = ['전략연구', '작전연구', '교육훈련', '인사관리', '군수지원', '기타']
 
+const PROGRESS_STATUSES = ['최초평가', '중간평가', '최종평가']
+
 // Mock 연구자료 데이터 (30건)
 const researchItems: ResearchItem[] = Array.from({ length: 30 }, (_, i) => {
   const category = CATEGORY_NAMES[i % CATEGORY_NAMES.length]
@@ -51,6 +56,9 @@ const researchItems: ResearchItem[] = Array.from({ length: 30 }, (_, i) => {
     fileName: `연구자료_${i + 1}.pdf`,
     downloadCount: faker.number.int({ min: 0, max: 200 }),
     viewCount: faker.number.int({ min: 10, max: 500 }),
+    researchYear: faker.number.int({ min: 2020, max: 2026 }),
+    budget: faker.number.int({ min: 1000000, max: 100000000 }),
+    progressStatus: faker.helpers.arrayElement(PROGRESS_STATUSES),
     createdAt,
     updatedAt: createdAt,
   }
@@ -77,6 +85,7 @@ export const sys11Handlers = [
     const size = parseInt(url.searchParams.get('size') || '10')
     const keyword = url.searchParams.get('keyword') || ''
     const category = url.searchParams.get('category') || ''
+    const progressStatus = url.searchParams.get('progressStatus') || ''
 
     let filtered = [...researchItems]
     if (keyword) {
@@ -89,6 +98,9 @@ export const sys11Handlers = [
     }
     if (category) {
       filtered = filtered.filter((item) => item.category === category)
+    }
+    if (progressStatus) {
+      filtered = filtered.filter((item) => item.progressStatus === progressStatus)
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
@@ -152,6 +164,9 @@ export const sys11Handlers = [
       fileName: `연구자료_${Date.now()}.pdf`,
       downloadCount: 0,
       viewCount: 0,
+      researchYear: (body.researchYear as number) || new Date().getFullYear(),
+      budget: (body.budget as number) || 0,
+      progressStatus: (body.progressStatus as string) || '최초평가',
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
     }
@@ -202,6 +217,38 @@ export const sys11Handlers = [
     const index = categories.findIndex((c) => c.id === params.id)
     if (index !== -1) categories.splice(index, 1)
     return HttpResponse.json({ success: true, data: null })
+  }),
+
+  // 카테고리별 통계 (년도별)
+  http.get('/api/sys11/stats', ({ request }) => {
+    const url = new URL(request.url)
+    void url.searchParams.get('year')
+    const stats = CATEGORY_NAMES.map((cat) => ({
+      category: cat,
+      totalCount: faker.number.int({ min: 5, max: 30 }),
+      totalBudget: faker.number.int({ min: 10000000, max: 500000000 }),
+    }))
+    return HttpResponse.json({ success: true, data: stats })
+  }),
+
+  // 다운로드 이력
+  http.get('/api/sys11/download-history', ({ request }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') || '0')
+    const size = parseInt(url.searchParams.get('size') || '10')
+    const boardType = url.searchParams.get('boardType') || ''
+    const items = Array.from({ length: 30 }, (_, i) => ({
+      id: `dl-${i + 1}`,
+      downloaderName: faker.person.lastName() + faker.person.firstName(),
+      downloaderUnit: faker.helpers.arrayElement(['1사단', '2사단', '해병대사령부']),
+      fileName: faker.system.fileName(),
+      downloadedAt: faker.date.recent({ days: 60 }).toISOString().split('T')[0],
+      boardType: faker.helpers.arrayElement(['연구자료', '자료실']),
+    }))
+    const filtered = boardType
+      ? items.filter((item) => item.boardType === boardType)
+      : items
+    return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
 
   // 자료실 목록 (research와 동일 데이터, 파일 다운로드 중심)

@@ -1,18 +1,19 @@
 import { useState } from 'react'
-import { Modal, Button, Input, Popconfirm, Tag, Space, message } from 'antd'
+import { Modal, Button, Input, Popconfirm, Tag, Space, Tabs, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
-interface Suggestion {
+interface Suggestion extends Record<string, unknown> {
   id: string
   title: string
   authorName: string
   authorUnit: string
-  status: 'open' | 'answered' | 'closed'
+  status: 'registered' | 'received' | 'processing' | 'completed' | 'rejected'
   isPrivate: boolean
   recommendCount: number
   reportCount: number
@@ -23,8 +24,28 @@ interface Suggestion {
   updatedAt: string
 }
 
-const STATUS_COLOR_MAP = { open: 'cyan', answered: 'green', closed: 'default' }
-const STATUS_LABEL_MAP = { open: '대기', answered: '답변완료', closed: '종료' }
+// G25: 서식 타입
+interface Template extends Record<string, unknown> {
+  id: string
+  name: string
+  content: string
+  createdAt: string
+}
+
+const STATUS_COLOR_MAP: Record<string, string> = {
+  registered: 'blue',
+  received: 'cyan',
+  processing: 'orange',
+  completed: 'green',
+  rejected: 'red',
+}
+const STATUS_LABEL_MAP: Record<string, string> = {
+  registered: '등록',
+  received: '접수',
+  processing: '진행',
+  completed: '완료',
+  rejected: '반려',
+}
 
 async function fetchSuggestions(params: PageRequest): Promise<PageResponse<Suggestion>> {
   const qs = new URLSearchParams({
@@ -34,6 +55,150 @@ async function fetchSuggestions(params: PageRequest): Promise<PageResponse<Sugge
   const res = await fetch(`/api/sys14/suggestions?${qs}`)
   const json: ApiResult<PageResponse<Suggestion>> = await res.json()
   return json.data
+}
+
+// G25: 서식 목록 조회
+async function fetchTemplates(): Promise<PageResponse<Template>> {
+  const res = await fetch('/api/sys14/templates')
+  const json: ApiResult<PageResponse<Template>> = await res.json()
+  return json.data
+}
+
+// G25: 서식관리 컴포넌트
+function TemplateManager() {
+  const [formOpen, setFormOpen] = useState(false)
+  const [editTarget, setEditTarget] = useState<Template | null>(null)
+
+  const queryClient = useQueryClient()
+
+  const TEMPLATE_FIELDS = [
+    { name: 'name', label: '서식명', type: 'text' as const, required: true },
+    { name: 'content', label: '서식 내용', type: 'textarea' as const, required: true },
+  ]
+
+  const createTemplateMutation = useMutation({
+    mutationFn: async (values: { name: string; content: string }) => {
+      const res = await fetch('/api/sys14/templates', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
+      return res.json()
+    },
+    onSuccess: () => {
+      message.success('서식이 등록되었습니다')
+      setFormOpen(false)
+      setEditTarget(null)
+      queryClient.invalidateQueries({ queryKey: ['sys14', 'templates'] })
+    },
+  })
+
+  const updateTemplateMutation = useMutation({
+    mutationFn: async (values: { name: string; content: string }) => {
+      const res = await fetch(`/api/sys14/templates/${editTarget?.id}`, {
+        method: 'PUT',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(values),
+      })
+      return res.json()
+    },
+    onSuccess: () => {
+      message.success('서식이 수정되었습니다')
+      setFormOpen(false)
+      setEditTarget(null)
+      queryClient.invalidateQueries({ queryKey: ['sys14', 'templates'] })
+    },
+  })
+
+  const deleteTemplateMutation = useMutation({
+    mutationFn: async (id: string) => {
+      const res = await fetch(`/api/sys14/templates/${id}`, { method: 'DELETE' })
+      return res.json()
+    },
+    onSuccess: () => {
+      message.success('서식이 삭제되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['sys14', 'templates'] })
+    },
+  })
+
+  const templateColumns: ProColumns<Template>[] = [
+    { title: '번호', dataIndex: 'id', width: 100 },
+    { title: '서식명', dataIndex: 'name', ellipsis: true },
+    { title: '등록일', dataIndex: 'createdAt', width: 120 },
+    {
+      title: '액션',
+      key: 'action',
+      width: 160,
+      render: (_, record) => (
+        <Space>
+          <Button
+            size="small"
+            onClick={() => {
+              setEditTarget(record)
+              setFormOpen(true)
+            }}
+          >
+            수정
+          </Button>
+          <Popconfirm
+            title="삭제하시겠습니까?"
+            onConfirm={() => deleteTemplateMutation.mutate(record.id)}
+            okText="확인"
+            cancelText="취소"
+          >
+            <Button size="small" danger>삭제</Button>
+          </Popconfirm>
+        </Space>
+      ),
+    },
+  ]
+
+  return (
+    <>
+      <DataTable<Template>
+        columns={templateColumns}
+        rowKey="id"
+        request={async (_params) => {
+          // 서식 목록은 고정 데이터이므로 전체 조회
+          const result = await fetchTemplates()
+          return result
+        }}
+        headerTitle="서식 목록"
+        toolBarRender={() => [
+          <Button
+            key="create"
+            type="primary"
+            onClick={() => { setEditTarget(null); setFormOpen(true) }}
+          >
+            서식 등록
+          </Button>,
+        ]}
+      />
+
+      <Modal
+        title={editTarget ? '서식 수정' : '서식 등록'}
+        open={formOpen}
+        onCancel={() => { setFormOpen(false); setEditTarget(null) }}
+        footer={null}
+        destroyOnClose
+      >
+        <CrudForm
+          fields={TEMPLATE_FIELDS}
+          initialValues={editTarget ?? {}}
+          onFinish={async (values) => {
+            const typed = values as { name: string; content: string }
+            if (editTarget) {
+              await updateTemplateMutation.mutateAsync(typed)
+            } else {
+              await createTemplateMutation.mutateAsync(typed)
+            }
+            return true
+          }}
+          mode={editTarget ? 'edit' : 'create'}
+        />
+      </Modal>
+    </>
+  )
 }
 
 export default function SuggestionAdminPage() {
@@ -130,14 +295,30 @@ export default function SuggestionAdminPage() {
     },
   ]
 
+  // G25: 탭으로 제언관리 + 서식관리 배치
+  const tabItems = [
+    {
+      key: 'manage',
+      label: '제언관리',
+      children: (
+        <DataTable<Suggestion>
+          columns={columns}
+          rowKey="id"
+          request={fetchSuggestions}
+          headerTitle="제언 목록"
+        />
+      ),
+    },
+    {
+      key: 'templates',
+      label: '서식관리',
+      children: <TemplateManager />,
+    },
+  ]
+
   return (
-    <PageContainer title="제언관리 (관리자)">
-      <DataTable<Suggestion>
-        columns={columns}
-        rowKey="id"
-        request={fetchSuggestions}
-        headerTitle="제언 목록"
-      />
+    <PageContainer title="관리자">
+      <Tabs items={tabItems} />
 
       {/* 답변 등록 모달 */}
       <Modal

@@ -7,6 +7,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import { boardConfigApi } from '@/entities/board/api'
 import type { BoardConfig } from '@/entities/board/types'
+import type { PageResponse } from '@/shared/api/types'
 
 interface BoardConfigRecord extends BoardConfig, Record<string, unknown> {}
 
@@ -151,7 +152,7 @@ export function BoardConfigPage({ onSelectBoard }: BoardConfigPageProps) {
       title: '삭제 확인',
       content: '선택한 항목을 삭제하시겠습니까? 삭제된 데이터는 복구할 수 없습니다',
       danger: true,
-      onConfirm: () => deleteMutation.mutateAsync(record.id),
+      onConfirm: async () => { await deleteMutation.mutateAsync(record.id) },
     })
   }
 
@@ -221,7 +222,7 @@ export function BoardConfigPage({ onSelectBoard }: BoardConfigPageProps) {
       <DataTable<BoardConfigRecord>
         columns={columns}
         rowKey="id"
-        request={(params) => boardConfigApi.list(params)}
+        request={(params) => boardConfigApi.list(params) as Promise<PageResponse<BoardConfigRecord>>}
         headerTitle="게시판 목록"
         toolBarRender={() => [
           <Button

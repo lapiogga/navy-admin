@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Modal, Popconfirm, Button, Form, Select, DatePicker, TimePicker, Input, message, Descriptions } from 'antd'
+import { Modal, Popconfirm, Button, Form, DatePicker, TimePicker, Input, message, Descriptions } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -9,7 +9,7 @@ import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
-interface Reservation {
+interface Reservation extends Record<string, unknown> {
   id: string
   roomId: string
   roomName: string

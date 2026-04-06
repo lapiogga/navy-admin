@@ -158,6 +158,65 @@ describe('sys16 회의실예약관리체계 — Nyquist 테스트', () => {
     })
   })
 
+  // === GAP 패치 테스트 (G28-G31) ===
+
+  describe('MeetingReservePage GAP 패치', () => {
+    const content = readFile(resolve(BASE, 'MeetingReservePage.tsx'))
+
+    it('G28: 관리부대 선택 필드가 존재한다', () => {
+      expect(content).toContain('managingUnit')
+    })
+
+    it('G28: 참석인원 필드가 존재한다', () => {
+      expect(content).toContain('attendeeCount')
+    })
+
+    it('G28: 참석자정보 필드가 존재한다', () => {
+      expect(content).toContain('attendees')
+    })
+  })
+
+  describe('MeetingStatusPage GAP 패치', () => {
+    const content = readFile(resolve(BASE, 'MeetingStatusPage.tsx'))
+
+    it('G29: 관리부대 검색조건이 존재한다', () => {
+      expect(content).toContain('managingUnit')
+    })
+  })
+
+  describe('ReservationMgmtPage GAP 패치', () => {
+    const content = readFile(resolve(BASE, 'ReservationMgmtPage.tsx'))
+
+    it('G30: 엑셀 다운로드가 존재한다', () => {
+      expect(content).toMatch(/excel|csv|엑셀/i)
+    })
+
+    it('G30: 프린트가 존재한다', () => {
+      expect(content).toMatch(/print|프린트/i)
+    })
+  })
+
+  describe('Sys16 index.tsx GAP 패치', () => {
+    const content = readFile(resolve(BASE, 'index.tsx'))
+
+    it('G31: 사용자별권한등록 라우트가 존재한다', () => {
+      expect(content).toContain('AuthGroupIndex')
+      expect(content).toContain('auth-group')
+    })
+  })
+
+  describe('sys16 MSW 핸들러 GAP 패치', () => {
+    const content = readFile(resolve(HANDLERS_DIR, 'sys16.ts'))
+
+    it('managingUnit 필드가 존재한다', () => {
+      expect(content).toContain('managingUnit')
+    })
+
+    it('attendeeCount 필드가 존재한다', () => {
+      expect(content).toContain('attendeeCount')
+    })
+  })
+
   describe('handlers/index.ts', () => {
     const content = readFile(resolve(HANDLERS_DIR, 'index.ts'))
 

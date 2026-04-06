@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState } from 'react'
 import { Button, Modal, Form, Input, Transfer, List, Space, message, Typography } from 'antd'
 import { PlusOutlined, ArrowUpOutlined, ArrowDownOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
@@ -8,7 +8,7 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { approvalLineApi } from '@/entities/approval/api'
 import type { ApprovalLine } from '@/entities/approval/types'
 import { apiClient } from '@/shared/api/client'
-import type { ApiResult } from '@/shared/api/types'
+import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 const { Text } = Typography
 
@@ -88,12 +88,13 @@ export default function ApprovalLinePage() {
   }))
 
   // Transfer → orderedApproverIds 동기화
-  const handleTransferChange = (newTargetKeys: string[]) => {
-    setTargetKeys(newTargetKeys)
+  const handleTransferChange = (newTargetKeys: React.Key[]) => {
+    const keys = newTargetKeys.map(String)
+    setTargetKeys(keys)
     // 기존 순서 유지 + 새로 추가된 것 append
     setOrderedApproverIds((prev) => {
-      const kept = prev.filter((id) => newTargetKeys.includes(id))
-      const added = newTargetKeys.filter((id) => !prev.includes(id))
+      const kept = prev.filter((id) => keys.includes(id))
+      const added = keys.filter((id) => !prev.includes(id))
       return [...kept, ...added]
     })
   }
@@ -261,7 +262,7 @@ export default function ApprovalLinePage() {
     <div>
       <DataTable<ApprovalLine & Record<string, unknown>>
         columns={columns}
-        request={(params) => approvalLineApi.list(params)}
+        request={(params) => approvalLineApi.list(params) as Promise<PageResponse<ApprovalLine & Record<string, unknown>>>}
         rowKey="id"
         headerTitle="결재선 관리"
         toolBarRender={() => [

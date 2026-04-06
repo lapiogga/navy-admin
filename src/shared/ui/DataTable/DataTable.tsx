@@ -1,5 +1,5 @@
 import type React from 'react'
-import type { ProColumns, ProTableProps } from '@ant-design/pro-components'
+import type { ProColumns, ProTableProps, ActionType } from '@ant-design/pro-components'
 import { ProTable } from '@ant-design/pro-components'
 import type { PageRequest, PageResponse } from '@/shared/api/types'
 
@@ -11,6 +11,7 @@ export interface DataTableProps<T extends Record<string, unknown>> {
   rowSelection?: ProTableProps<T, PageRequest>['rowSelection']
   headerTitle?: string
   onRow?: (record: T) => { onClick?: () => void; style?: React.CSSProperties }
+  actionRef?: React.Ref<ActionType>
 }
 
 export function DataTable<T extends Record<string, unknown>>({
@@ -21,6 +22,7 @@ export function DataTable<T extends Record<string, unknown>>({
   rowSelection,
   headerTitle,
   onRow,
+  actionRef,
 }: DataTableProps<T>) {
   return (
     <ProTable<T, PageRequest>
@@ -40,6 +42,7 @@ export function DataTable<T extends Record<string, unknown>>({
       search={false}
       dateFormatter="string"
       onRow={onRow}
+      actionRef={actionRef}
     />
   )
 }

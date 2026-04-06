@@ -1,78 +1,68 @@
-import { useState } from 'react'
-import { Button, message, Modal, Descriptions } from 'antd'
+import { Row, Col, Card, Tag } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
-import type { ProColumns } from '@ant-design/pro-components'
-import { DataTable } from '@/shared/ui/DataTable/DataTable'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import { BankOutlined, FileTextOutlined } from '@ant-design/icons'
 
-interface Regulation {
-  id: string
-  title: string
-  docNumber: string
-  category: string
-  department: string
-  effectiveDate: string
-  content: string
+// 예하부대 카드 데이터 (G10) - 부대 목록 및 예규 페이지 링크
+interface UnitCard {
+  name: string
+  url: string
+  description: string
+  regulationCount: number
+  type: '사단' | '여단' | '단' | '대대'
 }
 
-async function fetchPrecedentsUnit(params: PageRequest): Promise<PageResponse<Regulation>> {
-  const url = new URL('/api/sys05/precedents/unit', window.location.origin)
-  url.searchParams.set('page', String(params.page))
-  url.searchParams.set('size', String(params.size))
-  const res = await fetch(url.toString())
-  const json = await res.json() as { success: boolean; data: PageResponse<Regulation> }
-  return json.data
+const UNIT_LINKS: UnitCard[] = [
+  { name: '제1사단', url: '#', description: '포항 소재, 동해안 방어', regulationCount: 12, type: '사단' },
+  { name: '제2사단', url: '#', description: '김포 소재, 수도권 방어', regulationCount: 9, type: '사단' },
+  { name: '교육훈련단', url: '#', description: '해병대 교육훈련 전담', regulationCount: 15, type: '단' },
+  { name: '상륙기동단', url: '#', description: '상륙작전 전담 부대', regulationCount: 8, type: '단' },
+  { name: '항공단', url: '#', description: '해병대 항공 지원', regulationCount: 6, type: '단' },
+  { name: '군수단', url: '#', description: '군수지원 전담 부대', regulationCount: 5, type: '단' },
+  { name: '제6여단', url: '#', description: '서해 도서 방어', regulationCount: 7, type: '여단' },
+  { name: '제9여단', url: '#', description: '백령도 방어', regulationCount: 4, type: '여단' },
+]
+
+// 부대 유형별 색상
+const TYPE_COLOR: Record<string, string> = {
+  사단: 'blue',
+  여단: 'green',
+  단: 'orange',
+  대대: 'purple',
 }
 
 export default function PrecedentUnitPage() {
-  const [selected, setSelected] = useState<Regulation | null>(null)
-  const [modalOpen, setModalOpen] = useState(false)
-
-  const columns: ProColumns<Regulation>[] = [
-    { title: '번호', dataIndex: 'id', width: 100 },
-    { title: '문서번호', dataIndex: 'docNumber', width: 160 },
-    { title: '예규명', dataIndex: 'title', ellipsis: true },
-    { title: '담당부서', dataIndex: 'department', width: 120 },
-    { title: '시행일', dataIndex: 'effectiveDate', width: 120 },
-  ]
-
   return (
     <PageContainer title="예규 - 예하부대">
-      <DataTable<Regulation>
-        columns={columns}
-        request={fetchPrecedentsUnit}
-        rowKey="id"
-        headerTitle="예하부대 예규 목록"
-        onRow={(record) => ({
-          onClick: () => {
-            setSelected(record as unknown as Regulation)
-            setModalOpen(true)
-          },
-          style: { cursor: 'pointer' },
-        })}
-      />
-      <Modal
-        open={modalOpen}
-        onCancel={() => setModalOpen(false)}
-        title="예규 상세 - 예하부대"
-        width={720}
-        footer={
-          <div style={{ display: 'flex', gap: 8, justifyContent: 'flex-end' }}>
-            <Button onClick={() => message.success('다운로드 시작')}>다운로드</Button>
-            <Button type="primary" onClick={() => setModalOpen(false)}>닫기</Button>
-          </div>
-        }
-      >
-        {selected && (
-          <Descriptions column={1} bordered size="small">
-            <Descriptions.Item label="문서번호">{selected.docNumber}</Descriptions.Item>
-            <Descriptions.Item label="예규명">{selected.title}</Descriptions.Item>
-            <Descriptions.Item label="담당부서">{selected.department}</Descriptions.Item>
-            <Descriptions.Item label="시행일">{selected.effectiveDate}</Descriptions.Item>
-            <Descriptions.Item label="내용">{selected.content}</Descriptions.Item>
-          </Descriptions>
-        )}
-      </Modal>
+      <Row gutter={[16, 16]}>
+        {UNIT_LINKS.map((unit) => (
+          <Col key={unit.name} xs={24} sm={12} md={8} lg={6}>
+            <Card
+              hoverable
+              onClick={() => window.open(unit.url, '_blank')}
+              style={{ textAlign: 'center' }}
+            >
+              <BankOutlined style={{ fontSize: 36, color: '#1890ff', marginBottom: 12 }} />
+              <Card.Meta
+                title={
+                  <span>
+                    {unit.name}{' '}
+                    <Tag color={TYPE_COLOR[unit.type]}>{unit.type}</Tag>
+                  </span>
+                }
+                description={
+                  <div>
+                    <div style={{ marginBottom: 8 }}>{unit.description}</div>
+                    <div style={{ color: '#666' }}>
+                      <FileTextOutlined style={{ marginRight: 4 }} />
+                      예규 {unit.regulationCount}건
+                    </div>
+                  </div>
+                }
+              />
+            </Card>
+          </Col>
+        ))}
+      </Row>
     </PageContainer>
   )
 }

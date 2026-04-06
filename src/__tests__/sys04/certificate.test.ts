@@ -60,8 +60,8 @@ describe('CertificateApprovalPage', () => {
     expect(content).toContain('승인하시겠습니까?')
   })
 
-  it('반려 Popconfirm 타이틀을 포함한다', () => {
-    expect(content).toContain('반려하시겠습니까?')
+  it('반려사유 입력 모달을 포함한다', () => {
+    expect(content).toContain('반려사유 입력')
   })
 })
 
@@ -154,5 +154,88 @@ describe('sys04-certificate index.tsx 라우팅', () => {
 
   it('CertificateRegisterPage 라우트를 포함한다', () => {
     expect(content).toContain('CertificateRegisterPage')
+  })
+})
+
+describe('CertificateApplyPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'CertificateApplyPage.tsx'), 'utf-8')
+
+  it('G01: 신청구분 필드가 존재한다', () => {
+    expect(content).toContain('requestType')
+    expect(content).toContain('신청구분')
+  })
+
+  it('G01: 사유 필드가 존재한다', () => {
+    expect(content).toContain("name: 'reason'")
+  })
+
+  it('G01: 군번 필드가 존재한다', () => {
+    expect(content).toContain('militaryId')
+  })
+
+  it('G01: 이메일 필드가 존재한다', () => {
+    expect(content).toContain("name: 'email'")
+  })
+
+  it('G01: 전화번호 필드가 존재한다', () => {
+    expect(content).toContain("name: 'phone'")
+  })
+
+  it('G02: 회수 기능이 존재한다', () => {
+    expect(content).toContain('withdraw')
+    expect(content).toContain('회수')
+  })
+})
+
+describe('CertificateApprovalPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'CertificateApprovalPage.tsx'), 'utf-8')
+
+  it('G03: 반려사유 입력 모달이 존재한다', () => {
+    expect(content).toContain('rejectReason')
+    expect(content).toContain('반려사유')
+  })
+
+  it('G05: 신청구분 컬럼이 존재한다', () => {
+    expect(content).toContain('requestType')
+  })
+
+  it('G05: 국방전자서명인증센터 컬럼이 존재한다', () => {
+    expect(content).toContain('ndscaStatus')
+  })
+})
+
+describe('CertificateRegisterPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'CertificateRegisterPage.tsx'), 'utf-8')
+
+  it('G04: 엑셀 다운로드 기능이 존재한다', () => {
+    expect(content).toMatch(/excel|csv|엑셀/i)
+  })
+
+  it('G04: 발급 통계가 존재한다', () => {
+    expect(content).toMatch(/Statistic|통계/)
+  })
+
+  it('G04: 신청구분 컬럼이 존재한다', () => {
+    expect(content).toContain('requestType')
+  })
+})
+
+describe('sys04 MSW 핸들러 GAP 패치', () => {
+  const content = readFileSync(resolve(HANDLERS_BASE, 'sys04.ts'), 'utf-8')
+
+  it('withdrawn 상태가 정의되어 있다', () => {
+    expect(content).toContain('withdrawn')
+  })
+
+  it('rejectReason 필드가 존재한다', () => {
+    expect(content).toContain('rejectReason')
+  })
+
+  it('ndscaStatus 필드가 존재한다', () => {
+    expect(content).toContain('ndscaStatus')
+  })
+
+  it('withdraw 핸들러가 존재한다', () => {
+    expect(content).toContain('/withdraw')
   })
 })

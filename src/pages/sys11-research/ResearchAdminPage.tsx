@@ -1,12 +1,12 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { PageContainer } from '@ant-design/pro-components'
-import { Tabs, Modal, Button, Popconfirm, Statistic, Row, Col, Card, Table, message } from 'antd'
+import { Tabs, Modal, Button, Popconfirm, Statistic, Row, Col, Card, Table, Select, message } from 'antd'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { PageRequest, PageResponse } from '@/shared/api/types'
-import { Navigate, useNavigate } from 'react-router-dom'
+import { useNavigate } from 'react-router-dom'
 
 interface ResearchItem extends Record<string, unknown> {
   id: string
@@ -233,6 +233,62 @@ function AuthManagementTab() {
   )
 }
 
+// 다운로드 이력 탭
+interface DownloadHistoryItem extends Record<string, unknown> {
+  id: string
+  downloaderName: string
+  downloaderUnit: string
+  fileName: string
+  downloadedAt: string
+  boardType: string
+}
+
+function DownloadHistoryTab() {
+  const [boardFilter, setBoardFilter] = useState('')
+
+  async function fetchDownloadHistory(params: PageRequest): Promise<PageResponse<DownloadHistoryItem>> {
+    const url = new URL('/api/sys11/download-history', window.location.origin)
+    url.searchParams.set('page', String(params.page))
+    url.searchParams.set('size', String(params.size))
+    if (boardFilter) {
+      url.searchParams.set('boardType', boardFilter)
+    }
+    const res = await fetch(url.toString())
+    const json = await res.json()
+    return json.data
+  }
+
+  const columns: ProColumns<DownloadHistoryItem>[] = [
+    { title: '번호', dataIndex: 'id', width: 80 },
+    { title: '다운로더', dataIndex: 'downloaderName', width: 100 },
+    { title: '소속', dataIndex: 'downloaderUnit', width: 120 },
+    { title: '파일명', dataIndex: 'fileName', ellipsis: true },
+    { title: '다운로드일시', dataIndex: 'downloadedAt', width: 150 },
+    { title: '게시판', dataIndex: 'boardType', width: 100 },
+  ]
+
+  return (
+    <>
+      <Select
+        value={boardFilter}
+        onChange={setBoardFilter}
+        style={{ width: 200, marginBottom: 16 }}
+        options={[
+          { label: '전체', value: '' },
+          { label: '연구자료', value: '연구자료' },
+          { label: '자료실', value: '자료실' },
+        ]}
+      />
+      <DataTable<DownloadHistoryItem>
+        columns={columns}
+        request={fetchDownloadHistory}
+        rowKey="id"
+        headerTitle="다운로드 이력"
+      />
+    </>
+  )
+}
+
 export default function ResearchAdminPage() {
   const tabItems = [
     { key: 'data', label: '자료관리', children: <DataManagementTab /> },
@@ -241,6 +297,7 @@ export default function ResearchAdminPage() {
     { key: 'users', label: '사용자관리', children: <UserManagementTab /> },
     { key: 'deleted', label: '삭제관리', children: <DeleteManagementTab /> },
     { key: 'auth', label: '권한관리', children: <AuthManagementTab /> },
+    { key: 'download-history', label: '다운로드 이력', children: <DownloadHistoryTab /> },
   ]
 
   return (

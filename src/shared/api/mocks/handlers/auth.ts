@@ -7,7 +7,7 @@ const mockUser: User = {
   id: faker.string.uuid(),
   name: '홍길동',
   rank: '대위',
-  unit: '해병대사령부',
+  unit: '해군본부',
   username: 'admin',
   roles: ['ADMIN', 'SYS01_USER', 'SYS02_USER'],
 }

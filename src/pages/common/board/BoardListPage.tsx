@@ -6,6 +6,7 @@ import { DataTable } from '@/shared/ui'
 import { boardPostApi, boardConfigApi } from '@/entities/board/api'
 import { useQuery } from '@tanstack/react-query'
 import type { BoardPost } from '@/entities/board/types'
+import type { PageResponse } from '@/shared/api/types'
 import { BoardPostPage } from './BoardPostPage'
 
 interface BoardPostRecord extends BoardPost, Record<string, unknown> {}
@@ -65,7 +66,7 @@ export function BoardListPage({ boardId }: BoardListPageProps) {
       <DataTable<BoardPostRecord>
         columns={columns}
         rowKey="id"
-        request={(params) => boardPostApi.list(boardId, params)}
+        request={(params) => boardPostApi.list(boardId, params) as Promise<PageResponse<BoardPostRecord>>}
         headerTitle="게시글 목록"
         toolBarRender={() => [
           <Button

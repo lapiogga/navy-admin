@@ -149,6 +149,77 @@ describe('handlers/index.ts', () => {
   })
 })
 
+// === GAP 패치 테스트 (G11-G16) ===
+
+describe('ResearchMainPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'ResearchMainPage.tsx'), 'utf-8')
+
+  it('G11: 년도 선택이 존재한다', () => {
+    expect(content).toMatch(/selectedYear|년도/)
+  })
+
+  it('G11: 카테고리별 통계가 존재한다', () => {
+    expect(content).toMatch(/categoryStats|카테고리별/)
+  })
+
+  it('G11: 소개자료가 존재한다', () => {
+    expect(content).toMatch(/INTRO_DATA|소개/)
+  })
+})
+
+describe('ResearchListPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'ResearchListPage.tsx'), 'utf-8')
+
+  it('G12: 연구년도 컬럼이 존재한다', () => {
+    expect(content).toContain('researchYear')
+  })
+
+  it('G12: 연구예산 컬럼이 존재한다', () => {
+    expect(content).toContain('budget')
+  })
+
+  it('G13: 진행상황 폼 필드가 존재한다', () => {
+    expect(content).toContain('progressStatus')
+  })
+
+  it('G13: Upload 컴포넌트가 존재한다', () => {
+    expect(content).toContain('Upload')
+  })
+
+  it('G14: 키워드 검색이 존재한다', () => {
+    expect(content).toContain('keyword')
+  })
+
+  it('G15: 엑셀 다운로드가 존재한다', () => {
+    expect(content).toMatch(/excel|csv|엑셀/i)
+  })
+})
+
+describe('ResearchAdminPage GAP 패치', () => {
+  const content = readFileSync(resolve(BASE, 'ResearchAdminPage.tsx'), 'utf-8')
+
+  it('G16: 다운로드 이력 기능이 존재한다', () => {
+    expect(content).toMatch(/downloadHistory|download-history|다운로드 이력/)
+  })
+})
+
+describe('sys11 MSW 핸들러 GAP 패치', () => {
+  const content = readFileSync(resolve(HANDLERS_BASE, 'sys11.ts'), 'utf-8')
+
+  it('확장 필드가 존재한다', () => {
+    expect(content).toContain('researchYear')
+    expect(content).toContain('budget')
+  })
+
+  it('통계 API가 존재한다', () => {
+    expect(content).toContain('/stats')
+  })
+
+  it('다운로드 이력 API가 존재한다', () => {
+    expect(content).toContain('download-history')
+  })
+})
+
 describe('sys11-research index.tsx 라우팅', () => {
   const content = readFileSync(resolve(BASE, 'index.tsx'), 'utf-8')
 

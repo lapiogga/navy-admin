@@ -10,6 +10,7 @@ interface MeetingRoom {
   location: string
   capacity: number
   description: string
+  managingUnit: string
   photos: { id: string; url: string }[]
   equipment: { id: string; name: string; quantity: number }[]
   schedule: { day: string; enabled: boolean; startTime: string; endTime: string }[]
@@ -21,10 +22,13 @@ interface Reservation {
   roomName: string
   applicant: string
   unit: string
+  managingUnit: string
   purpose: string
   date: string
   startTime: string
   endTime: string
+  attendeeCount: number
+  attendees: string
   status: ReservationStatus
   createdAt: string
   processedAt?: string
@@ -42,12 +46,15 @@ const createSchedule = () =>
     endTime: '18:00',
   }))
 
+const MANAGING_UNITS = ['해병대사령부', '1사단', '2사단']
+
 const meetingRooms: MeetingRoom[] = Array.from({ length: 5 }, (_, i) => ({
   id: `room-${i + 1}`,
   name: `제${i + 1}회의실`,
   location: `${faker.number.int({ min: 1, max: 5 })}층 ${faker.number.int({ min: 100, max: 500 })}호`,
   capacity: faker.number.int({ min: 5, max: 30 }),
   description: `${i + 1}번 회의실입니다.`,
+  managingUnit: faker.helpers.arrayElement(MANAGING_UNITS),
   photos: Array.from({ length: faker.number.int({ min: 1, max: 3 }) }, (_, j) => ({
     id: `photo-${i + 1}-${j + 1}`,
     url: `https://picsum.photos/seed/${i * 10 + j}/400/300`,
@@ -70,7 +77,10 @@ const reservations: Reservation[] = Array.from({ length: 25 }, (_, i) => {
     roomName: room.name,
     applicant: faker.person.lastName() + faker.person.firstName(),
     unit: `제${faker.number.int({ min: 1, max: 9 })}대대`,
+    managingUnit: faker.helpers.arrayElement(MANAGING_UNITS),
     purpose: faker.lorem.sentence(),
+    attendeeCount: faker.number.int({ min: 2, max: 30 }),
+    attendees: faker.person.fullName() + ', ' + faker.person.fullName(),
     date: `2026-04-${String(faker.number.int({ min: 1, max: 28 })).padStart(2, '0')}`,
     startTime: '10:00',
     endTime: '12:00',
@@ -104,10 +114,13 @@ export const sys16Handlers = [
       roomName: room.name,
       applicant: '홍길동',
       unit: '제1대대',
+      managingUnit: body.managingUnit || '',
       purpose: body.purpose || '',
       date: body.date || '',
       startTime: body.startTime || '',
       endTime: body.endTime || '',
+      attendeeCount: body.attendeeCount || 0,
+      attendees: body.attendees || '',
       status: 'pending',
       createdAt: new Date().toISOString().split('T')[0],
     }
@@ -129,7 +142,9 @@ export const sys16Handlers = [
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
-    return HttpResponse.json({ success: true, data: paginate(reservations, page, size) })
+    const unitFilter = url.searchParams.get('managingUnit')
+    const filtered = unitFilter ? reservations.filter((r) => r.managingUnit === unitFilter) : reservations
+    return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
 
   // 예약 목록 (관리자, status 필터)
@@ -186,7 +201,9 @@ export const sys16Handlers = [
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
-    return HttpResponse.json({ success: true, data: paginate(meetingRooms, page, size) })
+    const unitFilter = url.searchParams.get('managingUnit')
+    const filtered = unitFilter ? meetingRooms.filter((r) => r.managingUnit === unitFilter) : meetingRooms
+    return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
 
   // 회의실 상세
@@ -205,6 +222,7 @@ export const sys16Handlers = [
       location: body.location || '',
       capacity: body.capacity || 0,
       description: body.description || '',
+      managingUnit: body.managingUnit || '해병대사령부',
       photos: [],
       equipment: [],
       schedule: createSchedule(),

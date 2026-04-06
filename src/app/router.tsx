@@ -1,7 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { lazy, Suspense } from 'react'
 import { RequireAuth } from './components/RequireAuth'
-import { PortalLayout } from './layouts/PortalLayout'
+import { MainPortalLayout } from './layouts/MainPortalLayout'
+import { SubsystemProLayout } from './layouts/PortalLayout'
 import { PageSpinner } from './components/PageSpinner'
 import LoginPage from '@/pages/login'
 import PortalPage from '@/pages/portal'
@@ -38,16 +39,28 @@ function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  // 메인 포탈: 사이드바 없는 헤더만 있는 레이아웃
   {
     path: '/',
     element: (
       <RequireAuth>
-        <PortalLayout />
+        <MainPortalLayout />
       </RequireAuth>
     ),
     children: [
       { index: true, element: <PortalPage /> },
       { path: 'demo', element: withSuspense(DemoPage) },
+    ],
+  },
+  // 서브시스템: ProLayout 사이드바가 있는 레이아웃 (새 창에서 열림)
+  {
+    path: '/',
+    element: (
+      <RequireAuth>
+        <SubsystemProLayout />
+      </RequireAuth>
+    ),
+    children: [
       { path: 'sys01/*', element: withSuspense(Sys01Page) },
       { path: 'sys02/*', element: withSuspense(Sys02Page) },
       { path: 'sys03/*', element: withSuspense(Sys03Page) },

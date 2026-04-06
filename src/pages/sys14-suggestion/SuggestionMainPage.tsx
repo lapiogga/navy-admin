@@ -22,6 +22,12 @@ interface SuggestionItem {
   status: string
 }
 
+interface NoticeItem {
+  id: string
+  title: string
+  createdAt: string
+}
+
 interface PageResponse<T> {
   content: T[]
   totalElements: number
@@ -44,8 +50,27 @@ async function fetchRecent(): Promise<PageResponse<SuggestionItem>> {
   return json.data
 }
 
-const STATUS_COLOR_MAP = { open: 'cyan', answered: 'green', closed: 'default' }
-const STATUS_LABEL_MAP = { open: '대기', answered: '답변완료', closed: '종료' }
+// G27: 공지사항 조회
+async function fetchNotices(): Promise<NoticeItem[]> {
+  const res = await fetch('/api/sys14/notices')
+  const json: ApiResult<NoticeItem[]> = await res.json()
+  return json.data
+}
+
+const STATUS_COLOR_MAP: Record<string, string> = {
+  registered: 'blue',
+  received: 'cyan',
+  processing: 'orange',
+  completed: 'green',
+  rejected: 'red',
+}
+const STATUS_LABEL_MAP: Record<string, string> = {
+  registered: '등록',
+  received: '접수',
+  processing: '진행',
+  completed: '완료',
+  rejected: '반려',
+}
 
 export default function SuggestionMainPage() {
   const navigate = useNavigate()
@@ -58,6 +83,12 @@ export default function SuggestionMainPage() {
   const { data: recent } = useQuery({
     queryKey: ['sys14', 'recent'],
     queryFn: fetchRecent,
+  })
+
+  // G27: 공지사항 데이터
+  const { data: notices = [] } = useQuery({
+    queryKey: ['sys14', 'notices'],
+    queryFn: fetchNotices,
   })
 
   return (
@@ -86,39 +117,66 @@ export default function SuggestionMainPage() {
         </Col>
       </Row>
 
-      {/* 최신 제언 5건 */}
-      <Card
-        title="최신 제언"
-        extra={
-          <Button type="link" onClick={() => navigate('/sys14/1/3')}>
-            전체보기
-          </Button>
-        }
-      >
-        <List
-          dataSource={recent?.content ?? []}
-          renderItem={(item) => (
-            <List.Item
-              extra={
-                <StatusBadge
-                  status={item.status}
-                  colorMap={STATUS_COLOR_MAP}
-                  labelMap={STATUS_LABEL_MAP}
-                />
-              }
-            >
-              <List.Item.Meta
-                title={item.title}
-                description={
-                  <Text type="secondary">
-                    {item.authorName} · {item.createdAt}
-                  </Text>
-                }
-              />
-            </List.Item>
-          )}
-        />
-      </Card>
+      {/* G27: 공지사항 + 최신 제언 양쪽 배치 */}
+      <Row gutter={16}>
+        <Col span={12}>
+          <Card
+            title="공지사항"
+            extra={
+              <Button type="link" onClick={() => navigate('/sys14/1/2')}>
+                전체보기
+              </Button>
+            }
+            size="small"
+          >
+            <List
+              dataSource={notices}
+              renderItem={(item) => (
+                <List.Item>
+                  <Text ellipsis style={{ flex: 1 }}>{item.title}</Text>
+                  <Text type="secondary" style={{ marginLeft: 8 }}>{item.createdAt}</Text>
+                </List.Item>
+              )}
+              locale={{ emptyText: '공지사항이 없습니다' }}
+            />
+          </Card>
+        </Col>
+        <Col span={12}>
+          <Card
+            title="최신 제언"
+            extra={
+              <Button type="link" onClick={() => navigate('/sys14/1/3')}>
+                전체보기
+              </Button>
+            }
+            size="small"
+          >
+            <List
+              dataSource={recent?.content ?? []}
+              renderItem={(item) => (
+                <List.Item
+                  extra={
+                    <StatusBadge
+                      status={item.status}
+                      colorMap={STATUS_COLOR_MAP}
+                      labelMap={STATUS_LABEL_MAP}
+                    />
+                  }
+                >
+                  <List.Item.Meta
+                    title={item.title}
+                    description={
+                      <Text type="secondary">
+                        {item.authorName} · {item.createdAt}
+                      </Text>
+                    }
+                  />
+                </List.Item>
+              )}
+            />
+          </Card>
+        </Col>
+      </Row>
     </PageContainer>
   )
 }

@@ -20,8 +20,8 @@ async function fetchCertificates(params: PageRequest): Promise<PageResponse<Cert
   return data
 }
 
-const STATUS_COLOR_MAP = { pending: 'orange', approved: 'green', rejected: 'red' }
-const STATUS_LABEL_MAP = { pending: '대기', approved: '승인', rejected: '반려' }
+const STATUS_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 'green', rejected: 'red', withdrawn: 'default' }
+const STATUS_LABEL_MAP: Record<string, string> = { pending: '대기', approved: '승인', rejected: '반려', withdrawn: '회수' }
 
 const CERT_TYPE_OPTIONS = [
   { label: '재직증명서', value: '재직증명서' },
@@ -29,7 +29,21 @@ const CERT_TYPE_OPTIONS = [
   { label: '복무증명서', value: '복무증명서' },
 ]
 
-type FormValues = { certType: string; purpose: string }
+const REQUEST_TYPE_OPTIONS = [
+  { label: '신규발급', value: '신규발급' },
+  { label: '재발급', value: '재발급' },
+  { label: '갱신', value: '갱신' },
+]
+
+type FormValues = {
+  certType: string
+  requestType: string
+  purpose: string
+  reason: string
+  militaryId: string
+  email: string
+  phone: string
+}
 
 export default function CertificateApplyPage() {
   const queryClient = useQueryClient()
@@ -81,6 +95,20 @@ export default function CertificateApplyPage() {
     },
   })
 
+  // 회수 mutation
+  const withdrawMutation = useMutation({
+    mutationFn: async (id: string) => {
+      return apiClient.patch(`/sys04/certificates/${id}/withdraw`)
+    },
+    onSuccess: () => {
+      message.success('신청서가 회수되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['sys04-certificates'] })
+    },
+    onError: () => {
+      message.error('회수에 실패했습니다')
+    },
+  })
+
   const handleFinish = async (values: Record<string, unknown>): Promise<boolean> => {
     const formValues = values as FormValues
     if (editTarget) {
@@ -119,6 +147,11 @@ export default function CertificateApplyPage() {
       width: 120,
     },
     {
+      title: '신청구분',
+      dataIndex: 'requestType',
+      width: 100,
+    },
+    {
       title: '신청목적',
       dataIndex: 'purpose',
       ellipsis: true,
@@ -142,7 +175,7 @@ export default function CertificateApplyPage() {
     },
     {
       title: '액션',
-      width: 140,
+      width: 200,
       render: (_, record) => (
         <>
           <Button
@@ -168,6 +201,20 @@ export default function CertificateApplyPage() {
               삭제
             </Button>
           </Popconfirm>
+          <Popconfirm
+            title="회수하시겠습니까?"
+            onConfirm={() => withdrawMutation.mutate(record.id)}
+            okText="회수"
+            cancelText="취소"
+          >
+            <Button
+              type="link"
+              size="small"
+              disabled={record.status !== 'pending'}
+            >
+              회수
+            </Button>
+          </Popconfirm>
         </>
       ),
     },
@@ -182,13 +229,52 @@ export default function CertificateApplyPage() {
       options: CERT_TYPE_OPTIONS,
     },
     {
+      name: 'requestType',
+      label: '신청구분',
+      type: 'select' as const,
+      required: true,
+      options: REQUEST_TYPE_OPTIONS,
+    },
+    {
       name: 'purpose',
       label: '신청목적',
       type: 'textarea' as const,
       required: true,
       placeholder: '신청 목적을 입력하세요',
     },
+    {
+      name: 'reason',
+      label: '사유',
+      type: 'textarea' as const,
+      required: true,
+      placeholder: '사유를 입력하세요',
+    },
+    {
+      name: 'militaryId',
+      label: '군번',
+      type: 'text' as const,
+      required: true,
+      disabled: true,
+    },
+    {
+      name: 'email',
+      label: '이메일',
+      type: 'text' as const,
+      required: true,
+      placeholder: 'example@mil.kr',
+    },
+    {
+      name: 'phone',
+      label: '전화번호',
+      type: 'text' as const,
+      required: true,
+      placeholder: '010-0000-0000',
+    },
   ]
+
+  const defaultInitialValues = {
+    militaryId: 'M-20250001',
+  }
 
   return (
     <PageContainer title="인증서 신청">
@@ -217,7 +303,15 @@ export default function CertificateApplyPage() {
         <CrudForm<Record<string, unknown>>
           fields={formFields}
           onFinish={handleFinish}
-          initialValues={editTarget ? { certType: editTarget.certType, purpose: editTarget.purpose } : undefined}
+          initialValues={editTarget ? {
+            certType: editTarget.certType,
+            requestType: editTarget.requestType,
+            purpose: editTarget.purpose,
+            reason: editTarget.reason,
+            militaryId: editTarget.militaryId,
+            email: editTarget.email,
+            phone: editTarget.phone,
+          } : defaultInitialValues}
           loading={createMutation.isPending || updateMutation.isPending}
           mode={editTarget ? 'edit' : 'create'}
         />

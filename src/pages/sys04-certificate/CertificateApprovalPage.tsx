@@ -1,4 +1,5 @@
-import { message } from 'antd'
+import { useState } from 'react'
+import { message, Modal, Input } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { Popconfirm, Button } from 'antd'
@@ -19,11 +20,17 @@ async function fetchCertificates(params: PageRequest): Promise<PageResponse<Cert
   return data
 }
 
-const STATUS_COLOR_MAP = { pending: 'orange', approved: 'green', rejected: 'red' }
-const STATUS_LABEL_MAP = { pending: '대기', approved: '승인', rejected: '반려' }
+const STATUS_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 'green', rejected: 'red', withdrawn: 'default' }
+const STATUS_LABEL_MAP: Record<string, string> = { pending: '대기', approved: '승인', rejected: '반려', withdrawn: '회수' }
+
+const NDSCA_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 'green', rejected: 'red' }
+const NDSCA_LABEL_MAP: Record<string, string> = { pending: '처리중', approved: '승인', rejected: '반려' }
 
 export default function CertificateApprovalPage() {
   const queryClient = useQueryClient()
+  const [rejectModalOpen, setRejectModalOpen] = useState(false)
+  const [rejectTargetId, setRejectTargetId] = useState<string | null>(null)
+  const [rejectReason, setRejectReason] = useState('')
 
   // 승인 mutation
   const approveMutation = useMutation({
@@ -41,17 +48,40 @@ export default function CertificateApprovalPage() {
 
   // 반려 mutation
   const rejectMutation = useMutation({
-    mutationFn: async (id: string) => {
-      return apiClient.patch(`/sys04/certificates/${id}/reject`)
+    mutationFn: async ({ id, rejectReason: reason }: { id: string; rejectReason: string }) => {
+      return apiClient.patch(`/sys04/certificates/${id}/reject`, { rejectReason: reason })
     },
     onSuccess: () => {
       message.success('처리 완료')
+      setRejectModalOpen(false)
+      setRejectTargetId(null)
+      setRejectReason('')
       queryClient.invalidateQueries({ queryKey: ['sys04-approval'] })
     },
     onError: () => {
       message.error('처리에 실패했습니다')
     },
   })
+
+  const handleRejectClick = (id: string) => {
+    setRejectTargetId(id)
+    setRejectModalOpen(true)
+  }
+
+  const handleRejectConfirm = () => {
+    if (!rejectTargetId) return
+    if (!rejectReason.trim()) {
+      message.warning('반려사유를 입력하세요')
+      return
+    }
+    rejectMutation.mutate({ id: rejectTargetId, rejectReason })
+  }
+
+  const handleRejectCancel = () => {
+    setRejectModalOpen(false)
+    setRejectTargetId(null)
+    setRejectReason('')
+  }
 
   const columns: ProColumns<CertApplication>[] = [
     {
@@ -76,6 +106,11 @@ export default function CertificateApprovalPage() {
       width: 120,
     },
     {
+      title: '신청구분',
+      dataIndex: 'requestType',
+      width: 100,
+    },
+    {
       title: '신청목적',
       dataIndex: 'purpose',
       ellipsis: true,
@@ -96,6 +131,18 @@ export default function CertificateApprovalPage() {
       title: '신청일',
       dataIndex: 'appliedAt',
       width: 110,
+    },
+    {
+      title: '국방전자서명인증센터',
+      dataIndex: 'ndscaStatus',
+      width: 120,
+      render: (_, record) => (
+        <StatusBadge
+          status={record.ndscaStatus || 'pending'}
+          colorMap={NDSCA_COLOR_MAP}
+          labelMap={NDSCA_LABEL_MAP}
+        />
+      ),
     },
     {
       title: '처리일',
@@ -128,17 +175,14 @@ export default function CertificateApprovalPage() {
                 승인
               </Button>
             </Popconfirm>
-            <Popconfirm
-              title="반려하시겠습니까?"
-              onConfirm={() => rejectMutation.mutate(record.id)}
-              okText="반려"
-              cancelText="취소"
-              okButtonProps={{ danger: true }}
+            <Button
+              type="link"
+              size="small"
+              danger
+              onClick={() => handleRejectClick(record.id)}
             >
-              <Button type="link" size="small" danger>
-                반려
-              </Button>
-            </Popconfirm>
+              반려
+            </Button>
           </>
         )
       },
@@ -156,6 +200,23 @@ export default function CertificateApprovalPage() {
         }}
         headerTitle="승인 대기 목록"
       />
+
+      <Modal
+        title="반려사유 입력"
+        open={rejectModalOpen}
+        onOk={handleRejectConfirm}
+        onCancel={handleRejectCancel}
+        okText="반려"
+        cancelText="취소"
+        okButtonProps={{ danger: true, loading: rejectMutation.isPending }}
+      >
+        <Input.TextArea
+          value={rejectReason}
+          onChange={(e) => setRejectReason(e.target.value)}
+          rows={4}
+          placeholder="반려사유를 입력하세요"
+        />
+      </Modal>
     </PageContainer>
   )
 }

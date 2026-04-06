@@ -1,4 +1,5 @@
-import { Popconfirm, Button, message } from 'antd'
+import { useRef } from 'react'
+import { Popconfirm, Button, Space, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -7,7 +8,7 @@ import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
-interface Reservation {
+interface Reservation extends Record<string, unknown> {
   id: string
   roomId: string
   roomName: string
@@ -27,12 +28,36 @@ const STATUS_LABEL_MAP = { pending: '대기', approved: '승인', rejected: '반
 
 export default function ReservationMgmtPage() {
   const queryClient = useQueryClient()
+  const dataRef = useRef<Reservation[]>([])
+
+  // 엑셀 다운로드 (CSV 변환)
+  const handleExcelExport = () => {
+    const header = '회의실,예약일,시간,목적,신청자,상태'
+    const rows = dataRef.current.map((r) =>
+      [r.roomName, r.date, `${r.startTime}~${r.endTime}`, r.purpose, r.applicant, r.status].join(',')
+    )
+    const csv = [header, ...rows].join('\n')
+    const blob = new Blob(['\uFEFF' + csv], { type: 'text/csv;charset=utf-8;' })
+    const url = URL.createObjectURL(blob)
+    const link = document.createElement('a')
+    link.href = url
+    link.download = '회의예약목록.csv'
+    link.click()
+    URL.revokeObjectURL(url)
+    message.success('엑셀 다운로드가 완료되었습니다')
+  }
+
+  // 프린트
+  const handlePrint = () => {
+    window.print()
+  }
 
   // 전체 예약 목록 request 함수
   const fetchReservations = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
     const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/api/sys16/reservations', {
       params: { page: params.page, size: params.size },
     })
+    dataRef.current = res.data.data.content
     return res.data.data
   }
 
@@ -117,6 +142,10 @@ export default function ReservationMgmtPage() {
 
   return (
     <PageContainer title="회의예약관리">
+      <Space style={{ marginBottom: 16 }}>
+        <Button onClick={handleExcelExport}>엑셀 다운로드</Button>
+        <Button onClick={handlePrint}>프린트</Button>
+      </Space>
       <DataTable<Reservation>
         columns={columns}
         request={fetchReservations}

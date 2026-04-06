@@ -3,15 +3,22 @@ import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 // 타입 정의
-export type CertStatus = 'pending' | 'approved' | 'rejected'
+export type CertStatus = 'pending' | 'approved' | 'rejected' | 'withdrawn'
 
-export interface CertApplication {
+export interface CertApplication extends Record<string, unknown> {
   id: string
   applicantName: string
   applicantUnit: string
   certType: string
+  requestType: string
   purpose: string
+  reason: string
+  militaryId: string
+  email: string
+  phone: string
   status: CertStatus
+  ndscaStatus: 'pending' | 'approved' | 'rejected'
+  rejectReason?: string
   appliedAt: string
   processedAt?: string
 }
@@ -19,6 +26,8 @@ export interface CertApplication {
 const CERT_TYPES = ['재직증명서', '경력증명서', '복무증명서']
 const UNITS = ['1사단', '2사단', '해병대사령부']
 const STATUSES: CertStatus[] = ['pending', 'approved', 'rejected']
+const REQUEST_TYPES = ['신규발급', '재발급', '갱신']
+const NDSCA_STATUSES: Array<'pending' | 'approved' | 'rejected'> = ['pending', 'approved', 'rejected']
 
 // Mock 데이터 20건
 let applications: CertApplication[] = Array.from({ length: 20 }, (_, i) => ({
@@ -26,6 +35,7 @@ let applications: CertApplication[] = Array.from({ length: 20 }, (_, i) => ({
   applicantName: faker.person.lastName() + faker.person.firstName(),
   applicantUnit: UNITS[i % UNITS.length],
   certType: CERT_TYPES[i % CERT_TYPES.length],
+  requestType: faker.helpers.arrayElement(REQUEST_TYPES),
   purpose: faker.helpers.arrayElement([
     '취업용',
     '금융기관 제출용',
@@ -33,7 +43,12 @@ let applications: CertApplication[] = Array.from({ length: 20 }, (_, i) => ({
     '학원 등록용',
     '보험사 제출용',
   ]),
+  reason: faker.lorem.sentence(),
+  militaryId: 'M-' + faker.string.numeric(8),
+  email: faker.internet.email(),
+  phone: faker.phone.number(),
   status: STATUSES[i % STATUSES.length],
+  ndscaStatus: faker.helpers.arrayElement(NDSCA_STATUSES),
   appliedAt: faker.date.recent({ days: 60 }).toISOString().split('T')[0],
   processedAt:
     STATUSES[i % STATUSES.length] !== 'pending'
@@ -82,8 +97,14 @@ export const sys04Handlers = [
       applicantName: '홍길동',
       applicantUnit: '해병대사령부',
       certType: body.certType || '재직증명서',
+      requestType: body.requestType || '신규발급',
       purpose: body.purpose || '',
+      reason: body.reason || '',
+      militaryId: body.militaryId || 'M-20250001',
+      email: body.email || '',
+      phone: body.phone || '',
       status: 'pending',
+      ndscaStatus: 'pending',
       appliedAt: new Date().toISOString().split('T')[0],
     }
     applications = [newItem, ...applications]
@@ -129,15 +150,37 @@ export const sys04Handlers = [
   }),
 
   // 인증서 반려
-  http.patch('/api/sys04/certificates/:id/reject', ({ params }) => {
+  http.patch('/api/sys04/certificates/:id/reject', async ({ params, request }) => {
+    const index = applications.findIndex((a) => a.id === params.id)
+    if (index === -1) {
+      return HttpResponse.json({ success: false, message: '신청서를 찾을 수 없습니다' }, { status: 404 })
+    }
+    let rejectReason = ''
+    try {
+      const body = (await request.json()) as { rejectReason?: string }
+      rejectReason = body.rejectReason || ''
+    } catch {
+      // body가 없을 수 있음
+    }
+    applications[index] = {
+      ...applications[index],
+      status: 'rejected',
+      rejectReason,
+      processedAt: new Date().toISOString().split('T')[0],
+    }
+    const result: ApiResult<CertApplication> = { success: true, data: applications[index] }
+    return HttpResponse.json(result)
+  }),
+
+  // 인증서 회수
+  http.patch('/api/sys04/certificates/:id/withdraw', ({ params }) => {
     const index = applications.findIndex((a) => a.id === params.id)
     if (index === -1) {
       return HttpResponse.json({ success: false, message: '신청서를 찾을 수 없습니다' }, { status: 404 })
     }
     applications[index] = {
       ...applications[index],
-      status: 'rejected',
-      processedAt: new Date().toISOString().split('T')[0],
+      status: 'withdrawn',
     }
     const result: ApiResult<CertApplication> = { success: true, data: applications[index] }
     return HttpResponse.json(result)

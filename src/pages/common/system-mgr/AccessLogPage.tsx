@@ -1,7 +1,6 @@
-import { useState, useRef } from 'react'
+import { useState } from 'react'
 import { Button } from 'antd'
 import type { ProColumns } from '@ant-design/pro-components'
-import type { ActionType } from '@ant-design/pro-components'
 import { DataTable, DetailModal } from '@/shared/ui'
 import type { DetailField } from '@/shared/ui'
 import { downloadCsv } from '@/shared/lib/csv'
@@ -42,7 +41,6 @@ export function AccessLogPage() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [detailData, setDetailData] = useState<Record<string, unknown> | null>(null)
   const [tableData, setTableData] = useState<AccessLog[]>([])
-  const actionRef = useRef<ActionType>()
 
   const columns: ProColumns<AccessLog>[] = [
     { title: '사용자명', dataIndex: 'userName', key: 'userName', width: 120 },

@@ -46,7 +46,7 @@ interface Schedule {
   endTime: string
 }
 
-interface MeetingRoom {
+interface MeetingRoom extends Record<string, unknown> {
   id: string
   name: string
   location: string

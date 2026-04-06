@@ -145,7 +145,7 @@ export function GroupMenuPage() {
               <Tree
                 checkable
                 checkStrictly={false}
-                defaultExpandDepth={1}
+                defaultExpandAll={false}
                 treeData={treeData}
                 checkedKeys={checkedKeys}
                 onCheck={handleCheck}

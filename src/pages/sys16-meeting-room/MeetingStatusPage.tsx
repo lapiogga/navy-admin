@@ -8,7 +8,7 @@ import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
-interface Reservation {
+interface Reservation extends Record<string, unknown> {
   id: string
   roomId: string
   roomName: string
@@ -31,7 +31,15 @@ interface MeetingRoom {
 const STATUS_COLOR_MAP = { pending: 'orange', approved: 'green', rejected: 'red' }
 const STATUS_LABEL_MAP = { pending: '대기', approved: '승인', rejected: '반려' }
 
+const UNIT_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '해병대사령부', value: '해병대사령부' },
+  { label: '1사단', value: '1사단' },
+  { label: '2사단', value: '2사단' },
+]
+
 export default function MeetingStatusPage() {
+  const [managingUnit, setManagingUnit] = useState<string>('')
   const [selectedRoom, setSelectedRoom] = useState<string>('')
   const [dateRange, setDateRange] = useState<[string, string] | null>(null)
 
@@ -53,6 +61,7 @@ export default function MeetingStatusPage() {
       page: params.page,
       size: params.size,
     }
+    if (managingUnit) queryParams.managingUnit = managingUnit
     if (selectedRoom) queryParams.roomId = selectedRoom
     if (dateRange) {
       queryParams.startDate = dateRange[0]
@@ -92,6 +101,14 @@ export default function MeetingStatusPage() {
   return (
     <PageContainer title="회의현황">
       <Space style={{ marginBottom: 16 }}>
+        <Select
+          placeholder="관리 부대"
+          style={{ width: 140 }}
+          allowClear
+          value={managingUnit || undefined}
+          onChange={(value) => setManagingUnit(value ?? '')}
+          options={UNIT_OPTIONS}
+        />
         <Select
           placeholder="회의실 선택"
           style={{ width: 180 }}
