@@ -401,6 +401,110 @@ let dailySettlements: DailySettlement[] = Array.from({ length: 20 }, () => ({
 }))
 
 // ──────────────────────────────────────────────────
+// Wave 3 데이터 (결산종합현황 + 관리자)
+// ──────────────────────────────────────────────────
+
+interface CheckItemRecord extends Record<string, unknown> {
+  id: string; itemName: string; category: string; weight: number; required: boolean; cycle: string; tabKey: string; department?: string
+}
+interface HolidayRecord extends Record<string, unknown> {
+  id: string; holidayType: '특정기간' | '특정요일'; description: string; startDate: string; endDate: string; tabType: string; department?: string
+}
+interface NotifyTimeRecord extends Record<string, unknown> {
+  id: string; department: string; isTopLevel: boolean; personalStartTime: string; personalEndTime: string; officeStartTime: string; officeEndTime: string
+}
+interface LogRecord extends Record<string, unknown> {
+  id: string; logType: string; eventAt: string; userName: string; department: string; actionType: string; detail: string
+}
+interface ExceptionRecord extends Record<string, unknown> {
+  id: string; personnelName: string; rank: string; department: string; reason: string; startDate: string; endDate: string; status: '적용중' | '만료'; exceptionType: string
+}
+interface PersonalSettingRecord extends Record<string, unknown> {
+  id: string; personalAlarm: boolean; officeAlarm: boolean; alarmTime: string
+}
+interface RegulationRecord extends Record<string, unknown> {
+  id: string; category: string; content: string; updatedAt: string
+}
+
+const TAB_KEYS_ALL = ['personal-required', 'office-required', 'personal-optional', 'office-optional', 'security-level']
+
+let checkItems: CheckItemRecord[] = TAB_KEYS_ALL.flatMap((tabKey) =>
+  Array.from({ length: 8 }, () => ({
+    id: faker.string.uuid(),
+    itemName: `점검항목-${faker.string.numeric(3)}`,
+    category: faker.helpers.arrayElement(['보안', '물리', '기술', '관리']),
+    weight: faker.number.int({ min: 1, max: 10 }),
+    required: faker.datatype.boolean(),
+    cycle: faker.helpers.arrayElement(['일일', '주간', '월간', '분기']),
+    tabKey,
+    department: ['personal-optional', 'office-optional'].includes(tabKey) ? faker.helpers.arrayElement(UNITS) : undefined,
+  })),
+)
+
+let holidayRecords: HolidayRecord[] = ['common', 'unit'].flatMap((tabType) =>
+  Array.from({ length: 6 }, () => ({
+    id: faker.string.uuid(),
+    holidayType: faker.helpers.arrayElement(['특정기간', '특정요일'] as ('특정기간' | '특정요일')[]),
+    description: faker.helpers.arrayElement(['신정', '설날', '광복절', '추석', '성탄절', '현충일']),
+    startDate: faker.date.future({ years: 1 }).toISOString().split('T')[0],
+    endDate: faker.date.future({ years: 1 }).toISOString().split('T')[0],
+    tabType,
+    department: tabType === 'unit' ? faker.helpers.arrayElement(UNITS) : undefined,
+  })),
+)
+
+const TOP_LEVEL = ['해군', '해병대']
+let notifyTimes: NotifyTimeRecord[] = [...TOP_LEVEL, ...UNITS].map((dept) => ({
+  id: faker.string.uuid(),
+  department: dept,
+  isTopLevel: TOP_LEVEL.includes(dept),
+  personalStartTime: '08:00',
+  personalEndTime: '09:00',
+  officeStartTime: '17:00',
+  officeEndTime: '18:00',
+}))
+
+let logRecords: LogRecord[] = ['결산실시', '종합'].flatMap((logType) =>
+  Array.from({ length: 15 }, () => ({
+    id: faker.string.uuid(),
+    logType,
+    eventAt: faker.date.recent({ days: 30 }).toISOString(),
+    userName: randomName(),
+    department: faker.helpers.arrayElement(UNITS),
+    actionType: faker.helpers.arrayElement(['조회', '등록', '수정', '삭제', '결재']),
+    detail: faker.lorem.sentence(),
+  })),
+)
+
+let exceptionRecords: ExceptionRecord[] = ['org', 'single', 'exception'].flatMap((exceptionType) =>
+  Array.from({ length: 8 }, () => ({
+    id: faker.string.uuid(),
+    personnelName: randomName(),
+    rank: faker.helpers.arrayElement(RANKS),
+    department: faker.helpers.arrayElement(UNITS),
+    reason: faker.helpers.arrayElement(['장기파견', '의료휴가', '1인근무', '직책상 예외']),
+    startDate: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
+    endDate: faker.date.future({ years: 1 }).toISOString().split('T')[0],
+    status: faker.helpers.arrayElement(['적용중', '만료'] as ('적용중' | '만료')[]),
+    exceptionType,
+  })),
+)
+
+const personalSettings: PersonalSettingRecord = {
+  id: 'user-setting',
+  personalAlarm: true,
+  officeAlarm: false,
+  alarmTime: '08:30',
+}
+
+let regulationContents: RegulationRecord[] = ['personal', 'office', 'secret', 'media'].map((category) => ({
+  id: faker.string.uuid(),
+  category,
+  content: `${category} 관련 규정 내용입니다. 보안 규정에 따라 모든 인원은 해당 절차를 준수하여야 합니다.`,
+  updatedAt: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
+}))
+
+// ──────────────────────────────────────────────────
 // 유틸리티
 // ──────────────────────────────────────────────────
 function paged<T>(items: T[], page: number, size: number): PageResponse<T> {
@@ -921,5 +1025,261 @@ export const sys15Handlers = [
     )
     const updated = approvalRecords.find((a) => a.id === params.id)
     return ok(updated)
+  }),
+
+  // ── Wave 3: 결산종합현황 ──
+  http.get('/api/sys15/summary/secret', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const dept = url.searchParams.get('department') ?? ''
+    const data = UNITS.map((u) => ({
+      id: faker.string.uuid(),
+      department: u,
+      totalSecrets: faker.number.int({ min: 10, max: 100 }),
+      activeSecrets: faker.number.int({ min: 5, max: 50 }),
+      expiredSecrets: faker.number.int({ min: 0, max: 10 }),
+      totalMedia: faker.number.int({ min: 20, max: 200 }),
+      activeMedia: faker.number.int({ min: 10, max: 100 }),
+      totalEquipment: faker.number.int({ min: 5, max: 30 }),
+      activeEquipment: faker.number.int({ min: 3, max: 20 }),
+      reportDate: new Date().toISOString().split('T')[0],
+    })).filter((r) => !dept || r.department === dept)
+    return ok(paged(data, page, size))
+  }),
+
+  http.get('/api/sys15/summary/personal', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const dept = url.searchParams.get('department') ?? ''
+    const data = UNITS.map((u) => {
+      const total = faker.number.int({ min: 50, max: 300 })
+      const completed = faker.number.int({ min: 30, max: total })
+      return {
+        id: faker.string.uuid(),
+        department: u,
+        totalPersonnel: total,
+        completedCount: completed,
+        incompletedCount: total - completed - faker.number.int({ min: 0, max: 5 }),
+        absenceCount: faker.number.int({ min: 0, max: 5 }),
+        completionRate: Math.round((completed / total) * 100),
+        startDate: '2026-01-01',
+        endDate: new Date().toISOString().split('T')[0],
+      }
+    }).filter((r) => !dept || r.department === dept)
+    return ok(paged(data, page, size))
+  }),
+
+  http.get('/api/sys15/summary/office', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const dept = url.searchParams.get('department') ?? ''
+    const data = UNITS.map((u) => {
+      const total = faker.number.int({ min: 5, max: 30 })
+      const completed = faker.number.int({ min: 3, max: total })
+      return {
+        id: faker.string.uuid(),
+        department: u,
+        totalOffices: total,
+        completedCount: completed,
+        incompletedCount: total - completed,
+        completionRate: Math.round((completed / total) * 100),
+        nonCompliantCount: faker.number.int({ min: 0, max: 10 }),
+        startDate: '2026-01-01',
+        endDate: new Date().toISOString().split('T')[0],
+      }
+    }).filter((r) => !dept || r.department === dept)
+    return ok(paged(data, page, size))
+  }),
+
+  http.get('/api/sys15/summary/absence', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const dept = url.searchParams.get('department') ?? ''
+    const data = UNITS.map((u) => ({
+      id: faker.string.uuid(),
+      department: u,
+      totalAbsence: faker.number.int({ min: 5, max: 50 }),
+      approvedCount: faker.number.int({ min: 3, max: 30 }),
+      pendingCount: faker.number.int({ min: 0, max: 5 }),
+      rejectedCount: faker.number.int({ min: 0, max: 3 }),
+      avgDays: faker.number.int({ min: 1, max: 14 }),
+      startDate: '2026-01-01',
+      endDate: new Date().toISOString().split('T')[0],
+    })).filter((r) => !dept || r.department === dept)
+    return ok(paged(data, page, size))
+  }),
+
+  // ── Wave 3: 점검항목관리 ──
+  http.get('/api/sys15/check-items', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const tabKey = url.searchParams.get('tabKey') ?? ''
+    const dept = url.searchParams.get('department') ?? ''
+    const filtered = checkItems.filter(
+      (c) => (!tabKey || c.tabKey === tabKey) && (!dept || c.department === dept),
+    )
+    return ok(paged(filtered, page, size))
+  }),
+  http.post('/api/sys15/check-items', async ({ request }) => {
+    const body = await request.json() as Partial<CheckItemRecord>
+    const item: CheckItemRecord = {
+      id: faker.string.uuid(),
+      itemName: body.itemName ?? '',
+      category: body.category ?? '',
+      weight: body.weight ?? 1,
+      required: body.required ?? false,
+      cycle: body.cycle ?? '일일',
+      tabKey: body.tabKey ?? 'personal-required',
+      department: body.department,
+    }
+    checkItems = [item, ...checkItems]
+    return ok(item)
+  }),
+  http.put('/api/sys15/check-items/:id', async ({ params, request }) => {
+    const body = await request.json() as Partial<CheckItemRecord>
+    checkItems = checkItems.map((c) => c.id === params.id ? { ...c, ...body } : c)
+    return ok(checkItems.find((c) => c.id === params.id))
+  }),
+  http.delete('/api/sys15/check-items/:id', ({ params }) => {
+    checkItems = checkItems.filter((c) => c.id !== params.id)
+    return ok({ id: params.id })
+  }),
+
+  // ── Wave 3: 공휴일관리 ──
+  http.get('/api/sys15/holidays', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const tabType = url.searchParams.get('tabType') ?? ''
+    const filtered = holidayRecords.filter((h) => !tabType || h.tabType === tabType)
+    return ok(paged(filtered, page, size))
+  }),
+  http.post('/api/sys15/holidays', async ({ request }) => {
+    const body = await request.json() as Partial<HolidayRecord>
+    const item: HolidayRecord = {
+      id: faker.string.uuid(),
+      holidayType: (body.holidayType ?? '특정기간') as '특정기간' | '특정요일',
+      description: body.description ?? '',
+      startDate: body.startDate ?? '',
+      endDate: body.endDate ?? '',
+      tabType: body.tabType ?? 'common',
+      department: body.department,
+    }
+    holidayRecords = [item, ...holidayRecords]
+    return ok(item)
+  }),
+  http.put('/api/sys15/holidays/:id', async ({ params, request }) => {
+    const body = await request.json() as Partial<HolidayRecord>
+    holidayRecords = holidayRecords.map((h) => h.id === params.id ? { ...h, ...body } : h)
+    return ok(holidayRecords.find((h) => h.id === params.id))
+  }),
+  http.delete('/api/sys15/holidays/:id', ({ params }) => {
+    holidayRecords = holidayRecords.filter((h) => h.id !== params.id)
+    return ok({ id: params.id })
+  }),
+
+  // ── Wave 3: 알림시간관리 ──
+  http.get('/api/sys15/notify-time', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 20)
+    return ok(paged(notifyTimes, page, size))
+  }),
+  http.put('/api/sys15/notify-time/:id', async ({ params, request }) => {
+    const body = await request.json() as Partial<NotifyTimeRecord>
+    notifyTimes = notifyTimes.map((n) => n.id === params.id ? { ...n, ...body } : n)
+    return ok(notifyTimes.find((n) => n.id === params.id))
+  }),
+
+  // ── Wave 3: 이력관리 ──
+  http.get('/api/sys15/logs', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const logType = url.searchParams.get('logType') ?? ''
+    const dept = url.searchParams.get('department') ?? ''
+    const filtered = logRecords.filter(
+      (l) => (!logType || l.logType === logType) && (!dept || l.department === dept),
+    )
+    return ok(paged(filtered, page, size))
+  }),
+
+  // ── Wave 3: 예외처리관리 ──
+  http.get('/api/sys15/org-tree', () => {
+    const tree = [
+      { key: 'navy', title: '해군', children: [
+        { key: '1fleet', title: '1함대', children: [{ key: '11div', title: '11전단' }] },
+        { key: '2fleet', title: '2함대', children: [{ key: '21div', title: '21전단' }] },
+        { key: '3fleet', title: '3함대' },
+        { key: 'hq', title: '해군사령부' },
+      ]},
+      { key: 'marines', title: '해병대', children: [
+        { key: 'mhq', title: '해병대사령부' },
+        { key: 'm1div', title: '1사단' },
+        { key: 'm2div', title: '2사단' },
+      ]},
+    ]
+    return ok(tree)
+  }),
+  http.get('/api/sys15/exceptions', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const exType = url.searchParams.get('exceptionType') ?? ''
+    const filtered = exceptionRecords.filter((e) => !exType || e.exceptionType === exType)
+    return ok(paged(filtered, page, size))
+  }),
+  http.post('/api/sys15/exceptions', async ({ request }) => {
+    const body = await request.json() as Partial<ExceptionRecord>
+    const item: ExceptionRecord = {
+      id: faker.string.uuid(),
+      personnelName: body.personnelName ?? '',
+      rank: body.rank ?? '',
+      department: body.department ?? '',
+      reason: body.reason ?? '',
+      startDate: body.startDate ?? '',
+      endDate: body.endDate ?? '',
+      status: '적용중',
+      exceptionType: body.exceptionType ?? 'exception',
+    }
+    exceptionRecords = [item, ...exceptionRecords]
+    return ok(item)
+  }),
+  http.put('/api/sys15/exceptions/:id', async ({ params, request }) => {
+    const body = await request.json() as Partial<ExceptionRecord>
+    exceptionRecords = exceptionRecords.map((e) => e.id === params.id ? { ...e, ...body } : e)
+    return ok(exceptionRecords.find((e) => e.id === params.id))
+  }),
+  http.delete('/api/sys15/exceptions/:id', ({ params }) => {
+    exceptionRecords = exceptionRecords.filter((e) => e.id !== params.id)
+    return ok({ id: params.id })
+  }),
+
+  // ── Wave 3: 개인설정 ──
+  http.get('/api/sys15/personal-settings', () => ok(personalSettings)),
+  http.put('/api/sys15/personal-settings', async ({ request }) => {
+    const body = await request.json() as Partial<PersonalSettingRecord>
+    Object.assign(personalSettings, body)
+    return ok(personalSettings)
+  }),
+
+  // ── Wave 3: 관련규정관리 ──
+  http.get('/api/sys15/regulations/:category', ({ params }) => {
+    const found = regulationContents.find((r) => r.category === params.category)
+    return ok(found ?? { id: params.category, category: params.category, content: '', updatedAt: '' })
+  }),
+  http.put('/api/sys15/regulations/:category', async ({ params, request }) => {
+    const body = await request.json() as { content: string }
+    regulationContents = regulationContents.map((r) =>
+      r.category === params.category
+        ? { ...r, content: body.content, updatedAt: new Date().toISOString().split('T')[0] }
+        : r,
+    )
+    return ok(regulationContents.find((r) => r.category === params.category))
   }),
 ]
