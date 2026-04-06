@@ -256,3 +256,94 @@ describe('sys10 index.tsx - BusWaitlistPage, BusViolatorPage 연결', () => {
     expect(content).toContain('BusViolatorPage')
   })
 })
+
+describe('ExternalLoginPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'ExternalLoginPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('타군 사용자 로그인 제목을 포함한다', () => {
+    expect(content).toContain('타군 사용자 로그인')
+  })
+
+  it('militaryId 필드를 포함한다', () => {
+    expect(content).toContain('militaryId')
+  })
+
+  it('password 필드를 포함한다', () => {
+    expect(content).toContain('password')
+  })
+
+  it('패스워드 초기화 기능을 포함한다', () => {
+    expect(content).toContain('패스워드 초기화')
+  })
+})
+
+describe('ExternalRegisterPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'ExternalRegisterPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('militaryBranch 필드를 포함한다', () => {
+    expect(content).toContain('militaryBranch')
+  })
+
+  it('passwordConfirm 필드를 포함한다', () => {
+    expect(content).toContain('passwordConfirm')
+  })
+
+  it('회원등록 신청 텍스트를 포함한다', () => {
+    expect(content).toContain('회원등록 신청')
+  })
+})
+
+describe('ExternalUserPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'ExternalUserPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('approve 기능을 포함한다', () => {
+    expect(content).toContain('approve')
+  })
+
+  it('reject 기능을 포함한다', () => {
+    expect(content).toContain('reject')
+  })
+
+  it('StatusBadge를 사용한다', () => {
+    expect(content).toContain('StatusBadge')
+  })
+
+  it('external-users API를 참조한다', () => {
+    expect(content).toContain('external-users')
+  })
+})
+
+describe('router.tsx - sys10/login 경로', () => {
+  const routerContent = readFileSync(
+    resolve(__dirname, '../../app/router.tsx'),
+    'utf-8'
+  )
+
+  it('sys10/login 경로를 포함한다', () => {
+    expect(routerContent).toContain('sys10/login')
+  })
+})
+
+describe('sys10 MSW 핸들러 - Task 2 타군 API', () => {
+  const content = readFileSync(resolve(HANDLERS_BASE, 'sys10.ts'), 'utf-8')
+
+  it('/api/sys10/external-auth 핸들러를 포함한다', () => {
+    expect(content).toContain('/api/sys10/external-auth')
+  })
+
+  it('/api/sys10/external-users 핸들러를 포함한다', () => {
+    expect(content).toContain('/api/sys10/external-users')
+  })
+})

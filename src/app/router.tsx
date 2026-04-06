@@ -6,6 +6,12 @@ import { SubsystemProLayout } from './layouts/PortalLayout'
 import { PageSpinner } from './components/PageSpinner'
 import LoginPage from '@/pages/login'
 import PortalPage from '@/pages/portal'
+const ExternalLoginPage = lazy(() =>
+  import('@/pages/sys10-weekend-bus/ExternalLoginPage').then((m) => ({ default: m.ExternalLoginPage }))
+)
+const ExternalRegisterPage = lazy(() =>
+  import('@/pages/sys10-weekend-bus/ExternalRegisterPage').then((m) => ({ default: m.ExternalRegisterPage }))
+)
 
 // 서브시스템: React.lazy 코드 스플리팅 (per D-22)
 const Sys01Page = lazy(() => import('@/pages/sys01-overtime'))
@@ -39,6 +45,22 @@ function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
 
 export const router = createBrowserRouter([
   { path: '/login', element: <LoginPage /> },
+  {
+    path: '/sys10/login',
+    element: (
+      <Suspense fallback={<PageSpinner />}>
+        <ExternalLoginPage />
+      </Suspense>
+    ),
+  },
+  {
+    path: '/sys10/login/register',
+    element: (
+      <Suspense fallback={<PageSpinner />}>
+        <ExternalRegisterPage />
+      </Suspense>
+    ),
+  },
   // 메인 포탈: 사이드바 없는 헤더만 있는 레이아웃
   {
     path: '/',

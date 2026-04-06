@@ -8,6 +8,7 @@ import { BusSchedulePage } from './BusSchedulePage'
 import { BusUsagePage } from './BusUsagePage'
 import { BusWaitlistPage } from './BusWaitlistPage'
 import { BusViolatorPage } from './BusViolatorPage'
+import { ExternalUserPage } from './ExternalUserPage'
 
 // 공통 게시판 lazy import (sysCode=sys10)
 const BoardListPage = lazy(() =>
@@ -67,8 +68,8 @@ export default function Page() {
         {/* /sys10/1/8 - 위규자관리 */}
         <Route path="1/8" element={<BusViolatorPage />} />
 
-        {/* /sys10/1/9 - 타군 사용자관리 (Plan 03에서 구현) */}
-        <Route path="1/9" element={<PlaceholderPage title="타군 사용자관리 준비중" />} />
+        {/* /sys10/1/9 - 타군 사용자관리 */}
+        <Route path="1/9" element={<ExternalUserPage />} />
 
         {/* 관리자 대메뉴 [규칙 7] */}
         <Route path="2/1" element={<CodeGroupPage />} />

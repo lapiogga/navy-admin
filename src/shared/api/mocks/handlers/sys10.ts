@@ -324,4 +324,59 @@ export const sys10Handlers = [
     if (idx !== -1) violators.splice(idx, 1)
     return HttpResponse.json({ id: params.id, deleted: true })
   }),
+
+  // 타군 사용자 Mock 데이터 (모듈 레벨로 올릴 수 없으므로 핸들러 내 클로저로 관리)
+  // POST 타군 로그인
+  http.post('/api/sys10/external-auth/login', async ({ request }) => {
+    const body = await request.json() as { militaryId: string; password: string }
+    if (body.militaryId && body.password) {
+      return HttpResponse.json({ token: 'mock-external-token', user: { militaryId: body.militaryId } })
+    }
+    return HttpResponse.json({ message: '인증 실패' }, { status: 401 })
+  }),
+
+  // 타군 사용자 회원등록
+  http.post('/api/sys10/external-users/register', async ({ request }) => {
+    const body = await request.json() as Record<string, unknown>
+    return HttpResponse.json({ id: `ext${Date.now()}`, ...body, status: 'pending' }, { status: 201 })
+  }),
+
+  // 타군 사용자 목록
+  http.get('/api/sys10/external-users', ({ request }) => {
+    const url = new URL(request.url)
+    const page = Number(url.searchParams.get('page') ?? 0)
+    const size = Number(url.searchParams.get('size') ?? 10)
+    const externalUsers = Array.from({ length: 8 }, (_, i) => ({
+      id: `ext${i + 1}`,
+      militaryBranch: ['육군', '공군', '해군', '육군', '공군', '해군', '육군', '공군'][i],
+      unitName: `${i + 1}대대`,
+      militaryId: `2025-${String(100 + i).padStart(6, '0')}`,
+      rank: ['상병', '일병', '병장', '하사', '중사', '상병', '일병', '대위'][i],
+      name: ['강태양', '이하늘', '박바다', '최달', '정별', '김구름', '윤비', '장산'][i],
+      position: ['분대장', '부소대장', '소대장', '중대장', '부중대장', '분대장', '부분대장', '대대장'][i],
+      phone: `010-${String(1000 + i).padStart(4, '0')}-${String(5678 + i).padStart(4, '0')}`,
+      email: `user${i + 1}@army.mil.kr`,
+      status: (i < 3 ? 'pending' : i < 7 ? 'approved' : 'rejected') as 'pending' | 'approved' | 'rejected',
+      registeredAt: `2026-04-0${i + 1}`,
+    }))
+    const start = page * size
+    const items = externalUsers.slice(start, start + size)
+    return HttpResponse.json({ content: items, totalElements: externalUsers.length })
+  }),
+
+  // 타군 사용자 승인
+  http.put('/api/sys10/external-users/:id/approve', ({ params }) => {
+    return HttpResponse.json({ id: params.id, status: 'approved' })
+  }),
+
+  // 타군 사용자 반려
+  http.put('/api/sys10/external-users/:id/reject', async ({ params, request }) => {
+    const body = await request.json() as { rejectReason: string }
+    return HttpResponse.json({ id: params.id, status: 'rejected', rejectReason: body.rejectReason })
+  }),
+
+  // 패스워드 초기화
+  http.post('/api/sys10/external-users/:id/reset-password', ({ params }) => {
+    return HttpResponse.json({ id: params.id, message: '임시 패스워드가 발송되었습니다.' })
+  }),
 ]
