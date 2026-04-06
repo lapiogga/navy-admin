@@ -3,8 +3,8 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: executing
-stopped_at: Completed 05-03-PLAN.md (SYS10 대기자/위규자/타군)
-last_updated: "2026-04-06T07:27:26.426Z"
+stopped_at: Completed 05-b-3-05-05-PLAN.md (SYS18 직무기술서관리체계 완성)
+last_updated: "2026-04-06T07:27:47.188Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 8
@@ -70,6 +70,7 @@ Progress: [█████░░░░░] 50%
 | Phase 05-b-3 P02 | 64 | 2 tasks | 12 files |
 | Phase 05-b-3 P01 | 42 | 2 tasks | 13 files |
 | Phase 05-b-3 P03 | 7 | 2 tasks | 8 files |
+| Phase 05-b-3 P05 | 6 | 2 tasks | 5 files |
 
 ## Accumulated Context
 
@@ -107,6 +108,8 @@ Recent decisions affecting current work:
 - [Phase 04-a-6]: SYS17 MVP 결재: Steps 시각화 + line API 시연, full integration은 v2 enhancement
 - [Phase 05-b-3]: SeatGrid 독립 컴포넌트 분리: BusReservationPage(인터랙티브)와 BusDispatchPage(readOnly) 재사용
 - [Phase 05-b-3]: SYS07 관리자 대메뉴 Phase 1 공통 lazy import 재사용 (규칙 7)
+- [Phase 05-b-3]: 표준업무시간 CRUD API를 /standard-work-hours 엔드포인트로 분리 (기존 /standard-hours와 충돌 방지)
+- [Phase 05-b-3]: CodeManagementPage를 CodeGroupPage 대신 사용 — 독립 실행 가능한 부모 래퍼 선택
 
 ### Pending Todos
 
@@ -120,7 +123,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-06T07:27:03.976Z
-Stopped at: Completed 05-03-PLAN.md (SYS10 대기자/위규자/타군)
+Last session: 2026-04-06T07:27:47.177Z
+Stopped at: Completed 05-b-3-05-05-PLAN.md (SYS18 직무기술서관리체계 완성)
 Resume command: /gsd:plan-phase 5 --auto
 Resume file: None
