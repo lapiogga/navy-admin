@@ -139,29 +139,59 @@
 | 2026-04-06 01:25 | 2026-04-06 01:42 | 3 | Phase 3 Execute | 5 plans 병렬(03-01~05), 152 new tests, 250/250 총 | 완료 |
 | 2026-04-06 01:42 | 2026-04-06 01:50 | 3 | Phase 3 Verify | Verifier 5/5 passed, REQUIREMENTS gap fix | 완료 |
 | 2026-04-06 01:50 | 2026-04-06 01:55 | 4 | Phase 4 Discuss | 6개 gray area 자동 결정, 27 decisions | 완료 |
+| 2026-04-06 08:57 | 2026-04-06 09:08 | 4 | Phase 4 Research | RESEARCH.md 생성 (npm 2종, 신규 116개 프로세스, 패턴 3개) | 완료 |
+| 2026-04-06 09:08 | 2026-04-06 09:22 | 4 | Phase 4 Plan (1차) | 5 plans in 2 waves (04-01~05) 생성 | 완료 |
+| 2026-04-06 09:22 | 2026-04-06 09:29 | - | 요건 변경 | req_analysis.txt 컬럼 반영 + UI-SPEC 필수 생성 규칙 추가 | 완료 |
+| 2026-04-06 09:29 | 2026-04-06 09:45 | 3,4 | UI-SPEC 병렬 생성 | Phase 3 소급 UI-SPEC(31 GAP) + Phase 4 UI-SPEC(176 프로세스) | 완료 |
+| 2026-04-06 09:45 | 2026-04-06 10:00 | 3 | Phase 3 패치 Plan | 03-06~10 (5 plans, Wave 1 병렬, 31 GAP 100% 커버) | 완료 |
 
 ## 재개 방법 (Resume Instructions)
 
-**다음 세션에서 실행할 명령:**
+**다음 세션 순서 (자동 실행):**
+
+### Step 1: Phase 3 패치 실행
 ```
-/gsd:plan-phase 4 --auto
+Phase 3 패치 계획 5개(03-06~10)를 병렬 실행. Wave 1, autonomous=true.
+각 플랜은 독립된 서브시스템만 수정하므로 충돌 없음.
 ```
-**주의:** 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것. Phase 4 discuss 완료, CONTEXT.md 생성됨. plan-phase부터 재시작 필요.
+- 03-06: SYS04 인증서 (G01-G05, 신청폼/회수/반려/엑셀/통계)
+- 03-07: SYS05 행정규칙 (G06-G10, CRUD 추가/조직도/예하부대)
+- 03-08: SYS14 나의제언 (G17-G27, 컬럼/상태/댓글/서식관리/엑셀)
+- 03-09: SYS11 연구자료 (G11-G16, 메인통계/컬럼/폼/검색/이력)
+- 03-10: SYS16 회의실예약 (G28-G31, 예약폼/검색/엑셀/권한)
+
+### Step 2: Phase 4 Plan 재수립
+```
+Phase 4의 기존 plans(04-01~05)를 삭제하고, 04-UI-SPEC.md를 반영하여 재계획.
+04-UI-SPEC.md에 req_analysis.txt 컬럼이 이미 반영되어 있음.
+```
+
+### Step 3: Phase 4 Execute + Verify
+
+**주의사항:**
+- 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것.
+- **신규 규칙**: 모든 화면은 req_analysis.txt의 단위프로세스 설명에 있는 컬럼/입력값을 최대한 반영
+- **신규 규칙**: 모든 Phase에서 UI-SPEC 필수 생성 (자동수행의 예외)
+- 향후 Phase 5~7도 동일 규칙 적용
 
 **현재 상태:**
 - Phase 0: 실행 완료 (프로젝트 기반, 공통 컴포넌트)
 - Phase 1: **실행 완료** + 검증 통과 (공통 기능 82개 프로세스)
 - Phase 2: **실행 완료** + 검증 통과 (메인 포탈)
-- Phase 3: **실행 완료** + 검증 통과 (저복잡도 서브시스템 5개, 250 tests)
-- Phase 4: **Discuss 완료, Plan 대기** (중복잡도 서브시스템 A 6개, 176개 프로세스)
-  - 04-CONTEXT.md 생성됨 (27 decisions), 04-DISCUSSION-LOG.md 생성됨
-  - Research/Plan/Execute 필요
+- Phase 3: **실행 완료** + 검증 통과 + **패치 계획 생성 완료** (31 GAP, 5 plans)
+  - 03-UI-SPEC.md 소급 생성, 03-06~10-PLAN.md 패치 계획 생성
+  - **패치 실행 대기**
+- Phase 4: **Plan 생성 완료** + **UI-SPEC 생성 완료** + **Plan 재수립 필요**
+  - 04-CONTEXT.md (27 decisions), 04-RESEARCH.md, 04-VALIDATION.md
+  - 04-UI-SPEC.md (26 테이블 + 14 폼 + 9 검색폼 + 8 차트 + 7 보고서)
+  - 04-01~05-PLAN.md 존재하나 UI-SPEC 반영 전이므로 재수립 필요
 
 **산출물 위치:**
-- `.planning/phases/01-99/01-VERIFICATION.md` — Phase 1 검증 리포트
-- `.planning/phases/02-00/02-VERIFICATION.md` — Phase 2 검증 리포트
-- `.planning/phases/03-5/03-VERIFICATION.md` — Phase 3 검증 리포트
-- `.planning/phases/03-5/03-01-SUMMARY.md` ~ `03-05-SUMMARY.md` — 실행 결과 5개
+- `.planning/phases/03-5/03-UI-SPEC.md` — Phase 3 소급 UI-SPEC (31 GAP 포함)
+- `.planning/phases/03-5/03-06~10-PLAN.md` — Phase 3 패치 계획 5개
+- `.planning/phases/04-a-6/04-UI-SPEC.md` — Phase 4 UI-SPEC
+- `.planning/phases/04-a-6/04-RESEARCH.md` — Phase 4 리서치
+- `.planning/phases/04-a-6/04-01~05-PLAN.md` — Phase 4 계획 (재수립 필요)
 
 **GitHub:** https://github.com/lapiogga/navy-admin.git (master branch)
 
