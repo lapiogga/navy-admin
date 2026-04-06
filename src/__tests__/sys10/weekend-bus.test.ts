@@ -104,3 +104,83 @@ describe('handlers/index.ts', () => {
     expect(content).toContain('sys10Handlers')
   })
 })
+
+describe('BusReservationStatusPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusReservationStatusPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('DataTable 컴포넌트를 사용한다', () => {
+    expect(content).toContain('DataTable')
+  })
+
+  it('reservedCount 컬럼을 포함한다', () => {
+    expect(content).toContain('reservedCount')
+  })
+
+  it('StatusBadge 컴포넌트를 사용한다', () => {
+    expect(content).toContain('StatusBadge')
+  })
+
+  it('승차권 발급 기능을 포함한다', () => {
+    expect(content).toContain('승차권')
+  })
+})
+
+describe('BusDispatchPage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusDispatchPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('SeatGrid 컴포넌트를 사용한다', () => {
+    expect(content).toContain('SeatGrid')
+  })
+
+  it('readOnly 모드를 사용한다', () => {
+    expect(content).toContain('readOnly')
+  })
+
+  it('CrudForm 또는 Form을 사용한다', () => {
+    expect(content).toContain('Form')
+  })
+})
+
+describe('BusSchedulePage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusSchedulePage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('openTime 필드를 포함한다', () => {
+    expect(content).toContain('openTime')
+  })
+
+  it('closeTime 필드를 포함한다', () => {
+    expect(content).toContain('closeTime')
+  })
+
+  it('reservationRank 필드를 포함한다', () => {
+    expect(content).toContain('reservationRank')
+  })
+})
+
+describe('BusUsagePage 컴포넌트', () => {
+  const content = readFileSync(resolve(BASE, 'BusUsagePage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(0)
+  })
+
+  it('usageRate 컬럼을 포함한다', () => {
+    expect(content).toContain('usageRate')
+  })
+
+  it('usedSeats 컬럼을 포함한다', () => {
+    expect(content).toContain('usedSeats')
+  })
+})
