@@ -3,14 +3,14 @@ gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
 status: verifying
-stopped_at: Completed 06-02-PLAN.md - SYS01 Part1 11 pages
-last_updated: "2026-04-06T08:28:49.335Z"
+stopped_at: Completed 06-2-01-PLAN.md (SYS08 부대계보관리체계 59개)
+last_updated: "2026-04-06T08:30:08.044Z"
 last_activity: 2026-04-06
 progress:
   total_phases: 8
   completed_phases: 5
   total_plans: 33
-  completed_plans: 26
+  completed_plans: 27
   percent: 63
 ---
 
@@ -72,6 +72,7 @@ Progress: [██████░░░░] 63%
 | Phase 05-b-3 P03 | 7 | 2 tasks | 8 files |
 | Phase 05-b-3 P05 | 6 | 2 tasks | 5 files |
 | Phase 06-2 P02 | 664 | 2 tasks | 13 files |
+| Phase 06-2 P01 | 13 | 2 tasks | 16 files |
 
 ## Accumulated Context
 
@@ -111,6 +112,8 @@ Recent decisions affecting current work:
 - [Phase 05-b-3]: SYS07 관리자 대메뉴 Phase 1 공통 lazy import 재사용 (규칙 7)
 - [Phase 05-b-3]: 표준업무시간 CRUD API를 /standard-work-hours 엔드포인트로 분리 (기존 /standard-hours와 충돌 방지)
 - [Phase 05-b-3]: CodeManagementPage를 CodeGroupPage 대신 사용 — 독립 실행 가능한 부모 래퍼 선택
+- [Phase 06-2]: SYS08 Tree Master-Detail: antd Tree(좌측 Card) + DataTable(우측) selectedUnit queryKey 연동 패턴 확립
+- [Phase 06-2]: Upload.Dragger + FileReader.readAsDataURL: beforeUpload에서 Base64 변환, return false로 자동업로드 방지
 
 ### Pending Todos
 
@@ -124,7 +127,7 @@ Recent decisions affecting current work:
 
 ## Session Continuity
 
-Last session: 2026-04-06T08:28:39.947Z
-Stopped at: Completed 06-02-PLAN.md - SYS01 Part1 11 pages
+Last session: 2026-04-06T08:30:08.027Z
+Stopped at: Completed 06-2-01-PLAN.md (SYS08 부대계보관리체계 59개)
 Resume command: /gsd:discuss-phase 6
 Resume file: None

@@ -145,8 +145,8 @@ Plans:
   4. 초과근무 일괄처리 승인, 최대인정시간/근무시간 관리, 당직개소 설정 등 관리자 기능 전체가 동작한다
 **Plans**: 3 plans (2 waves)
 Plans:
-- [ ] 06-01-PLAN.md (W1) -- SYS08 부대계보관리체계 (Tree Master-Detail+Upload.Dragger+Steps결재+통계10종+게시판+관리자)
-- [ ] 06-02-PLAN.md (W1) -- SYS01 초과근무 Part 1 (신청서TimePicker자동계산+결재Steps+일괄처리+월말결산마감+근무현황차트+부재관리)
+- [x] 06-01-PLAN.md (W1) -- SYS08 부대계보관리체계 (Tree Master-Detail+Upload.Dragger+Steps결재+통계10종+게시판+관리자)
+- [x] 06-02-PLAN.md (W1) -- SYS01 초과근무 Part 1 (신청서TimePicker자동계산+결재Steps+일괄처리+월말결산마감+근무현황차트+부재관리)
 - [ ] 06-03-PLAN.md (W2, depends: 06-02) -- SYS01 초과근무 Part 2 (최대인정시간Tabs+Calendar근무시간/공휴일+당직개소+개인설정+게시판+관리자+라우터22개)
 **UI hint**: yes
 
@@ -176,5 +176,5 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 3. 저복잡도 서브시스템 5개 | 5/10 | GAP Closure | - |
 | 4. 중복잡도 서브시스템 A 6개 | 4/6 | In Progress|  |
 | 5. 중복잡도 서브시스템 B 3개 | 5/5 | Complete   | 2026-04-06 |
-| 6. 고복잡도 서브시스템 2개 | 0/3 | Planned | - |
+| 6. 고복잡도 서브시스템 2개 | 2/3 | In Progress|  |
 | 7. 최고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
