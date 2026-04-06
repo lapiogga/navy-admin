@@ -1,0 +1,10 @@
+@media print {
+  @page { size: A4 portrait; margin: 20mm; }
+  .ant-layout-sider, .ant-layout-header, .ant-breadcrumb, .ant-btn, .no-print { display: none !important; }
+  .print-area { width: 100%; padding: 0; margin: 0; }
+  .report-title { font-size: 24px; font-weight: 700; text-align: center; margin-bottom: 32px; }
+  .signature-area { margin-top: 48px; text-align: right; }
+  .ant-descriptions { border: 1px solid #000 !important; }
+  .ant-descriptions-item-label { font-weight: 600 !important; background: #f0f0f0 !important; }
+  .no-break { page-break-inside: avoid; }
+}
