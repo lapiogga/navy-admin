@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Modal, Button, message, Form, Input, Descriptions, Tag } from 'antd'
+import { Modal, Button, message, Form, Input, Descriptions, Tag, Steps } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
@@ -123,13 +123,26 @@ export default function PerfTaskResultApprovalPage() {
         width={600}
       >
         {selectedItem && (
-          <Descriptions column={2} bordered>
-            <Descriptions.Item label="상세과제명" span={2}>{selectedItem.detailTaskTitle}</Descriptions.Item>
-            <Descriptions.Item label="부대(서)">{selectedItem.deptName}</Descriptions.Item>
-            <Descriptions.Item label="진도율">{selectedItem.progressRate}%</Descriptions.Item>
-            <Descriptions.Item label="진행 내용" span={2}>{selectedItem.content}</Descriptions.Item>
-            <Descriptions.Item label="상신일">{selectedItem.submittedAt ?? '-'}</Descriptions.Item>
-          </Descriptions>
+          <>
+            <Steps
+              current={selectedItem.status === 'pending' ? 1 : selectedItem.status === 'approved' ? 2 : 0}
+              size="small"
+              style={{ marginBottom: 24 }}
+              items={[
+                { title: '작성' },
+                { title: '결재대기', description: selectedItem.status === 'pending' ? '현재' : undefined },
+                { title: selectedItem.status === 'rejected' ? '반려' : '승인완료' },
+              ]}
+              status={selectedItem.status === 'rejected' ? 'error' : undefined}
+            />
+            <Descriptions column={2} bordered>
+              <Descriptions.Item label="상세과제명" span={2}>{selectedItem.detailTaskTitle}</Descriptions.Item>
+              <Descriptions.Item label="부대(서)">{selectedItem.deptName}</Descriptions.Item>
+              <Descriptions.Item label="진도율">{selectedItem.progressRate}%</Descriptions.Item>
+              <Descriptions.Item label="진행 내용" span={2}>{selectedItem.content}</Descriptions.Item>
+              <Descriptions.Item label="상신일">{selectedItem.submittedAt ?? '-'}</Descriptions.Item>
+            </Descriptions>
+          </>
         )}
       </Modal>
 

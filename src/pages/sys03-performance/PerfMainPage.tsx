@@ -1,6 +1,7 @@
 import { Card, Row, Col, Statistic, Progress, Spin } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
+import { Bar, Gauge } from '@ant-design/charts'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult } from '@/shared/api/types'
 
@@ -87,65 +88,49 @@ export default function PerfMainPage() {
         </Col>
       </Row>
 
-      <Row gutter={16}>
-        {/* 지휘방침별 업무추진율 */}
-        <Col span={12}>
-          <Card title="지휘방침별 업무추진율" style={{ marginBottom: 16 }}>
-            {stats.policyRates.map((item) => (
-              <div key={item.policyTitle} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span>{item.policyTitle}</span>
-                  <span style={{ color: getRateColor(item.rate) }}>{item.rate}%</span>
-                </div>
-                <Progress
-                  percent={item.rate}
-                  strokeColor={getRateColor(item.rate)}
-                  showInfo={false}
-                  size="small"
-                />
-              </div>
-            ))}
+      {/* Gauge + Bar 차트 */}
+      <Row gutter={16} style={{ marginBottom: 24 }}>
+        <Col span={8}>
+          <Card title="나의 부서 업무 달성률">
+            <Gauge
+              percent={stats.myDeptRate / 100}
+              range={{ color: ['#30BF78', '#E8EDF3'] }}
+              indicator={{
+                pointer: { style: { stroke: '#D0D0D0' } },
+                pin: { style: { stroke: '#D0D0D0' } },
+              }}
+              statistic={{
+                content: {
+                  formatter: () => `${stats.myDeptRate}%`,
+                  style: { fontSize: '24px', color: getRateColor(stats.myDeptRate) },
+                },
+              }}
+              height={200}
+            />
           </Card>
         </Col>
-
-        {/* 부/실/단별 업무추진율 */}
-        <Col span={12}>
-          <Card title="부/실/단별 업무추진율" style={{ marginBottom: 16 }}>
-            {stats.deptRates.map((item) => (
-              <div key={item.deptName} style={{ marginBottom: 12 }}>
-                <div style={{ display: 'flex', justifyContent: 'space-between', marginBottom: 4 }}>
-                  <span>{item.deptName}</span>
-                  <span style={{ color: getRateColor(item.rate) }}>{item.rate}%</span>
-                </div>
-                <Progress
-                  percent={item.rate}
-                  strokeColor={getRateColor(item.rate)}
-                  showInfo={false}
-                  size="small"
-                />
-              </div>
-            ))}
+        <Col span={8}>
+          <Card title="지휘방침별 업무추진율">
+            <Bar
+              data={stats.policyRates.map((r) => ({ name: r.policyTitle, value: r.rate }))}
+              xField="value"
+              yField="name"
+              height={200}
+              label={{ position: 'right' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
+              color="#1890ff"
+            />
           </Card>
         </Col>
-      </Row>
-
-      {/* 나의 부서 업무 달성률 상세 */}
-      <Row gutter={16}>
-        <Col span={24}>
-          <Card title="나의 부서 업무 달성률 상세">
-            <Row gutter={16}>
-              {stats.deptRates.slice(0, 4).map((item) => (
-                <Col key={item.deptName} span={6}>
-                  <Progress
-                    type="circle"
-                    percent={item.rate}
-                    strokeColor={getRateColor(item.rate)}
-                    format={(pct) => `${pct}%`}
-                  />
-                  <div style={{ textAlign: 'center', marginTop: 8 }}>{item.deptName}</div>
-                </Col>
-              ))}
-            </Row>
+        <Col span={8}>
+          <Card title="부/실/단별 업무추진율">
+            <Bar
+              data={stats.deptRates.map((r) => ({ name: r.deptName, value: r.rate }))}
+              xField="value"
+              yField="name"
+              height={200}
+              label={{ position: 'right' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
+              color="#faad14"
+            />
           </Card>
         </Col>
       </Row>

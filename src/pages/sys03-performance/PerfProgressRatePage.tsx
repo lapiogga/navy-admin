@@ -1,8 +1,9 @@
-import { useState } from 'react'
+import { useState, useRef } from 'react'
 import { Modal, Button, message, Tabs, Descriptions } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
-import { DownloadOutlined } from '@ant-design/icons'
+import { DownloadOutlined, PrinterOutlined } from '@ant-design/icons'
 import { useMutation } from '@tanstack/react-query'
+import { Bar } from '@ant-design/charts'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { apiClient } from '@/shared/api/client'
@@ -16,9 +17,28 @@ async function fetchProgressRates(params: PageRequest): Promise<PageResponse<Pro
   return (res as ApiResult<PageResponse<ProgressRate>>).data ?? (res as unknown as PageResponse<ProgressRate>)
 }
 
+function ProgressBarChart({ data }: { data: ProgressRate[] }) {
+  const chartData = data.map((item) => ({
+    name: item.deptName || item.unitName,
+    value: item.progressRate,
+  }))
+  return (
+    <Bar
+      data={chartData}
+      xField="value"
+      yField="name"
+      height={Math.max(200, chartData.length * 30)}
+      label={{ position: 'right' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
+      color="#1890ff"
+    />
+  )
+}
+
 function UnitProgressTab() {
   const [detailOpen, setDetailOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<ProgressRate | null>(null)
+  const [chartData, setChartData] = useState<ProgressRate[]>([])
+  const printRef = useRef<HTMLDivElement>(null)
 
   const exportMutation = useMutation({
     mutationFn: async () => apiClient.post('/sys03/progress-rates/export'),
@@ -64,6 +84,13 @@ function UnitProgressTab() {
         request={(params) => fetchProgressRates(params)}
         toolBarRender={() => [
           <Button
+            key="print"
+            icon={<PrinterOutlined />}
+            onClick={() => window.print()}
+          >
+            인쇄
+          </Button>,
+          <Button
             key="export"
             icon={<DownloadOutlined />}
             onClick={() => exportMutation.mutate()}
@@ -72,7 +99,16 @@ function UnitProgressTab() {
             엑셀 저장
           </Button>,
         ]}
+        postData={(data: ProgressRate[]) => {
+          setChartData(data)
+          return data
+        }}
       />
+      {chartData.length > 0 && (
+        <div ref={printRef} style={{ marginTop: 16 }} className="print-area">
+          <ProgressBarChart data={chartData} />
+        </div>
+      )}
       <Modal
         title="부대별 추진진도율 상세"
         open={detailOpen}
