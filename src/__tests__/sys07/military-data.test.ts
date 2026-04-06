@@ -150,27 +150,38 @@ describe('SYS07 군사자료관리체계', () => {
   })
 
   describe('MilDataUsagePage', () => {
-    it('Steps 워크플로우 존재 (Task 2)', () => {
-      try {
-        const content = read('pages/sys07-mil-data/MilDataUsagePage.tsx')
-        expect(content).toContain('Steps')
-        expect(content).toContain('current')
-      } catch {
-        // Task 2에서 생성 예정 - stub
-        expect(true).toBe(true)
-      }
+    it('Steps 워크플로우 존재', () => {
+      const content = read('pages/sys07-mil-data/MilDataUsagePage.tsx')
+      expect(content).toContain('Steps')
+      expect(content).toContain('current')
+    })
+
+    it('비밀등급 경고 Modal 존재', () => {
+      const content = read('pages/sys07-mil-data/MilDataUsagePage.tsx')
+      expect(content).toContain('비밀')
+      expect(content).toContain('열람 사유')
+    })
+
+    it('usagePurpose approve reject 존재', () => {
+      const content = read('pages/sys07-mil-data/MilDataUsagePage.tsx')
+      expect(content).toContain('usagePurpose')
+      expect(content).toContain('approve')
+      expect(content).toContain('reject')
     })
   })
 
   describe('MilDataStatsPage', () => {
-    it('@ant-design/charts 차트 존재 (Task 2)', () => {
-      try {
-        const content = read('pages/sys07-mil-data/MilDataStatsPage.tsx')
-        expect(content).toContain('@ant-design/charts')
-      } catch {
-        // Task 2에서 생성 예정 - stub
-        expect(true).toBe(true)
-      }
+    it('@ant-design/charts Column Pie Line 차트 존재', () => {
+      const content = read('pages/sys07-mil-data/MilDataStatsPage.tsx')
+      expect(content).toContain('Column')
+      expect(content).toContain('Pie')
+      expect(content).toContain('Line')
+      expect(content).toContain('@ant-design/charts')
+    })
+
+    it('접수용관리기록부 DataTable 존재', () => {
+      const content = read('pages/sys07-mil-data/MilDataStatsPage.tsx')
+      expect(content).toContain('접수용관리기록부')
     })
   })
 })
