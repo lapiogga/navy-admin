@@ -6,7 +6,7 @@ import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { PrintableReport } from '@/pages/sys09-memorial/PrintableReport'
-import { apiClient } from '@/shared/api/apiClient'
+import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
 
 interface ViolatorItem {

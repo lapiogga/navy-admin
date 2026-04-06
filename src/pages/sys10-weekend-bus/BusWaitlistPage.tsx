@@ -4,7 +4,7 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components'
 import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
-import { apiClient } from '@/shared/api/apiClient'
+import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
 
 interface WaitlistItem {

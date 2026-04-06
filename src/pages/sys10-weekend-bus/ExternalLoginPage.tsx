@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { Button, Card, Form, Input, Modal, message, Typography } from 'antd'
-import { apiClient } from '@/shared/api/apiClient'
+import { apiClient } from '@/shared/api/client'
 
 const { Title, Text } = Typography
 

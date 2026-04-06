@@ -159,7 +159,7 @@ export default function MilDataUsagePage() {
     { title: '군번', dataIndex: 'militaryId', width: 100 },
     { title: '계급', dataIndex: 'rank', width: 80 },
     { title: '직위', dataIndex: 'position', width: 100 },
-    { title: '부대', dataIndex: 'unit', width: 120 },
+    { title: '부대(서)', dataIndex: 'unit', width: 120 },
     { title: '활용일', dataIndex: 'usageDate', width: 110 },
     { title: '반납예정일', dataIndex: 'returnDueDate', width: 110 },
     { title: '반납일', dataIndex: 'returnDate', width: 110, render: (v) => (v as string) ?? '-' },
@@ -246,7 +246,7 @@ export default function MilDataUsagePage() {
               <div><b>군번:</b> {selectedUsage.militaryId}</div>
               <div><b>계급:</b> {selectedUsage.rank}</div>
               <div><b>직위:</b> {selectedUsage.position}</div>
-              <div><b>부대:</b> {selectedUsage.unit}</div>
+              <div><b>부대(서):</b> {selectedUsage.unit}</div>
               <div><b>활용일:</b> {selectedUsage.usageDate}</div>
               <div><b>반납예정일:</b> {selectedUsage.returnDueDate}</div>
               {selectedUsage.returnDate && <div><b>반납일:</b> {selectedUsage.returnDate}</div>}
@@ -297,8 +297,8 @@ export default function MilDataUsagePage() {
             <Form.Item name="position" label="직위">
               <Input placeholder="직위 입력" />
             </Form.Item>
-            <Form.Item name="unit" label="부대">
-              <Input placeholder="부대 입력" />
+            <Form.Item name="unit" label="부대(서)">
+              <Input placeholder="부대(서) 입력" />
             </Form.Item>
             <Form.Item name="phone" label="연락처">
               <Input placeholder="연락처 입력" />
