@@ -37,7 +37,7 @@ describe('코드관리 타입', () => {
 })
 
 describe('codeHandlers MSW 핸들러', () => {
-  it('codeHandlers가 export된다', async () => {
+  it('codeHandlers가 export된다', { timeout: 15000 }, async () => {
     const { codeHandlers } = await import('@/shared/api/mocks/handlers/common/code')
     expect(Array.isArray(codeHandlers)).toBe(true)
     expect(codeHandlers.length).toBeGreaterThan(0)

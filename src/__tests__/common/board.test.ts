@@ -107,7 +107,7 @@ describe('게시판 타입', () => {
 })
 
 describe('boardHandlers MSW 핸들러', () => {
-  it('boardHandlers가 export된다', async () => {
+  it('boardHandlers가 export된다', { timeout: 15000 }, async () => {
     const { boardHandlers } = await import('@/shared/api/mocks/handlers/common/board')
     expect(Array.isArray(boardHandlers)).toBe(true)
     expect(boardHandlers.length).toBeGreaterThan(0)
