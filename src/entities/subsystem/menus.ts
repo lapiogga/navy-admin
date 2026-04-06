@@ -323,6 +323,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '부대기록부', path: '/sys08/8/1' },
       ],
     },
+    {
+      name: '관리자',
+      path: '/sys08/9',
+      children: [
+        { name: '코드관리', path: '/sys08/9/1' },
+        { name: '권한관리', path: '/sys08/9/2' },
+      ],
+    },
   ],
   sys09: [
     {
