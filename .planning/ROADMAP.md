@@ -102,7 +102,13 @@ Plans:
   3. 설문종합관리체계에서 관리자가 설문 문항을 생성하고 배포하면, 사용자가 응답하고 결과 분석 화면에서 응답 통계를 확인할 수 있다
   4. 지시건의사항관리체계에서 지휘관 지시/건의 사항을 등록하고 이행현황을 추적하며 통계 차트를 조회할 수 있다
   5. 영현보훈체계에서 사망자/상이자를 등록하고 부대별/신분별/연도별 현황 보고서를 조회 및 저장할 수 있다
-**Plans**: TBD
+**Plans**: 5 plans (2 waves)
+Plans:
+- [ ] 04-01-PLAN.md (W1) -- npm 의존성 설치(@ant-design/charts, @dnd-kit) + sys06 해병대규정관리(sys05 재사용) + sys13 지식관리(CRUD+통계차트)
+- [ ] 04-02-PLAN.md (W2, depends: 04-01) -- sys17 검열결과관리(결재 워크플로우 Steps + 결과 통계 + 추진현황)
+- [ ] 04-03-PLAN.md (W2, depends: 04-01) -- sys12 지시건의사항관리(이행/처리현황 Progress+Timeline + 통계)
+- [ ] 04-04-PLAN.md (W2, depends: 04-01) -- sys09 영현보훈(CRUD + 현황 통계 4종 + 보고서/확인서 Print CSS)
+- [ ] 04-05-PLAN.md (W2, depends: 04-01) -- sys02 설문종합관리(문항편집기 dnd-kit + 결과분석 차트 + 체계관리 6탭)
 **UI hint**: yes
 
 ### Phase 5: 중복잡도 서브시스템 B 3개
@@ -152,7 +158,7 @@ Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
 | 1. 공통 기능 (99_공통기능) | 4/4 | Complete   | 2026-04-05 |
 | 2. 메인 포탈 (00_포탈) | 2/2 | Complete   | 2026-04-05 |
 | 3. 저복잡도 서브시스템 5개 | 5/5 | Complete   | 2026-04-05 |
-| 4. 중복잡도 서브시스템 A 6개 | 0/TBD | Not started | - |
+| 4. 중복잡도 서브시스템 A 6개 | 0/5 | Planning   | - |
 | 5. 중복잡도 서브시스템 B 3개 | 0/TBD | Not started | - |
 | 6. 고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
 | 7. 최고복잡도 서브시스템 2개 | 0/TBD | Not started | - |
