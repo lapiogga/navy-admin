@@ -141,6 +141,74 @@ describe('JobDescListPage', () => {
   })
 })
 
+describe('JobDescApprovalPage', () => {
+  const content = readFileSync(resolve(BASE, 'JobDescApprovalPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(100)
+  })
+
+  it('Steps 컴포넌트를 포함한다', () => {
+    expect(content).toContain('Steps')
+  })
+
+  it('approve(승인) 기능을 포함한다', () => {
+    expect(content).toContain('approve')
+  })
+
+  it('reject(반려) 기능을 포함한다', () => {
+    expect(content).toContain('reject')
+  })
+
+  it('rejectReason(반려사유)을 포함한다', () => {
+    expect(content).toContain('rejectReason')
+  })
+
+  it('재결재 기능을 포함한다', () => {
+    expect(content).toContain('재결재')
+  })
+
+  it('firstApprover를 포함한다', () => {
+    expect(content).toContain('firstApprover')
+  })
+
+  it('secondApprover를 포함한다', () => {
+    expect(content).toContain('secondApprover')
+  })
+
+  it('CrudForm 컴포넌트를 포함한다', () => {
+    expect(content).toContain('CrudForm')
+  })
+})
+
+describe('OrgDiagnosisPage', () => {
+  const content = readFileSync(resolve(BASE, 'OrgDiagnosisPage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(60)
+  })
+
+  it('diagnosisPeriod(진단기간)을 포함한다', () => {
+    expect(content).toContain('diagnosisPeriod')
+  })
+
+  it('targetUsers(대상자)를 포함한다', () => {
+    expect(content).toContain('targetUsers')
+  })
+
+  it('isBefore(진단기간 비교)를 포함한다', () => {
+    expect(content).toContain('isBefore')
+  })
+
+  it('DataTable을 포함한다', () => {
+    expect(content).toContain('DataTable')
+  })
+
+  it('StatusBadge를 포함한다', () => {
+    expect(content).toContain('StatusBadge')
+  })
+})
+
 describe('index.tsx 라우트 분기', () => {
   const content = readFileSync(resolve(BASE, 'index.tsx'), 'utf-8')
 
