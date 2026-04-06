@@ -272,6 +272,46 @@ describe('sys18.ts 관리자/통계/표준업무시간 API', () => {
   })
 })
 
+describe('StandardWorkTimePage', () => {
+  const content = readFileSync(resolve(BASE, 'StandardWorkTimePage.tsx'), 'utf-8')
+
+  it('파일이 존재한다', () => {
+    expect(content.length).toBeGreaterThan(60)
+  })
+
+  it('dayjs를 import하고 isAfter/isBefore를 사용한다', () => {
+    expect(content).toContain('dayjs')
+    expect(content).toMatch(/isAfter|isBefore/)
+  })
+
+  it('rankCategory 필드를 포함한다', () => {
+    expect(content).toContain('rankCategory')
+  })
+
+  it('standardHours 필드를 포함한다', () => {
+    expect(content).toContain('standardHours')
+  })
+
+  it('RangePicker를 포함한다', () => {
+    expect(content).toContain('RangePicker')
+  })
+
+  it('CrudForm을 참조한다', () => {
+    expect(content).toContain('CrudForm')
+  })
+
+  it('DataTable을 포함한다', () => {
+    expect(content).toContain('DataTable')
+  })
+
+  it('StatusBadge로 적용상태를 표시한다', () => {
+    expect(content).toContain('StatusBadge')
+    expect(content).toContain('적용중')
+    expect(content).toContain('적용예정')
+    expect(content).toContain('적용만료')
+  })
+})
+
 describe('index.tsx 라우트 분기', () => {
   const content = readFileSync(resolve(BASE, 'index.tsx'), 'utf-8')
 
@@ -308,6 +348,29 @@ describe('index.tsx 라우트 분기', () => {
   })
 
   it('권한관리 lazy import를 포함한다', () => {
+    expect(content).toContain('auth-group')
+  })
+
+  it('/sys18/1/5 라우트에 JobDescAdminPage를 포함한다 (placeholder 아님)', () => {
+    expect(content).toContain('1/5')
+    expect(content).toContain('JobDescAdminPage')
+    expect(content).not.toContain('PlaceholderPage')
+  })
+
+  it('/sys18/2/2 라우트에 StandardWorkTimePage를 포함한다 (placeholder 아님)', () => {
+    expect(content).toContain('2/2')
+    expect(content).toContain('StandardWorkTimePage')
+  })
+
+  it('BoardListPage를 lazy import한다', () => {
+    expect(content).toContain('BoardListPage')
+  })
+
+  it('code-mgmt를 lazy import한다', () => {
+    expect(content).toContain('code-mgmt')
+  })
+
+  it('AuthGroupPage를 lazy import한다', () => {
     expect(content).toContain('auth-group')
   })
 })

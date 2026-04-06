@@ -4,20 +4,13 @@ import { PageSpinner } from '@/app/components/PageSpinner'
 import JobDescListPage from './JobDescListPage'
 import JobDescApprovalPage from './JobDescApprovalPage'
 import OrgDiagnosisPage from './OrgDiagnosisPage'
+import JobDescAdminPage from './JobDescAdminPage'
+import StandardWorkTimePage from './StandardWorkTimePage'
 
 // 공통 기능 Phase 1 페이지 재사용 (규칙 6, 7)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
-const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
-const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
-
-// Plan 05에서 구현할 placeholder
-function PlaceholderPage({ title }: { title: string }) {
-  return (
-    <div style={{ padding: 24, textAlign: 'center', color: '#999' }}>
-      <p>{title} — Plan 05에서 구현 예정</p>
-    </div>
-  )
-}
+const BoardListPage = lazy(() => import('@/pages/common/board/BoardListPage'))
+const CodeMgmtPage = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
+const AuthGroupPage = lazy(() => import('@/pages/common/auth-group'))
 
 export default function Sys18Page() {
   return (
@@ -26,12 +19,12 @@ export default function Sys18Page() {
       <Route index element={<Navigate to="/sys18/1/3" replace />} />
 
       {/* 직무기술서 관리 */}
-      {/* /sys18/1/1 — 게시판 (공통 기능, 규칙 6) */}
+      {/* /sys18/1/1 — 게시판 (공통 기능, 규칙 6): sysCode=sys18 */}
       <Route
         path="1/1"
         element={
           <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
+            <BoardListPage boardId="sys18" />
           </Suspense>
         }
       />
@@ -45,8 +38,8 @@ export default function Sys18Page() {
       {/* /sys18/1/4 — 결재 (JOB-03) */}
       <Route path="1/4" element={<JobDescApprovalPage />} />
 
-      {/* /sys18/1/5 — 직무기술서 조회(관리자) - Plan 05에서 구현 예정 */}
-      <Route path="1/5" element={<PlaceholderPage title="직무기술서 조회(관리자)" />} />
+      {/* /sys18/1/5 — 직무기술서 조회(관리자) (JOB-02) */}
+      <Route path="1/5" element={<JobDescAdminPage />} />
 
       {/* 관리자 */}
       {/* /sys18/2/1 — 공통코드관리 (공통 기능, 규칙 7) */}
@@ -54,20 +47,20 @@ export default function Sys18Page() {
         path="2/1"
         element={
           <Suspense fallback={<PageSpinner />}>
-            <CodeMgmtIndex />
+            <CodeMgmtPage />
           </Suspense>
         }
       />
 
-      {/* /sys18/2/2 — 표준업무시간관리 - Plan 05에서 구현 예정 */}
-      <Route path="2/2" element={<PlaceholderPage title="표준업무시간관리" />} />
+      {/* /sys18/2/2 — 표준업무시간관리 (JOB-08) */}
+      <Route path="2/2" element={<StandardWorkTimePage />} />
 
       {/* /sys18/2/3 — 사용자권한관리 (공통 기능, 규칙 7) */}
       <Route
         path="2/3"
         element={
           <Suspense fallback={<PageSpinner />}>
-            <AuthGroupIndex />
+            <AuthGroupPage />  {/* AuthGroupIndex — 권한그룹/메뉴별/그룹별/그룹사용자/부대 Tabs */}
           </Suspense>
         }
       />
