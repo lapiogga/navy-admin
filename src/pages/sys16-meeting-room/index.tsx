@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import MeetingReservePage from './MeetingReservePage'
 import MyReservationPage from './MyReservationPage'
 import MeetingStatusPage from './MeetingStatusPage'
@@ -18,8 +19,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys16Page() {
   return (
     <Routes>
-      {/* 기본 경로: 회의예약신청으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys16/1/2" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys16"
+          title="회의실예약관리체계"
+          noticeBoardPath="/sys16/1/1"
+          qnaBoardPath="/sys16/1/1"
+        />
+      } />
 
       {/* 공지사항 (공통 게시판 재사용 - ROOM-06) */}
       <Route

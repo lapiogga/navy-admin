@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import SuggestionMainPage from './SuggestionMainPage'
 import SuggestionListPage from './SuggestionListPage'
 import SuggestionAdminPage from './SuggestionAdminPage'
@@ -15,8 +16,16 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys14Page() {
   return (
     <Routes>
-      {/* 기본 경로: 메인화면으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys14/1/1" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys14"
+          title="나의 제언"
+          noticeBoardPath="/sys14/1/2"
+          qnaBoardPath="/sys14/1/2"
+          dashboard={<SuggestionMainPage />}
+        />
+      } />
 
       {/* 메인화면 (고유 페이지 - SUGST-01) */}
       <Route path="1/1" element={<SuggestionMainPage />} />

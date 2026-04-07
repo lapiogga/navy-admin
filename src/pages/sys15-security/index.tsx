@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 
 // SYS15 Wave 1: 비밀/매체/보안자재 CRUD
 const SecretPage = React.lazy(() => import('./SecretPage'))
@@ -73,7 +74,15 @@ export default function Sys15Page() {
     <Routes>
       {/* 메인화면 (1) */}
       <Route path="1/1" element={withSuspense(SecMainPage)} />
-      <Route path="" element={withSuspense(SecMainPage)} />
+      <Route path="" element={
+        <SubsystemHomePage
+          sysCode="sys15"
+          title="보안일일결산체계"
+          noticeBoardPath="/sys15/7/1"
+          qnaBoardPath="/sys15/7/2"
+          dashboard={withSuspense(SecMainPage)}
+        />
+      } />
 
       {/* 비밀/매체관리 (2) */}
       <Route path="2/1" element={withSuspense(MediaPage)} />

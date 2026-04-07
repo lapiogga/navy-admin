@@ -528,6 +528,26 @@ export const boardHandlers = [
     return HttpResponse.json(result)
   }),
 
+  // ── 게시글 최신 N건 ──
+
+  http.get('/api/common/boards/:boardId/recent', ({ params, request }) => {
+    const url = new URL(request.url)
+    const limit = Number(url.searchParams.get('limit') ?? '5')
+    const filtered = mockPosts
+      .filter((p) => p.boardId === params.boardId && p.status === 'ACTIVE')
+      .sort((a, b) => new Date(b.createdAt).getTime() - new Date(a.createdAt).getTime())
+      .slice(0, limit)
+      .map((p) => ({
+        id: p.id,
+        title: p.title,
+        authorName: p.authorName,
+        createdAt: p.createdAt,
+        viewCount: p.viewCount,
+      }))
+    const result: ApiResult<typeof filtered> = { success: true, data: filtered }
+    return HttpResponse.json(result)
+  }),
+
   // ── 게시글 ──
 
   http.get('/api/common/boards/:boardId/posts', ({ params, request }) => {

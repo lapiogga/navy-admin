@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import MySurveyPage from './MySurveyPage'
 import SurveyQuestionEditor from './SurveyQuestionEditor'
 import SurveyParticipationPage from './SurveyParticipationPage'
@@ -19,8 +20,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys02Page() {
   return (
     <Routes>
-      {/* 기본 경로: 나의 설문관리로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys02/1/2" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys02"
+          title="설문종합관리체계"
+          noticeBoardPath="/sys02/1/1"
+          qnaBoardPath="/sys02/1/1"
+        />
+      } />
 
       {/* 게시판 (공통 페이지 재사용 - SURV-05) */}
       <Route

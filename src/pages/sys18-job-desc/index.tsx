@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import JobDescListPage from './JobDescListPage'
 import JobDescApprovalPage from './JobDescApprovalPage'
 import OrgDiagnosisPage from './OrgDiagnosisPage'
@@ -18,8 +19,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys18Page() {
   return (
     <Routes>
-      {/* 기본 경로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys18/1/3" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys18"
+          title="직무기술서관리체계"
+          noticeBoardPath="/sys18/1/1"
+          qnaBoardPath="/sys18/1/1"
+        />
+      } />
 
       {/* 직무기술서 관리 */}
       {/* /sys18/1/1 — 게시판 (공통 기능, 규칙 6): sysCode=sys18 */}

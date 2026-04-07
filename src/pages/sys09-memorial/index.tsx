@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import DeceasedPage from './DeceasedPage'
 import InjuredPage from './InjuredPage'
 import ReviewPage from './ReviewPage'
@@ -28,7 +29,14 @@ export default function Sys09Page() {
   return (
     <Routes>
       {/* 기본 경로: 사망자 관리로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys09/2/1" replace />} />
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys09"
+          title="영현보훈체계"
+          noticeBoardPath="/sys09/1/1"
+          qnaBoardPath="/sys09/1/1"
+        />
+      } />
 
       {/* sys09/1/1: 게시판 (공통 페이지 재사용 - HONOR-17) */}
       <Route

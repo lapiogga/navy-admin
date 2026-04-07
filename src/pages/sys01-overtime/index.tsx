@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 
 // SYS01 Part 1 페이지 (신청서 관리 + 현황조회 + 부대관리 일부)
 const OtRequestPage = React.lazy(() => import('./OtRequestPage'))
@@ -63,6 +64,15 @@ function BoardQna() {
 export default function Sys01Page() {
   return (
     <Routes>
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys01"
+          title="초과근무관리체계"
+          noticeBoardPath="/sys01/6/1"
+          qnaBoardPath="/sys01/6/2"
+        />
+      } />
+
       {/* 신청서 관리 (1) */}
       <Route path="1/1" element={withSuspense(OtRequestPage)} />
       <Route path="1/2" element={withSuspense(OtApprovalPage)} />

@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import CertificateApplyPage from './CertificateApplyPage'
 import CertificateApprovalPage from './CertificateApprovalPage'
 import CertificateRegisterPage from './CertificateRegisterPage'
@@ -16,8 +17,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys04Page() {
   return (
     <Routes>
-      {/* 기본 경로: 인증서 신청으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys04/1/2" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys04"
+          title="인증서발급신청체계"
+          noticeBoardPath="/sys04/1/1"
+          qnaBoardPath="/sys04/1/1"
+        />
+      } />
 
       {/* 게시판 (공통 페이지 재사용 - CERT-04) */}
       <Route

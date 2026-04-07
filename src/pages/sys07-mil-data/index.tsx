@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import MilDataListPage from './MilDataListPage'
 import MilDataUsagePage from './MilDataUsagePage'
 import MilDataStatsPage from './MilDataStatsPage'
@@ -17,7 +18,14 @@ export default function Sys07Page() {
   return (
     <Routes>
       {/* 기본 경로: 군사자료 관리로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys07/1/1" replace />} />
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys07"
+          title="군사자료관리체계"
+          noticeBoardPath="/sys07/1/1"
+          qnaBoardPath="/sys07/1/1"
+        />
+      } />
 
       {/* 군사자료 관리 */}
       {/* 군사자료 관리 (MDATA-01) */}

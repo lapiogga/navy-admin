@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 
 // SYS03 페이지 - 메인
 const PerfMainPage = React.lazy(() => import('./PerfMainPage'))
@@ -73,7 +74,15 @@ export default function Sys03Page() {
     <Routes>
       {/* 메인화면 (1) - menus.ts: /sys03/1 */}
       <Route path="1/1" element={withSuspense(PerfMainPage)} />
-      <Route path="" element={withSuspense(PerfMainPage)} />
+      <Route path="" element={
+        <SubsystemHomePage
+          sysCode="sys03"
+          title="성과관리체계"
+          noticeBoardPath="/sys03/5/1"
+          qnaBoardPath="/sys03/5/2"
+          dashboard={withSuspense(PerfMainPage)}
+        />
+      } />
 
       {/* 기준정보관리 (2) - menus.ts: /sys03/2 */}
       <Route path="2/1" element={withSuspense(PerfBaseYearPage)} />

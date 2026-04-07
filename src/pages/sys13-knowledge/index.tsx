@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import KnowledgeListPage from './KnowledgeListPage'
 import MyKnowledgePage from './MyKnowledgePage'
 import KnowledgeAdminPage from './KnowledgeAdminPage'
@@ -18,8 +19,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys13Page() {
   return (
     <Routes>
-      {/* 기본 경로: 지식열람으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys13/3/1" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys13"
+          title="지식관리체계"
+          noticeBoardPath="/sys13/1/1"
+          qnaBoardPath="/sys13/1/1"
+        />
+      } />
 
       {/* 게시판 (공통 페이지 재사용 - KNOW-05) */}
       <Route

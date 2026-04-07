@@ -1,6 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 
 // SYS08 페이지
 const UnitRecordPage = React.lazy(() => import('./UnitRecordPage'))
@@ -41,6 +42,15 @@ function BoardNotice() {
 export default function Sys08Page() {
   return (
     <Routes>
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys08"
+          title="부대계보관리체계"
+          noticeBoardPath="/sys08/1/1"
+          qnaBoardPath="/sys08/1/1"
+        />
+      } />
+
       {/* 게시판 */}
       <Route path="1/1" element={<BoardNotice />} />
 

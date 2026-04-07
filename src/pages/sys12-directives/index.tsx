@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import DirectiveProgressPage from './DirectiveProgressPage'
 import DirectiveListPage from './DirectiveListPage'
 import ProposalProgressPage from './ProposalProgressPage'
@@ -33,7 +34,14 @@ export default function Sys12Page() {
   return (
     <Routes>
       {/* 기본 경로: 지휘관 지시사항으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys12/2/3" replace />} />
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys12"
+          title="지시건의사항관리체계"
+          noticeBoardPath="/sys12/1/1"
+          qnaBoardPath="/sys12/1/2"
+        />
+      } />
 
       {/* 게시판 - 공지사항 (DRCT-06, 공통게시판 재사용) */}
       <Route

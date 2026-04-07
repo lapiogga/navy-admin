@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Spin } from 'antd'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import { BusReservationPage } from './BusReservationPage'
 import { BusReservationStatusPage } from './BusReservationStatusPage'
 import { BusDispatchPage } from './BusDispatchPage'
@@ -48,6 +49,15 @@ export default function Page() {
   return (
     <Suspense fallback={<Loading />}>
       <Routes>
+        <Route index element={
+          <SubsystemHomePage
+            sysCode="sys10"
+            title="주말버스예약관리체계"
+            noticeBoardPath="/sys10/1/1"
+            qnaBoardPath="/sys10/1/1"
+          />
+        } />
+
         {/* /sys10/1/1 - 게시판 (공지+질의응답) */}
         <Route path="1/1" element={<BoardListPage boardId="sys10-notice" />} />
 

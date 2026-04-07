@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 import InspectionUnitPage from './InspectionUnitPage'
 import InspectionPlanPage from './InspectionPlanPage'
 import InspectionResultPage from './InspectionResultPage'
@@ -22,8 +23,15 @@ const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 export default function Sys17Page() {
   return (
     <Routes>
-      {/* 기본 경로: 공지사항으로 리다이렉트 */}
-      <Route index element={<Navigate to="/sys17/1/1" replace />} />
+      {/* 메인화면 */}
+      <Route index element={
+        <SubsystemHomePage
+          sysCode="sys17"
+          title="검열결과관리체계"
+          noticeBoardPath="/sys17/1/1"
+          qnaBoardPath="/sys17/1/1"
+        />
+      } />
 
       {/* 검열결과 관리 */}
       {/* 공지사항 (공통 재사용 - INSP-06) */}

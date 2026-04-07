@@ -8,6 +8,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
+import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
 
 // sys05-admin-rules 페이지 재사용 (sysCode='sys06' prop 전달)
 import RegulationListPageBase from '@/pages/sys05-admin-rules/RegulationListPage'
@@ -52,8 +53,15 @@ export default function Sys06Page() {
   return (
     <Suspense fallback={<PageSpinner />}>
       <Routes>
-        {/* 기본 경로: 현행규정으로 리다이렉트 */}
-        <Route index element={<Navigate to="/sys06/1/1" replace />} />
+        {/* 메인화면 */}
+        <Route index element={
+          <SubsystemHomePage
+            sysCode="sys06"
+            title="해병대규정관리체계"
+            noticeBoardPath="/sys06/4/1"
+            qnaBoardPath="/sys06/4/1"
+          />
+        } />
 
         {/* MREG-01: 현행규정 (sys05-admin-rules 재사용, sysCode='sys06') */}
         <Route path="1/1" element={<Sys06RegulationList />} />
