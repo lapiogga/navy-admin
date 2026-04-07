@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { ALL_UNITS } from '../mockUnits'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 // 타입 정의
@@ -19,6 +21,10 @@ export interface OtRequest extends Record<string, unknown> {
   status: OtStatus
   applicantName: string
   applicantUnit: string
+  serviceNumber: string
+  rank: string
+  applicantIp: string
+  dutyPost: string
   createdAt: string
 }
 
@@ -30,6 +36,11 @@ export interface OtApproval extends Record<string, unknown> {
   totalHours: number
   applicantName: string
   applicantUnit: string
+  serviceNumber: string
+  rank: string
+  approverName: string
+  approverServiceNumber: string
+  approverRank: string
   reason: string
   approvalStatus: OtStatus
   approvedAt?: string
@@ -96,6 +107,7 @@ export interface OtUnitPersonnel extends Record<string, unknown> {
   position: string
   unitName: string
   militaryId: string
+  serviceNumber: string
   phone: string
   dutyPost: string
 }
@@ -105,6 +117,7 @@ export interface DutyWorker extends Record<string, unknown> {
   id: string
   name: string
   rank: string
+  serviceNumber: string
   unitName: string
   dutyDate: string
   dutyPost: string
@@ -172,7 +185,7 @@ export interface PersonalDept extends Record<string, unknown> {
 }
 
 // 내부 DB
-const UNITS = ['1함대', '2함대', '3함대', '해군사령부', '교육사령부', '군수사령부', '해병대사령부']
+const UNITS = ALL_UNITS
 const RANKS = ['중위', '대위', '소령', '중령', '대령', '준위', '하사', '중사', '상사', '원사']
 const POSITIONS = ['작전장교', '인사장교', '군수장교', '정보장교', '통신장교', '의무장교', '법무장교']
 const DUTY_POSTS = ['제1당직실', '제2당직실', '제3당직실', '본부 당직실', '지휘통제실', '통신당직실', '함정당직실']
@@ -199,6 +212,10 @@ let otRequests: OtRequest[] = Array.from({ length: 30 }, () => ({
   status: faker.helpers.arrayElement(['draft', 'pending', 'approved', 'rejected'] as OtStatus[]),
   applicantName: faker.person.lastName() + faker.person.firstName(),
   applicantUnit: faker.helpers.arrayElement(UNITS),
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  applicantIp: faker.internet.ip(),
+  dutyPost: faker.helpers.arrayElement(DUTY_POSTS),
   createdAt: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
 }))
 
@@ -210,6 +227,11 @@ let otApprovals: OtApproval[] = Array.from({ length: 20 }, () => ({
   totalHours: faker.number.int({ min: 1, max: 4 }),
   applicantName: faker.person.lastName() + faker.person.firstName(),
   applicantUnit: faker.helpers.arrayElement(UNITS),
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  approverName: faker.person.lastName() + faker.person.firstName(),
+  approverServiceNumber: randomServiceNumber(),
+  approverRank: faker.helpers.arrayElement(RANKS),
   reason: faker.helpers.arrayElement(['작전 준비', '행정 처리', '훈련 지원', '비상 대비']),
   approvalStatus: faker.helpers.arrayElement(['pending', 'approved', 'rejected'] as OtStatus[]),
   approvedAt: faker.date.recent({ days: 10 }).toISOString().split('T')[0],
@@ -262,16 +284,20 @@ const otUnitStatuses: OtUnitStatus[] = Array.from({ length: 20 }, () => ({
   avgHours: parseFloat(faker.number.float({ min: 1, max: 8, fractionDigits: 1 }).toString()),
 }))
 
-const otUnitPersonnel: OtUnitPersonnel[] = Array.from({ length: 25 }, () => ({
-  id: faker.string.uuid(),
-  name: faker.person.lastName() + faker.person.firstName(),
-  rank: faker.helpers.arrayElement(RANKS),
-  position: faker.helpers.arrayElement(POSITIONS),
-  unitName: faker.helpers.arrayElement(UNITS),
-  militaryId: faker.string.numeric(8),
-  phone: `010-${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
-  dutyPost: faker.helpers.arrayElement(['제1당직실', '제2당직실', '본부 당직실', '지휘통제실']),
-}))
+const otUnitPersonnel: OtUnitPersonnel[] = Array.from({ length: 25 }, () => {
+  const sn = randomServiceNumber()
+  return {
+    id: faker.string.uuid(),
+    name: faker.person.lastName() + faker.person.firstName(),
+    rank: faker.helpers.arrayElement(RANKS),
+    position: faker.helpers.arrayElement(POSITIONS),
+    unitName: faker.helpers.arrayElement(UNITS),
+    militaryId: sn,
+    serviceNumber: sn,
+    phone: `010-${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+    dutyPost: faker.helpers.arrayElement(['제1당직실', '제2당직실', '본부 당직실', '지휘통제실']),
+  }
+})
 
 // ─── 당직근무자 mock 데이터 (18건) ───
 let dutyWorkers: DutyWorker[] = Array.from({ length: 18 }, (_, i) => {
@@ -281,6 +307,7 @@ let dutyWorkers: DutyWorker[] = Array.from({ length: 18 }, (_, i) => {
     id: faker.string.uuid(),
     name: faker.person.lastName() + faker.person.firstName(),
     rank: faker.helpers.arrayElement(RANKS),
+    serviceNumber: randomServiceNumber(),
     unitName: faker.helpers.arrayElement(UNITS),
     dutyDate: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
     dutyPost,
@@ -294,13 +321,13 @@ let dutyWorkers: DutyWorker[] = Array.from({ length: 18 }, (_, i) => {
 
 // ─── 당직개소 mock 데이터 (15건) ───
 let dutyPosts: DutyPost[] = [
-  { id: faker.string.uuid(), postName: '제1당직실', postId: 'DP0001', location: '본관 1층', macAddress: faker.internet.mac(), unitNames: ['1함대', '해군사령부'], capacity: 3, isActive: true, createdAt: '2026-01-01' },
-  { id: faker.string.uuid(), postName: '제2당직실', postId: 'DP0002', location: '본관 2층', macAddress: faker.internet.mac(), unitNames: ['2함대'], capacity: 2, isActive: true, createdAt: '2026-01-01' },
-  { id: faker.string.uuid(), postName: '제3당직실', postId: 'DP0003', location: '별관 1층', macAddress: faker.internet.mac(), unitNames: ['3함대'], capacity: 2, isActive: true, createdAt: '2026-01-01' },
-  { id: faker.string.uuid(), postName: '본부 당직실', postId: 'DP0004', location: '사령부 본관 3층', macAddress: faker.internet.mac(), unitNames: ['해군사령부', '해병대사령부'], capacity: 4, isActive: true, createdAt: '2026-01-01' },
-  { id: faker.string.uuid(), postName: '지휘통제실', postId: 'DP0005', location: '사령부 지하 1층', macAddress: faker.internet.mac(), unitNames: ['해군사령부'], capacity: 5, isActive: true, createdAt: '2026-01-01' },
-  { id: faker.string.uuid(), postName: '통신당직실', postId: 'DP0006', location: '통신동 2층', macAddress: faker.internet.mac(), unitNames: ['교육사령부', '군수사령부'], capacity: 2, isActive: true, createdAt: '2026-01-15' },
-  { id: faker.string.uuid(), postName: '함정당직실', postId: 'DP0007', location: '부두 관리동', macAddress: faker.internet.mac(), unitNames: ['1함대', '2함대', '3함대'], capacity: 3, isActive: true, createdAt: '2026-01-15' },
+  { id: faker.string.uuid(), postName: '제1당직실', postId: 'DP0001', location: '본관 1층', macAddress: faker.internet.mac(), unitNames: ['제1함대', '해군본부'], capacity: 3, isActive: true, createdAt: '2026-01-01' },
+  { id: faker.string.uuid(), postName: '제2당직실', postId: 'DP0002', location: '본관 2층', macAddress: faker.internet.mac(), unitNames: ['제2함대'], capacity: 2, isActive: true, createdAt: '2026-01-01' },
+  { id: faker.string.uuid(), postName: '제3당직실', postId: 'DP0003', location: '별관 1층', macAddress: faker.internet.mac(), unitNames: ['제3함대'], capacity: 2, isActive: true, createdAt: '2026-01-01' },
+  { id: faker.string.uuid(), postName: '본부 당직실', postId: 'DP0004', location: '사령부 본관 3층', macAddress: faker.internet.mac(), unitNames: ['해군본부', '해병대사령부'], capacity: 4, isActive: true, createdAt: '2026-01-01' },
+  { id: faker.string.uuid(), postName: '지휘통제실', postId: 'DP0005', location: '사령부 지하 1층', macAddress: faker.internet.mac(), unitNames: ['해군본부'], capacity: 5, isActive: true, createdAt: '2026-01-01' },
+  { id: faker.string.uuid(), postName: '통신당직실', postId: 'DP0006', location: '통신동 2층', macAddress: faker.internet.mac(), unitNames: ['해군교육사령부', '해군군수사령부'], capacity: 2, isActive: true, createdAt: '2026-01-15' },
+  { id: faker.string.uuid(), postName: '함정당직실', postId: 'DP0007', location: '부두 관리동', macAddress: faker.internet.mac(), unitNames: ['제1함대', '제2함대', '제3함대'], capacity: 3, isActive: true, createdAt: '2026-01-15' },
   ...Array.from({ length: 8 }, () => ({
     id: faker.string.uuid(),
     postName: faker.helpers.arrayElement(DUTY_POSTS),
@@ -410,6 +437,10 @@ export const sys01Handlers = [
       status: 'draft',
       applicantName: '홍길동',
       applicantUnit: '1함대',
+      serviceNumber: randomServiceNumber(),
+      rank: '대위',
+      applicantIp: body.applicantIp ?? '192.168.1.1',
+      dutyPost: body.dutyPost ?? '제1당직실',
       createdAt: new Date().toISOString().split('T')[0],
     }
     otRequests = [item, ...otRequests]
@@ -649,6 +680,7 @@ export const sys01Handlers = [
       id: faker.string.uuid(),
       name: body.name ?? '',
       rank: body.rank ?? '',
+      serviceNumber: body.serviceNumber ?? randomServiceNumber(),
       unitName: body.unitName ?? '',
       dutyDate: body.dutyDate ?? '',
       dutyPost: body.dutyPost ?? '',

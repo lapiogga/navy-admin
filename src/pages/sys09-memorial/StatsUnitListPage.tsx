@@ -1,6 +1,9 @@
+import { useState, useCallback } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { PageContainer } from '@ant-design/pro-components'
 import { Table, Button, message } from 'antd'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 import type { Deceased } from '@/shared/api/mocks/handlers/sys09'
@@ -12,9 +15,21 @@ const DEATH_TYPE_LABEL: Record<string, string> = {
   accident: '사고사',
 }
 
-async function fetchUnitList(): Promise<Deceased[]> {
+const UNIT_OPTIONS = ['1사단', '2사단', '해병대사령부', '교육훈련단', '상륙기동단'].map((u) => ({ label: u, value: u }))
+const RANK_OPTIONS = [
+  '이병', '일병', '상병', '병장', '하사', '중사', '상사', '원사',
+  '소위', '중위', '대위', '소령', '중령', '대령',
+].map((r) => ({ label: r, value: r }))
+
+// 부대별/계급별 필터
+const searchFields: SearchField[] = [
+  { name: 'unit', label: '부대', type: 'select', options: UNIT_OPTIONS },
+  { name: 'rank', label: '계급', type: 'select', options: RANK_OPTIONS },
+]
+
+async function fetchUnitList(filters?: Record<string, unknown>): Promise<Deceased[]> {
   const res = await apiClient.get<never, ApiResult<PageResponse<Deceased>>>('/sys09/stats/unit-list', {
-    params: { page: 0, size: 100 },
+    params: { page: 0, size: 100, ...filters },
   })
   const data = (res as ApiResult<PageResponse<Deceased>>).data ?? (res as unknown as PageResponse<Deceased>)
   return data.content || []
@@ -36,13 +51,24 @@ const columns = [
 ]
 
 export default function StatsUnitListPage() {
+  const [filters, setFilters] = useState<Record<string, unknown>>({})
+
   const { data = [] } = useQuery({
-    queryKey: ['sys09/stats/unit-list'],
-    queryFn: fetchUnitList,
+    queryKey: ['sys09/stats/unit-list', filters],
+    queryFn: () => fetchUnitList(filters),
   })
+
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    setFilters(values)
+  }, [])
+
+  const handleReset = useCallback(() => {
+    setFilters({})
+  }, [])
 
   return (
     <PageContainer title="부대별 사망자 명부">
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleReset} />
       <div style={{ marginBottom: 16, textAlign: 'right' }}>
         <Button onClick={() => message.info('엑셀 다운로드')}>엑셀 다운로드</Button>
       </div>

@@ -445,3 +445,43 @@ React.lazy()로 서브시스템을 분리하면 초기 로딩 시 login + portal
 - [Vite Code Splitting with manualChunks](https://sambitsahoo.com/blog/vite-code-splitting-that-works.html)
 - [Monorepo Architecture 2025 - Feature-Sliced Design Blog](https://feature-sliced.design/blog/frontend-monorepo-explained)
 - [Building Scalable Frontend Monorepo with Turborepo](https://dev.to/harrytranswe/building-a-scalable-frontend-monorepo-with-turborepo-vite-tailwindcss-v4-react-19-tanstack-21ko)
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+### 공통 컴포넌트 아키텍처 패턴 강화
+
+GAP 분석(req_spec vs 구현 비교)에 따라 `shared/ui` 레이어의 공통 컴포넌트가 확장되었다. 이는 FSD 아키텍처의 **shared 레이어가 표준 UI 계약을 정의하고, 상위 레이어(pages)가 이를 소비하는** 패턴을 더욱 강화한다.
+
+### 변경된 아키텍처 요소
+
+```
+shared/
+  ui/
+    DataTable/       -- navy-bordered-table CSS 자동 적용 (R5 규칙)
+    SearchForm/      -- search-form-container 100px wrapper (R2 규칙)
+    CrudForm/        -- file/dateRange/checkbox 필드 타입 추가 (R1 규칙)
+    DetailModal/     -- render(value, record) 시그니처 확장
+  lib/
+    military.ts      -- [신규] formatMilitaryPerson(), militaryPersonColumn() (R6 규칙)
+  styles/
+    index.css        -- 글로벌 CSS (navy 테이블 보더, 검색 폼 컨테이너)
+```
+
+### 아키텍처 원칙 준수
+
+1. **단일 변경점**: 공통 컴포넌트 수정 1회로 18개 서브시스템 전체에 일괄 적용. 서브시스템별 개별 CSS 수정 불필요.
+2. **하위 호환**: 기존 API(DataTable columns, SearchForm fields, CrudForm fieldType) 유지. 새 기능은 선택적(opt-in).
+3. **FSD 레이어 규칙 준수**: `shared/lib/military.ts`는 도메인 독립적 유틸리티로 shared 레이어에 배치. 군 도메인 엔티티는 entities 레이어에 유지.
+
+### GAP 규칙 6개의 아키텍처 매핑
+
+| 규칙 | 아키텍처 레이어 | 구현 위치 |
+|------|----------------|----------|
+| R1 (입력값 컬럼) | shared/ui | CrudForm fieldType 확장 |
+| R2 (검색영역 100px) | shared/ui + shared/styles | SearchForm wrapper + index.css |
+| R3 (규칙/예외사항) | pages/* | 각 서브시스템 페이지에서 UI 로직 구현 |
+| R4 (관리자 메뉴) | pages/* | 서브시스템별 AdminPage 컴포넌트 |
+| R5 (테이블 보더) | shared/ui + shared/styles | DataTable CSS + index.css |
+| R6 (군번/계급/성명) | shared/lib | military.ts 헬퍼 |

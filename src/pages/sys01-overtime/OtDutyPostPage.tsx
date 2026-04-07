@@ -5,8 +5,22 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+
+/** 검색 필드 정의 */
+const dutyPostSearchFields: SearchField[] = [
+  { name: 'postName', label: '개소명', type: 'text', placeholder: '개소명 검색' },
+  { name: 'unitName', label: '부대명', type: 'select', options: [
+    { label: '1함대', value: '1함대' },
+    { label: '2함대', value: '2함대' },
+    { label: '3함대', value: '3함대' },
+    { label: '해군사령부', value: '해군사령부' },
+    { label: '교육사령부', value: '교육사령부' },
+  ]},
+]
 
 interface DutyPost extends Record<string, unknown> {
   id: string
@@ -110,6 +124,7 @@ export default function OtDutyPostPage() {
 
   return (
     <PageContainer title="당직개소 관리">
+      <SearchForm fields={dutyPostSearchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <DataTable<DutyPost>
         columns={columns}
         request={fetchDutyPosts}

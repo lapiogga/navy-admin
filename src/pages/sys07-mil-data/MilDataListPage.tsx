@@ -22,10 +22,35 @@ const SECURITY_LEVEL_OPTIONS = [
 ]
 
 const STORAGE_TYPE_OPTIONS = [
-  { label: '금고보관', value: '금고보관' },
-  { label: '서가보관', value: '서가보관' },
-  { label: '전산보관', value: '전산보관' },
+  { label: '이관비밀', value: '이관비밀' },
+  { label: '존안비밀', value: '존안비밀' },
+  { label: '군사자료', value: '군사자료' },
 ]
+
+const RETENTION_CATEGORY_OPTIONS = [
+  { label: '10년 이하', value: '10년 이하' },
+  { label: '10년 초과', value: '10년 초과' },
+]
+
+const STORAGE_LOCATION_OPTIONS = [
+  { label: '본부 비밀취급소', value: '본부 비밀취급소' },
+  { label: '1사단 보관소', value: '1사단 보관소' },
+  { label: '2사단 보관소', value: '2사단 보관소' },
+  { label: '교육훈련단', value: '교육훈련단' },
+]
+
+const DEPARTMENT_OPTIONS = [
+  { label: '작전처', value: '작전처' },
+  { label: '정보처', value: '정보처' },
+  { label: '인사처', value: '인사처' },
+  { label: '군수처', value: '군수처' },
+  { label: '기획처', value: '기획처' },
+]
+
+const TRANSFER_YEAR_OPTIONS = Array.from({ length: 6 }, (_, i) => {
+  const y = String(2024 - i)
+  return { label: `${y}년`, value: y }
+})
 
 const DOC_TYPE_OPTIONS = [
   { label: '훈령', value: '훈령' },
@@ -35,25 +60,38 @@ const DOC_TYPE_OPTIONS = [
   { label: '보고서', value: '보고서' },
 ]
 
+// CSV 자료상태: 정상, 대출, 열람, 파기, 재분류, 합철, 지출
 const STATUS_OPTIONS = [
-  { label: '보존중', value: 'active' },
-  { label: '대출중', value: 'on_loan' },
-  { label: '평가심의', value: 'evaluation' },
+  { label: '정상(보존중)', value: 'active' },
+  { label: '대출', value: 'on_loan' },
+  { label: '열람', value: 'viewing' },
   { label: '파기', value: 'disposed' },
+  { label: '재분류', value: 'reclassified' },
+  { label: '합철', value: 'merged' },
+  { label: '지출', value: 'checkout' },
+  { label: '평가심의', value: 'evaluation' },
 ]
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   active: 'green',
   on_loan: 'blue',
+  viewing: 'cyan',
   evaluation: 'gold',
   disposed: 'default',
+  reclassified: 'purple',
+  merged: 'magenta',
+  checkout: 'orange',
 }
 
 const STATUS_LABEL_MAP: Record<string, string> = {
-  active: '보존중',
-  on_loan: '대출중',
+  active: '정상(보존중)',
+  on_loan: '대출',
+  viewing: '열람',
   evaluation: '평가심의',
   disposed: '파기',
+  reclassified: '재분류',
+  merged: '합철',
+  checkout: '지출',
 }
 
 function securityLevelTag(level: string) {
@@ -109,12 +147,24 @@ export default function MilDataListPage() {
     onError: () => message.error('삭제에 실패했습니다'),
   })
 
+  // CSV 검색조건: 보관형태, 보존기간 구분, 보관장소, 이관년도, 이관번호,
+  // 이관일자(기간), 문서일자(기간), 발행부서, 이관부서, 문서번호, 문서제목,
+  // 자료상태, 비밀등급, 문서구분
   const searchFields = [
-    { name: 'securityLevel', label: '비밀등급', type: 'select' as const, options: SECURITY_LEVEL_OPTIONS },
     { name: 'storageType', label: '보관형태', type: 'select' as const, options: STORAGE_TYPE_OPTIONS },
+    { name: 'retentionCategory', label: '보존기간 구분', type: 'select' as const, options: RETENTION_CATEGORY_OPTIONS },
+    { name: 'storageLocation', label: '보관장소', type: 'select' as const, options: STORAGE_LOCATION_OPTIONS },
+    { name: 'transferYear', label: '이관년도', type: 'select' as const, options: TRANSFER_YEAR_OPTIONS },
+    { name: 'transferNumber', label: '이관번호', type: 'text' as const },
+    { name: 'transferDateRange', label: '이관일자', type: 'dateRange' as const },
+    { name: 'docDateRange', label: '문서일자', type: 'dateRange' as const },
+    { name: 'issueDept', label: '발행부서', type: 'select' as const, options: DEPARTMENT_OPTIONS },
+    { name: 'transferDept', label: '이관부서', type: 'select' as const, options: DEPARTMENT_OPTIONS },
+    { name: 'docNumber', label: '문서번호', type: 'text' as const },
+    { name: 'keyword', label: '문서제목', type: 'text' as const },
+    { name: 'status', label: '자료상태', type: 'select' as const, options: STATUS_OPTIONS },
+    { name: 'securityLevel', label: '비밀등급', type: 'select' as const, options: SECURITY_LEVEL_OPTIONS },
     { name: 'docType', label: '문서구분', type: 'select' as const, options: DOC_TYPE_OPTIONS },
-    { name: 'keyword', label: '키워드', type: 'text' as const },
-    { name: 'status', label: '상태', type: 'select' as const, options: STATUS_OPTIONS },
   ]
 
   const columns: ProColumns<MilDocument>[] = [
@@ -128,8 +178,10 @@ export default function MilDataListPage() {
         <a onClick={() => { setDetailTarget(r); setDetailOpen(true) }}>{text as string}</a>
       ),
     },
-    { title: '작성자', dataIndex: 'author', width: 100 },
+    { title: '이관부서', dataIndex: 'transferDept', width: 100 },
+    { title: '발행부서', dataIndex: 'issueDept', width: 100 },
     { title: '이관일자', dataIndex: 'transferDate', width: 110 },
+    { title: '문서일자', dataIndex: 'docDate', width: 110 },
     { title: '보관형태', dataIndex: 'storageType', width: 100 },
     { title: '보존기간', dataIndex: 'retentionPeriod', width: 80, render: (v) => `${v}년` },
     { title: '보존만료일', dataIndex: 'retentionExpireDate', width: 120 },

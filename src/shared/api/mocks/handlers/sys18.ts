@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 
 // 타입 정의
 export type JobDescType = 'personal' | 'position' | 'department'
@@ -59,6 +61,8 @@ export interface OrgDiagnosis extends Record<string, unknown> {
   diagnosisPeriodEnd: string
   targetUsers: string[]
   targetCount: number
+  excludedUsers: string[]
+  excludedCount: number
   progressStatus: OrgDiagnosisProgressStatus
 }
 
@@ -86,7 +90,7 @@ export interface ApprovalItem extends Record<string, unknown> {
 // 상수
 const RANKS = ['하사', '중사', '상사', '원사', '준위', '소위', '중위', '대위', '소령', '중령']
 const DEPARTMENTS = ['인사처', '작전처', '군수처', '정보처', '교육처', '동원처']
-const UNITS = ['해병대사령부', '1사단', '2사단', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const TASK_TYPES: JobDescTask['taskType'][] = ['정책', '관리', '지원', '기타']
 const JD_STATUSES: JobDescStatus[] = ['draft', 'submitted', 'approved_1st', 'completed', 'rejected']
 const JD_TYPES: JobDescType[] = ['personal', 'position', 'department']
@@ -121,7 +125,7 @@ function makeJobDesc(i: number): JobDesc {
     diagnosisName,
     writerId: `user-${i + 1}`,
     writerName: faker.person.fullName(),
-    writerMilitaryId: `22-${faker.number.int({ min: 10000, max: 99999 })}`,
+    writerMilitaryId: randomServiceNumber(),
     rank: RANKS[i % RANKS.length],
     position: `${faker.company.buzzNoun()} 담당`,
     department: DEPARTMENTS[deptIdx],
@@ -168,6 +172,8 @@ function makeOrgDiagnosis(i: number): OrgDiagnosis {
     diagnosisPeriodEnd: diagEnd.toISOString().split('T')[0],
     targetUsers: Array.from({ length: faker.number.int({ min: 3, max: 10 }) }, () => `user-${faker.number.int({ min: 1, max: 20 })}`),
     targetCount: faker.number.int({ min: 10, max: 50 }),
+    excludedUsers: Array.from({ length: faker.number.int({ min: 0, max: 3 }) }, () => `user-${faker.number.int({ min: 6, max: 8 })}`),
+    excludedCount: faker.number.int({ min: 0, max: 5 }),
     progressStatus: statuses[i % statuses.length],
   }
 }
@@ -201,12 +207,22 @@ function makeApprovalItem(i: number, jd: JobDesc): ApprovalItem {
 
 export type RankCategory = '장관' | '영관' | '부사관' | '원사' | '병'
 
+export type StandardWorkHourStatusType = '적용만료' | '적용중' | '적용예정'
+
 export interface StandardWorkHour extends Record<string, unknown> {
   id: string
   rankCategory: RankCategory
   standardHours: number
   periodStart: string
   periodEnd: string
+  statusType: StandardWorkHourStatusType
+}
+
+function calcStatusType(periodStart: string, periodEnd: string): StandardWorkHourStatusType {
+  const today = new Date().toISOString().split('T')[0]
+  if (today > periodEnd) return '적용만료'
+  if (today < periodStart) return '적용예정'
+  return '적용중'
 }
 
 function makeStandardWorkHour(rankCategory: RankCategory, standardHours: number, periodStart: string, periodEnd: string): StandardWorkHour {
@@ -216,6 +232,7 @@ function makeStandardWorkHour(rankCategory: RankCategory, standardHours: number,
     standardHours,
     periodStart,
     periodEnd,
+    statusType: calcStatusType(periodStart, periodEnd),
   }
 }
 
@@ -246,7 +263,7 @@ function paginate<T>(items: T[], page: number, size: number): PageResponse<T> {
 }
 
 export const sys18Handlers = [
-  // 직무기술서 목록 (페이지네이션 + 필터)
+  // 직무기술서 목록 (페이지네이션 + 필터 + 검색)
   http.get('/api/sys18/job-descs', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') ?? '0')
@@ -254,10 +271,14 @@ export const sys18Handlers = [
     const type = url.searchParams.get('type')
     const status = url.searchParams.get('status')
     const diagnosisId = url.searchParams.get('diagnosisId')
+    const diagnosisName = url.searchParams.get('diagnosisName')
+    const keyword = url.searchParams.get('keyword')
     let filtered = [...jobDescs]
     if (type) filtered = filtered.filter((j) => j.type === type)
     if (status) filtered = filtered.filter((j) => j.status === status)
     if (diagnosisId) filtered = filtered.filter((j) => j.diagnosisId === diagnosisId)
+    if (diagnosisName) filtered = filtered.filter((j) => j.diagnosisName.includes(diagnosisName))
+    if (keyword) filtered = filtered.filter((j) => j.writerName.includes(keyword) || j.department.includes(keyword))
     const result: ApiResult<PageResponse<JobDesc>> = { success: true, data: paginate(filtered, page, size) }
     return HttpResponse.json(result)
   }),
@@ -323,12 +344,19 @@ export const sys18Handlers = [
     return HttpResponse.json({ success: true, data: copied } as ApiResult<JobDesc>)
   }),
 
-  // 조직진단 목록
+  // 조직진단 목록 (검색 필터 지원)
   http.get('/api/sys18/org-diagnosis', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') ?? '0')
     const size = parseInt(url.searchParams.get('size') ?? '10')
-    const result: ApiResult<PageResponse<OrgDiagnosis>> = { success: true, data: paginate(orgDiagnoses, page, size) }
+    const diagnosisName = url.searchParams.get('diagnosisName')
+    const diagnosisUnit = url.searchParams.get('diagnosisUnit')
+    const progressStatus = url.searchParams.get('progressStatus')
+    let filtered = [...orgDiagnoses]
+    if (diagnosisName) filtered = filtered.filter((d) => d.diagnosisName.includes(diagnosisName))
+    if (diagnosisUnit) filtered = filtered.filter((d) => d.diagnosisUnit === diagnosisUnit)
+    if (progressStatus) filtered = filtered.filter((d) => d.progressStatus === progressStatus)
+    const result: ApiResult<PageResponse<OrgDiagnosis>> = { success: true, data: paginate(filtered, page, size) }
     return HttpResponse.json(result)
   }),
 
@@ -359,14 +387,18 @@ export const sys18Handlers = [
     return HttpResponse.json({ success: true, data: { standardHours: 40 } } as ApiResult<{ standardHours: number }>)
   }),
 
-  // 결재대기 목록
+  // 결재대기 목록 (검색 필터 지원)
   http.get('/api/sys18/approvals', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') ?? '0')
     const size = parseInt(url.searchParams.get('size') ?? '10')
     const status = url.searchParams.get('status')
+    const writerName = url.searchParams.get('writerName')
+    const department = url.searchParams.get('department')
     let filtered = [...approvalItems]
     if (status) filtered = filtered.filter((a) => a.status === status)
+    if (writerName) filtered = filtered.filter((a) => a.writerName.includes(writerName))
+    if (department) filtered = filtered.filter((a) => a.department.includes(department))
     const result: ApiResult<PageResponse<ApprovalItem>> = { success: true, data: paginate(filtered, page, size) }
     return HttpResponse.json(result)
   }),
@@ -432,7 +464,7 @@ export const sys18Handlers = [
     return HttpResponse.json({ success: true } as ApiResult<null>)
   }),
 
-  // 관리자용 직무기술서 목록
+  // 관리자용 직무기술서 목록 (검색조건: 진단명, 검색기간, 부대명, 직책명)
   http.get('/api/sys18/job-descs/admin', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') ?? '0')
@@ -441,11 +473,15 @@ export const sys18Handlers = [
     const status = url.searchParams.get('status')
     const keyword = url.searchParams.get('keyword')
     const unit = url.searchParams.get('unit')
+    const diagnosisName = url.searchParams.get('diagnosisName')
+    const position = url.searchParams.get('position')
     let filtered = [...jobDescs]
     if (type) filtered = filtered.filter((j) => j.type === type)
     if (status) filtered = filtered.filter((j) => j.status === status)
     if (keyword) filtered = filtered.filter((j) => j.writerName.includes(keyword) || j.diagnosisName.includes(keyword))
     if (unit) filtered = filtered.filter((j) => j.unit.includes(unit) || j.department.includes(unit))
+    if (diagnosisName) filtered = filtered.filter((j) => j.diagnosisName.includes(diagnosisName))
+    if (position) filtered = filtered.filter((j) => j.position.includes(position))
     const result: ApiResult<PageResponse<JobDesc>> = { success: true, data: paginate(filtered, page, size) }
     return HttpResponse.json(result)
   }),

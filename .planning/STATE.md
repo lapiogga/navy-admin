@@ -2,35 +2,35 @@
 gsd_state_version: 1.0
 milestone: v1.0
 milestone_name: milestone
-status: executing
-stopped_at: Completed 07-2-06-PLAN.md
-last_updated: "2026-04-06T13:01:07.807Z"
-last_activity: 2026-04-06
+status: complete
+stopped_at: Phase 8 GAP 수정 + spec-doc 재생성 + 문서 현행화 완료
+last_updated: "2026-04-07T15:00:00.000Z"
+last_activity: 2026-04-07
 progress:
-  total_phases: 8
-  completed_phases: 7
+  total_phases: 9
+  completed_phases: 9
   total_plans: 39
-  completed_plans: 34
-  percent: 67
+  completed_plans: 39
+  percent: 100
 ---
 
 # Project State
 
 ## Project Reference
 
-See: .planning/PROJECT.md (updated 2026-04-06)
+See: .planning/PROJECT.md (updated 2026-04-07)
 
 **Core value:** 인증된 사용자가 메인 포탈에서 모든 행정 서브시스템에 원활하게 접속하여 업무를 처리할 수 있어야 한다
-**Current focus:** Phase 07 — 2
+**Current focus:** v1.0 MVP 프론트엔드 완료 — 백엔드 연동 대기
 
 ## Current Position
 
-Phase: 07
-Plan: Not started
-Status: Ready to execute
-Last activity: 2026-04-06
+Phase: 08 (GAP 수정 완료)
+Plan: All complete
+Status: v1.0 MVP Complete
+Last activity: 2026-04-07
 
-Progress: [███████░░░] 67%
+Progress: [██████████] 100%
 
 ## Performance Metrics
 
@@ -130,17 +130,32 @@ Recent decisions affecting current work:
 
 ### Pending Todos
 
-- Phase 04 대기 (`/gsd:discuss-phase 4 --auto`)
+- v2 백엔드(Java Spring Boot) 연동 계획 수립
 
 ### Blockers/Concerns
 
-- [Phase 0 진입 전]: Ant Design v5 ProComponents 버전 호환성 확인 필요 (v6 존재 확인됨)
-- [Phase 7 진입 전]: 보안일일결산(138개 프로세스) 서브 Phase 분할 경계 설정 필요
+- [해결됨]: Ant Design v5 ProComponents 버전 호환성 — v5.29.3 사용, 정상 동작
+- [해결됨]: 보안일일결산(138개 프로세스) — 3 Wave 6 Plan으로 분할 완료
 - [전체]: 군 인트라넷 브라우저 버전(IE 지원 여부) 미확인 — 빌드 최적화 목표값 재조정 필요할 수 있음
 
 ## Session Continuity
 
-Last session: 2026-04-06T12:36:31.917Z
-Stopped at: Completed 07-2-06-PLAN.md
-Resume command: /gsd:execute-phase 7 --plan 05
+Last session: 2026-04-07T15:00:00.000Z
+Stopped at: Phase 8 GAP 수정 + spec-doc 재생성 + 문서 현행화 완료
+Resume command: v2 백엔드 연동 시 /gsd:new-milestone v2
 Resume file: None
+
+## Phase 8: GAP 수정 + spec-doc 재생성 + 문서 현행화 (2026-04-07)
+
+### 작업 내용
+1. **공통 컴포넌트 수정**: DataTable(navy-bordered-table CSS), SearchForm(search-form-container), CrudForm(file/dateRange/checkbox 타입 추가), military.ts(formatMilitaryPerson + militaryPersonColumn 헬퍼)
+2. **18개 서브시스템 GAP 수정** (6대 규칙 적용):
+   - R1: 입력값 컬럼 반영 (CrudForm fields에 CSV 입력값 항목 추가)
+   - R2: 검색영역 100px (SearchForm 추가)
+   - R3: 규칙/예외사항 반영 (UI 로직/안내문/제한조건)
+   - R4: 관리자 메뉴 포함
+   - R5: 테이블 군청색 라인 (DataTable CSS)
+   - R6: 신청자 = 군번/계급/성명 (militaryPersonColumn)
+3. **SYS06 독립화**: SYS05에서 분리, 별도 페이지 + API 핸들러 구성
+4. **spec-doc 5종 재생성**: 조감도, 업무분석서, 다이어그램, 메뉴구조도, 상관관계도
+5. **v1.0.0 태그 생성 및 GitHub 배포**

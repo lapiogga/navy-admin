@@ -7,9 +7,23 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtRequest, OtBulkRequest } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 검색 필드 정의 */
+const bulkSearchFields: SearchField[] = [
+  { name: 'workDate', label: '근무일', type: 'date' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '작성중', value: 'draft' },
+    { label: '결재대기', value: 'pending' },
+    { label: '승인', value: 'approved' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 const { TextArea } = Input
 
@@ -81,7 +95,7 @@ export default function OtBulkPage() {
   })
 
   const personColumns: ProColumns<OtRequest>[] = [
-    { title: '신청자', dataIndex: 'applicantName', width: 90 },
+    militaryPersonColumn<OtRequest>('신청자', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'applicantName' }),
     { title: '부대(서)', dataIndex: 'applicantUnit', width: 100 },
     { title: '근무일', dataIndex: 'workDate', width: 110 },
     { title: '총근무시간(h)', dataIndex: 'totalHours', width: 110 },
@@ -116,6 +130,7 @@ export default function OtBulkPage() {
 
   return (
     <PageContainer title="일괄처리">
+      <SearchForm fields={bulkSearchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <div style={{ marginBottom: 24 }}>
         <div style={{ marginBottom: 8, fontWeight: 'bold' }}>대상자 선택</div>
         <DataTable<OtRequest>

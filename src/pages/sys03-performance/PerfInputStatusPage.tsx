@@ -1,16 +1,24 @@
+import { useState, useRef } from 'react'
 import { Button, Progress, Card } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { DownloadOutlined } from '@ant-design/icons'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import type { ProColumns } from '@ant-design/pro-components'
+import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { InputStatus } from '@/shared/api/mocks/handlers/sys03-performance'
 
-async function fetchInputStatuses(params: PageRequest): Promise<PageResponse<InputStatus>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '부대(서)', type: 'text', placeholder: '부대(서)명 검색' },
+]
+
+async function fetchInputStatuses(params: PageRequest & { keyword?: string }): Promise<PageResponse<InputStatus>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<InputStatus>>>('/sys03/input-status', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<InputStatus>>).data ?? (res as unknown as PageResponse<InputStatus>)
 }
@@ -30,6 +38,9 @@ function getRateColor(rate: number): string {
 }
 
 export default function PerfInputStatusPage() {
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+  const actionRef = useRef<ActionType>()
+
   const { data: allStatuses = [] } = useQuery({
     queryKey: ['sys03', 'input-status', 'all'],
     queryFn: fetchAllInputStatuses,
@@ -55,11 +66,13 @@ export default function PerfInputStatusPage() {
 
   return (
     <PageContainer title="업무실적 입력현황">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<InputStatus>
         rowKey="id"
         columns={columns}
         headerTitle="부대(서)별 업무실적 입력현황"
-        request={(params) => fetchInputStatuses(params)}
+        actionRef={actionRef}
+        request={(params) => fetchInputStatuses({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="export"

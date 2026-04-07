@@ -15,11 +15,12 @@ Decimal phases는 숫자 순서대로 정수 Phase 사이에 실행된다.
 - [x] **Phase 0: 프로젝트 기반 구축** - FSD 구조, 공통 컴포넌트 라이브러리, MSW/라우팅/상태관리 기반 동결 (completed 2026-04-05)
 - [x] **Phase 1: 공통 기능 (99_공통기능)** - 권한관리, 결재선, 코드관리, 공통게시판, 시스템관리 82개 프로세스 (completed 2026-04-05)
 - [x] **Phase 2: 메인 포탈 (00_포탈)** - 로그인/로그아웃, 대시보드, 세션관리 완전 동작 (completed 2026-04-05)
-- [ ] **Phase 3: 저복잡도 서브시스템 5개** - 인증서/행정규칙/나의제언/연구자료/회의실 85개 프로세스 (GAP 패치 진행중)
-- [ ] **Phase 4: 중복잡도 서브시스템 A 6개** - 지식/검열/규정/설문/지시건의/영현보훈 176개 프로세스
-- [x] **Phase 5: 중복잡도 서브시스템 B 3개** - 군사자료/주말버스/직무기술서 131개 프로세스 (completed 2026-04-06)
-- [x] **Phase 6: 고복잡도 서브시스템 2개** - 부대계보(트리뷰)/초과근무(캘린더) 158개 프로세스 (completed 2026-04-06)
-- [x] **Phase 7: 최고복잡도 서브시스템 2개** - 성과관리(KPI차트)/보안일일결산(복합워크플로우) 214개 프로세스 (completed 2026-04-06)
+- [x] **Phase 3: 저복잡도 서브시스템 5개** - 인증서/행정규칙/나의제언/연구자료/회의실 85개 프로세스 (completed 2026-04-06, GAP fixed 2026-04-07)
+- [x] **Phase 4: 중복잡도 서브시스템 A 6개** - 지식/검열/규정/설문/지시건의/영현보훈 176개 프로세스 (completed 2026-04-06, GAP fixed 2026-04-07)
+- [x] **Phase 5: 중복잡도 서브시스템 B 3개** - 군사자료/주말버스/직무기술서 131개 프로세스 (completed 2026-04-06, GAP fixed 2026-04-07)
+- [x] **Phase 6: 고복잡도 서브시스템 2개** - 부대계보(트리뷰)/초과근무(캘린더) 158개 프로세스 (completed 2026-04-06, GAP fixed 2026-04-07)
+- [x] **Phase 7: 최고복잡도 서브시스템 2개** - 성과관리(KPI차트)/보안일일결산(복합워크플로우) 214개 프로세스 (completed 2026-04-06, GAP fixed 2026-04-07)
+- [x] **Phase 8: GAP 수정 + spec-doc 재생성** - 18개 서브시스템 6대 GAP 규칙 적용, 공통 컴포넌트 강화, spec-doc 5종 재생성, SYS06 독립화 (completed 2026-04-07)
 
 ## Phase Details
 
@@ -90,11 +91,11 @@ Plans:
 - [x] 03-03-PLAN.md (W1) -- 14_나의제언 (메인/제언확인/관리자 + 추천/신고/답변)
 - [x] 03-04-PLAN.md (W1) -- 11_연구자료종합관리체계 (메인/자료CRUD/자료실/관리자6탭)
 - [x] 03-05-PLAN.md (W1) -- 16_회의실예약관리체계 (예약신청/내예약/관리/회의실CRUD+시간대/장비/사진)
-- [ ] 03-06-PLAN.md (W2, gap_closure) -- SYS04 GAP패치: 신청폼 필드확장, 회수, 반려사유, 엑셀/통계 (G01-G05)
-- [ ] 03-07-PLAN.md (W2, gap_closure) -- SYS05 GAP패치: 규정/예규/지시 CRUD, 조직도트리, 예하부대카드 (G06-G10)
-- [ ] 03-08-PLAN.md (W2, gap_closure) -- SYS14 GAP패치: 컬럼/상태/댓글CRUD/서식관리/엑셀 (G17-G27)
-- [ ] 03-09-PLAN.md (W2, gap_closure) -- SYS11 GAP패치: 메인통계/컬럼/폼/검색/엑셀/다운로드이력 (G11-G16)
-- [ ] 03-10-PLAN.md (W2, gap_closure) -- SYS16 GAP패치: 예약폼확장/검색/엑셀프린트/권한라우트 (G28-G31)
+- [x] 03-06-PLAN.md (W2, gap_closure) -- SYS04 GAP패치: 신청폼 필드확장, 회수, 반려사유, 엑셀/통계 (G01-G05)
+- [x] 03-07-PLAN.md (W2, gap_closure) -- SYS05 GAP패치: 규정/예규/지시 CRUD, 조직도트리, 예하부대카드 (G06-G10)
+- [x] 03-08-PLAN.md (W2, gap_closure) -- SYS14 GAP패치: 컬럼/상태/댓글CRUD/서식관리/엑셀 (G17-G27)
+- [x] 03-09-PLAN.md (W2, gap_closure) -- SYS11 GAP패치: 메인통계/컬럼/폼/검색/엑셀/다운로드이력 (G11-G16)
+- [x] 03-10-PLAN.md (W2, gap_closure) -- SYS16 GAP패치: 예약폼확장/검색/엑셀프린트/권한라우트 (G28-G31)
 **UI hint**: yes
 
 ### Phase 4: 중복잡도 서브시스템 A 6개
@@ -109,10 +110,10 @@ Plans:
   5. 영현보훈체계에서 사망자/상이자를 등록하고 부대별/신분별/연도별 현황 보고서를 조회 및 저장할 수 있다
 **Plans**: 6 plans (1 wave, all parallel)
 Plans:
-- [ ] 04-01-PLAN.md (W1) -- SYS13 지식관리체계 (CRUD+추천/평점/댓글+통계Pie/Bar차트) + npm 의존성 설치(@ant-design/charts, @dnd-kit)
+- [x] 04-01-PLAN.md (W1) -- SYS13 지식관리체계 (CRUD+추천/평점/댓글+통계Pie/Bar차트) + npm 의존성 설치(@ant-design/charts, @dnd-kit)
 - [x] 04-02-PLAN.md (W1) -- SYS17 검열결과관리체계 (검열부대지정+검열계획+조치과제+결재Steps+추진현황Stacked Bar)
 - [x] 04-03-PLAN.md (W1) -- SYS06 해병대규정관리체계 (sys05 페이지 재사용+공통게시판 재사용, 최소 신규 코드)
-- [ ] 04-04-PLAN.md (W1) -- SYS02 설문종합관리체계 (문항편집기 dnd-kit+설문참여+결과분석Bar차트+체계관리)
+- [x] 04-04-PLAN.md (W1) -- SYS02 설문종합관리체계 (문항편집기 dnd-kit+설문참여+결과분석Bar차트+체계관리)
 - [x] 04-05-PLAN.md (W1) -- SYS12 지시건의사항관리체계 (지시/건의 추진현황+목록+CRUD+Timeline+관리자통계)
 - [x] 04-06-PLAN.md (W1) -- SYS09 영현보훈체계 (CRUD 3종+현황차트 6종+보고서/확인서 7종 Print CSS)
 **UI hint**: yes
@@ -170,18 +171,34 @@ Plans:
 - [x] 07-06-PLAN.md (W3, dep:07-04) -- SYS15 종합현황4+관리자5(점검항목Tabs5/예외처리Tree3)+개인설정+게시판2+시스템2+라우터완성
 **UI hint**: yes
 
+### Phase 8: GAP 수정 + spec-doc 재생성 + 문서 현행화
+**Goal**: 18개 서브시스템이 req_spec 기반 6대 GAP 규칙(입력값 컬럼, 검색영역, 규칙/예외, 관리자 메뉴, 테이블 라인, 군번/계급/성명)을 모두 준수하고, spec-doc 5종이 최신 상태로 재생성된다
+**Depends on**: Phase 7
+**Requirements**: GAP-R1~R6 (신규)
+**Success Criteria** (what must be TRUE):
+  1. 모든 CrudForm에 CSV 입력값 항목의 전체 컬럼이 반영되어 있다
+  2. 모든 목록 화면 상단에 높이 100px SearchForm이 존재한다
+  3. DataTable에 군청색 상단 2px / 하단 1px 라인이 적용되어 있다
+  4. 신청자/사용자 컬럼이 군번/계급/성명 3항목을 동시 표시한다
+  5. SYS06이 SYS05에서 독립하여 별도 페이지와 API 핸들러를 보유한다
+  6. spec-doc 5종(조감도, 업무분석서, 다이어그램, 메뉴구조도, 상관관계도)이 재생성되어 있다
+**Plans**: GAP 수정 5 Wave (공통 컴포넌트 + 18개 서브시스템 + spec-doc 재생성)
+**Completed**: 2026-04-07
+**UI hint**: yes
+
 ## Progress
 
 **Execution Order:**
-Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7
+Phases execute in numeric order: 0 -> 1 -> 2 -> 3 -> 4 -> 5 -> 6 -> 7 -> 8
 
 | Phase | Plans Complete | Status | Completed |
 |-------|----------------|--------|-----------|
-| 0. 프로젝트 기반 구축 | 3/3 | Complete   | 2026-04-05 |
-| 1. 공통 기능 (99_공통기능) | 4/4 | Complete   | 2026-04-05 |
-| 2. 메인 포탈 (00_포탈) | 2/2 | Complete   | 2026-04-05 |
-| 3. 저복잡도 서브시스템 5개 | 5/10 | GAP Closure | - |
-| 4. 중복잡도 서브시스템 A 6개 | 4/6 | In Progress|  |
-| 5. 중복잡도 서브시스템 B 3개 | 5/5 | Complete   | 2026-04-06 |
-| 6. 고복잡도 서브시스템 2개 | 3/3 | Complete   | 2026-04-06 |
-| 7. 최고복잡도 서브시스템 2개 | 6/6 | Complete   | 2026-04-06 |
+| 0. 프로젝트 기반 구축 | 3/3 | Complete | 2026-04-05 |
+| 1. 공통 기능 (99_공통기능) | 4/4 | Complete | 2026-04-05 |
+| 2. 메인 포탈 (00_포탈) | 2/2 | Complete | 2026-04-05 |
+| 3. 저복잡도 서브시스템 5개 | 10/10 | Complete + GAP Fixed | 2026-04-07 |
+| 4. 중복잡도 서브시스템 A 6개 | 6/6 | Complete + GAP Fixed | 2026-04-07 |
+| 5. 중복잡도 서브시스템 B 3개 | 5/5 | Complete + GAP Fixed | 2026-04-07 |
+| 6. 고복잡도 서브시스템 2개 | 3/3 | Complete + GAP Fixed | 2026-04-07 |
+| 7. 최고복잡도 서브시스템 2개 | 6/6 | Complete + GAP Fixed | 2026-04-07 |
+| 8. GAP 수정 + spec-doc 재생성 | - | Complete | 2026-04-07 |

@@ -53,20 +53,30 @@ export default function MilDataDetailPage({ docId }: MilDataDetailPageProps) {
 
   return (
     <>
+      {/* CSV 상세 조회 필드: 비밀등급, 관리번호, 문서구분, 접수일자, 문서제목,
+          이관부서, 보관위치, 문서일자, 보존기간, 문서규격, 문서형태,
+          발행부서, 문서매수, 문서번호, 예고문, 변경근거 */}
       <Descriptions layout="vertical" column={3} bordered size="small">
         <Descriptions.Item label="비밀등급">{securityLevelTag(doc.securityLevel)}</Descriptions.Item>
-        <Descriptions.Item label="보관형태">{doc.storageType}</Descriptions.Item>
         <Descriptions.Item label="관리번호">{doc.docNumber}</Descriptions.Item>
         <Descriptions.Item label="문서구분">{doc.docType}</Descriptions.Item>
+        <Descriptions.Item label="문서제목" span={3}>{doc.title}</Descriptions.Item>
+        <Descriptions.Item label="이관부서">{(doc as Record<string, unknown>).transferDept as string ?? '-'}</Descriptions.Item>
+        <Descriptions.Item label="발행부서">{(doc as Record<string, unknown>).issueDept as string ?? '-'}</Descriptions.Item>
         <Descriptions.Item label="이관일자">{doc.transferDate}</Descriptions.Item>
-        <Descriptions.Item label="보존기간">{doc.retentionPeriod}년</Descriptions.Item>
-        <Descriptions.Item label="자료명" span={2}>{doc.title}</Descriptions.Item>
-        <Descriptions.Item label="작성자">{doc.author}</Descriptions.Item>
-        <Descriptions.Item label="쪽수">{doc.pages}</Descriptions.Item>
+        <Descriptions.Item label="문서일자">{(doc as Record<string, unknown>).docDate as string ?? '-'}</Descriptions.Item>
+        <Descriptions.Item label="보관형태">{doc.storageType}</Descriptions.Item>
+        <Descriptions.Item label="보관위치">{(doc as Record<string, unknown>).storagePosition as string ?? '-'}</Descriptions.Item>
         <Descriptions.Item label="보관장소">{doc.storageLocation}</Descriptions.Item>
-        <Descriptions.Item label="등록일">{doc.registeredAt}</Descriptions.Item>
-        <Descriptions.Item label="상태">{STATUS_LABEL_MAP[doc.status] ?? doc.status}</Descriptions.Item>
+        <Descriptions.Item label="보존기간">{doc.retentionPeriod}년</Descriptions.Item>
         <Descriptions.Item label="보존만료일">{doc.retentionExpireDate}</Descriptions.Item>
+        <Descriptions.Item label="문서매수">{doc.pages}매</Descriptions.Item>
+        <Descriptions.Item label="문서규격">{(doc as Record<string, unknown>).docSpec as string ?? '-'}</Descriptions.Item>
+        <Descriptions.Item label="문서형태">{(doc as Record<string, unknown>).docFormat as string ?? '-'}</Descriptions.Item>
+        <Descriptions.Item label="상태">{STATUS_LABEL_MAP[doc.status] ?? doc.status}</Descriptions.Item>
+        <Descriptions.Item label="등록일">{doc.registeredAt}</Descriptions.Item>
+        <Descriptions.Item label="예고문" span={3}>{(doc as Record<string, unknown>).notice as string || '-'}</Descriptions.Item>
+        <Descriptions.Item label="변경근거" span={3}>{(doc as Record<string, unknown>).changeReason as string || '-'}</Descriptions.Item>
         <Descriptions.Item label="비고" span={3}>{doc.remarks}</Descriptions.Item>
       </Descriptions>
 

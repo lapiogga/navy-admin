@@ -178,5 +178,12 @@ None — 외부 서비스 설정 불필요.
 - Vitest: 9/9 tests passed
 
 ---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 01 인프라 기반은 변경 없음. 단, `src/index.css`에 글로벌 CSS(navy 테이블 보더, 검색 폼 컨테이너)가 추가되어 Vite 빌드 파이프라인에 포함됨.
+
+---
 *Phase: 00-project-foundation*
 *Completed: 2026-04-05*
+*GAP 수정: 2026-04-07*

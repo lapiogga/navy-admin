@@ -124,3 +124,12 @@ None - 플랜 그대로 실행됨.
 - sys09.ts handlers: FOUND
 - index.tsx (17 routes): FOUND
 - Commits: b82d4fa, f30750b — VERIFIED
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS09 영현보훈체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CrudForm에 추가 필드 다수 반영
+- **R2**: 목록 화면 상단에 SearchForm 7개 필드 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용

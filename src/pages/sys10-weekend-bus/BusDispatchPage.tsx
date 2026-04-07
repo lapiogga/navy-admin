@@ -3,6 +3,8 @@ import { Button, Modal, message, Space, Form, Select, DatePicker, TimePicker, In
 import { PlusOutlined } from '@ant-design/icons'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
@@ -40,11 +42,46 @@ export function BusDispatchPage() {
   const [editRecord, setEditRecord] = useState<DispatchRecord | null>(null)
   const [seatModalOpen, setSeatModalOpen] = useState(false)
   const [seatModalSeats, setSeatModalSeats] = useState<Seat[]>([])
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [form] = Form.useForm()
 
+  // 검색 필드 정의 (CSV: 상하행구분, 운행일자, 출발시간, 출발지, 도착지, 좌석수, 배정여부, 예약인원)
+  const searchFields: SearchField[] = [
+    {
+      name: 'direction',
+      label: '상하행구분',
+      type: 'select',
+      options: [
+        { label: '상행', value: '상행' },
+        { label: '하행', value: '하행' },
+      ],
+    },
+    { name: 'dateRange', label: '운행일자', type: 'dateRange' },
+    { name: 'departure', label: '출발지', type: 'text', placeholder: '출발지 입력' },
+    { name: 'destination', label: '도착지', type: 'text', placeholder: '도착지 입력' },
+    {
+      name: 'assignStatus',
+      label: '배정여부',
+      type: 'select',
+      options: [
+        { label: '배정', value: 'assigned' },
+        { label: '미배정', value: 'unassigned' },
+      ],
+    },
+  ]
+
   const fetchDispatches = async (params: PageRequest) => {
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      ...Object.fromEntries(
+        Object.entries(searchParams)
+          .filter(([, v]) => v != null && v !== '')
+          .map(([k, v]) => [k, String(v)])
+      ),
+    })
     const res = await apiClient.get<{ content: DispatchRecord[]; totalElements: number }>(
-      `/sys10/dispatches?page=${params.page}&size=${params.size}`
+      `/sys10/dispatches?${qs.toString()}`
     )
     return {
       content: res.data.content,
@@ -179,6 +216,19 @@ export function BusDispatchPage() {
   return (
     <div style={{ padding: 24 }}>
       <h2>주말버스 배차관리</h2>
+
+      {/* 검색영역 (R2: CSV 검색조건 - 상하행구분, 운행일자, 출발지, 도착지, 배정여부) */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
 
       <DataTable<DispatchRecord>
         columns={columns}

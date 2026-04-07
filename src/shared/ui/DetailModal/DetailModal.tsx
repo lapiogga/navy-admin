@@ -3,7 +3,7 @@ import { Modal, Descriptions } from 'antd'
 export interface DetailField {
   key: string
   label: string
-  render?: (value: unknown) => React.ReactNode
+  render?: (value: unknown, record?: Record<string, unknown>) => React.ReactNode
 }
 
 export interface DetailModalProps {
@@ -29,7 +29,7 @@ export function DetailModal({
         <Descriptions column={1} bordered size="small">
           {fields.map((field) => (
             <Descriptions.Item key={field.key} label={field.label}>
-              {field.render ? field.render(data[field.key]) : String(data[field.key] ?? '-')}
+              {field.render ? field.render(data[field.key], data) : String(data[field.key] ?? '-')}
             </Descriptions.Item>
           ))}
         </Descriptions>

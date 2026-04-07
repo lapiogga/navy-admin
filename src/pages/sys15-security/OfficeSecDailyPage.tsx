@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Checkbox, Input, Button, Form, DatePicker, message, Divider, Tag } from 'antd'
+import { Checkbox, Input, Button, Form, DatePicker, message, Divider, Tag, Alert } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -124,6 +124,20 @@ export default function OfficeSecDailyPage() {
       message.warning(`미체크 항목 "${item?.label}"에 대한 사유를 입력하세요.`)
       return
     }
+
+    // CSV 규칙: 미실시자, 부재자가 있는 경우 해당 사유를 입력해야만 결산 실시 가능
+    const formValues = form.getFieldsValue()
+    const hasNonCompliant = formValues.nonCompliantPersons && formValues.nonCompliantPersons !== '없음'
+    const hasAbsent = formValues.absentPersons && formValues.absentPersons !== '없음'
+    if (hasNonCompliant && !formValues.nonCompliantReason?.trim()) {
+      message.warning('미실시자가 있는 경우 미실시 사유를 반드시 입력해야 합니다.')
+      return
+    }
+    if (hasAbsent && !formValues.absentReason?.trim()) {
+      message.warning('부재자가 있는 경우 부재 사유를 반드시 입력해야 합니다.')
+      return
+    }
+
     submitMutation.mutate(buildPayload('submitted'))
   }
 
@@ -201,11 +215,14 @@ export default function OfficeSecDailyPage() {
 
           <Divider />
 
-          <h4>미실시자/부재자 관리 (필수)</h4>
+          <h4>미실시자/부재자 관리</h4>
+          <p style={{ color: '#ff4d4f', fontSize: 12, marginBottom: 12 }}>
+            * 미실시자 또는 부재자가 있는 경우, 해당 사유를 입력해야만 결산 실시가 가능합니다.
+          </p>
           <Form.Item
             name="nonCompliantPersons"
             label="미실시자 성명"
-            rules={[{ required: false }]}
+            rules={[{ required: true, message: '미실시자 성명을 입력하세요 (없으면 "없음")' }]}
           >
             <Input placeholder="미실시자가 없으면 '없음'을 입력하세요" />
           </Form.Item>
@@ -213,18 +230,22 @@ export default function OfficeSecDailyPage() {
             name="nonCompliantReason"
             label="미실시 사유"
             rules={[{ required: false }]}
+            extra="미실시자가 있는 경우 필수 입력"
           >
             <TextArea rows={2} placeholder="미실시 사유를 입력하세요" />
           </Form.Item>
           <Form.Item
             name="absentPersons"
             label="부재자 성명"
+            rules={[{ required: true, message: '부재자 성명을 입력하세요 (없으면 "없음")' }]}
           >
             <Input placeholder="부재자가 없으면 '없음'을 입력하세요" />
           </Form.Item>
           <Form.Item
             name="absentReason"
             label="부재 사유"
+            rules={[{ required: false }]}
+            extra="부재자가 있는 경우 필수 입력"
           >
             <TextArea rows={2} placeholder="부재 사유를 입력하세요" />
           </Form.Item>

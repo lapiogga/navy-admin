@@ -149,46 +149,48 @@
 | 2026-04-06 12:04 | 2026-04-06 12:25 | 4 | Phase 4 Verify | Verifier 통과, Phase 4 완료 | 완료 |
 | 2026-04-06 12:25 | 2026-04-06 13:00 | 5 | Phase 5 Discuss | 12개 gray area, 38 decisions | 완료 |
 | 2026-04-06 13:00 | 2026-04-06 13:06 | - | 문서 현행화 + Push | 전체 현행화, GitHub 배포 | 완료 |
+| 2026-04-07 13:00 | 2026-04-07 13:30 | - | 서브시스템 메인화면 | 18개 서브시스템 SubsystemHomePage 컴포넌트 + Mock API + 라우트 | 완료 |
+| 2026-04-07 13:30 | 2026-04-07 13:40 | - | v1.0.0 태그 + 배포 | GitHub push + git tag v1.0.0 | 완료 |
+| 2026-04-07 13:40 | 2026-04-07 14:30 | - | spec-doc 문서 생성 | 조감도/업무분석서/다이어그램/메뉴구조도/상관관계도 5개 문서 | 완료 |
+| 2026-04-07 14:30 | 2026-04-07 15:00 | - | GAP 분석 + 공통 컴포넌트 수정 | req_spec vs 구현 화면 비교, DataTable/SearchForm/CrudForm/military.ts 수정 | 완료 |
+| 2026-04-07 15:00 | 2026-04-07 17:30 | - | 18개 서브시스템 GAP 수정 | Wave 1~4 병렬 실행, 120+ 파일 수정 (6 규칙 적용) | 완료 |
+| 2026-04-07 17:30 | 2026-04-07 18:00 | - | spec-doc 5종 재생성 | GAP 수정 반영하여 전면 재작성 | 완료 |
+| 2026-04-07 18:00 | 2026-04-07 18:30 | - | 문서 전체 업그레이드 | .planning/ 80+ 마크다운 파일 GAP 수정 반영 + PPT 18개 생성 | 완료 |
+| 2026-04-07 18:30 | 2026-04-07 19:00 | - | UI 공통 7개 수정 | 검색높이 가변, 타이틀삭제, 헤더/사이드바 시인성, 태그/버튼/여백 | 완료 |
+| 2026-04-07 19:00 | 2026-04-07 19:30 | - | 군번 규칙 적용 | mockServiceNumber.ts 생성, 18개 핸들러 일괄 교체 | 완료 |
+| 2026-04-07 19:30 | 2026-04-07 20:00 | - | 부대 조직도 적용 | mockUnits.ts 생성, 14개 핸들러 부대명 교체 | 완료 |
+| 2026-04-07 20:00 | 2026-04-07 20:15 | - | 문서 현행화 + Push | WORK-LOG/TERMINAL-LOG 업데이트, GitHub 배포 | 완료 |
 
 ## 재개 방법 (Resume Instructions)
 
-**다음 세션 순서 (자동 실행):**
+**현재 상태: 프론트엔드 개발 100% 완료**
 
-### Step 1: Phase 5 Plan
-```
-/gsd:plan-phase 5 --auto
-05-CONTEXT.md (38 decisions) 기반으로 계획 수립.
-UI-SPEC 필수 생성 규칙 적용.
-```
+- Phase 0~7: **전체 완료** + 검증 통과
+- GAP 수정: **18개 서브시스템 x 6규칙 전체 적용 완료**
+- spec-doc: **6개 문서 생성 완료** (조감도/업무분석서/다이어그램/메뉴구조도/상관관계도/GAP분석)
+- PPT: **18개 서브시스템별 분석/설계 자료 생성 완료**
+- 마크다운 문서: **80+ 파일 최신 상태 업데이트 완료**
 
-### Step 2: Phase 5 Execute + Verify
-```
-/gsd:execute-phase 5 --auto
-3개 서브시스템: 군사자료관리(40), 주말버스예약(44), 직무기술서관리(47)
-총 131개 프로세스
-```
+### GAP 수정 적용 규칙 6개 (전체 완료)
+1. R1: 입력값 컬럼 반영 - CSV '입력값' 항목을 CrudForm 필드에 반영
+2. R2: 검색영역 100px - SearchForm 추가 (CSV '검색기능' 항목 반영)
+3. R3: 규칙/예외사항 - UI 로직/안내문/제한조건으로 구현
+4. R4: 관리자 메뉴 - 18개 서브시스템 각각에 포함
+5. R5: 테이블 군청색 라인 - DataTable CSS (상단 2px, 하단 1px)
+6. R6: 군번/계급/성명 - militaryPersonColumn() 헬퍼 일괄 적용
 
-### Step 3: Phase 6~7 순차 진행
-
-**주의사항:**
-- 사용자가 자동 실행을 요청함. 의견을 묻지 않고 자동 진행할 것.
-- **규칙**: 모든 화면은 req_analysis.txt의 단위프로세스 설명의 컬럼/입력값 최대한 반영
-- **규칙**: 모든 Phase에서 UI-SPEC 필수 생성
-
-**현재 상태:**
-- Phase 0: 실행 완료 (프로젝트 기반, 공통 컴포넌트)
-- Phase 1: **실행 완료** + 검증 통과 (공통 기능 82개 프로세스)
-- Phase 2: **실행 완료** + 검증 통과 (메인 포탈)
-- Phase 3: **실행 완료** + 검증 통과 + **패치 완료** (저복잡도 5개, 85개 프로세스)
-- Phase 4: **실행 완료** + 검증 통과 (중복잡도 A 6개, 176개 프로세스)
-- Phase 5: **Discuss 완료** → Plan 대기 (중복잡도 B 3개, 131개 프로세스)
-  - 05-CONTEXT.md (38 decisions), 05-DISCUSSION-LOG.md
-- Phase 6: 미착수 (고복잡도 2개, 158개 프로세스)
-- Phase 7: 미착수 (최고복잡도 2개, 214개 프로세스)
+### 공통 컴포넌트 (GAP 수정으로 추가/변경)
+- `DataTable.tsx`: navy-bordered-table CSS 클래스
+- `SearchForm.tsx`: search-form-container wrapper (높이 100px)
+- `CrudForm.tsx`: file/dateRange/checkbox 타입 필드 추가
+- `military.ts`: formatMilitaryPerson(), militaryPersonColumn() 헬퍼
+- `index.css`: 글로벌 CSS (테이블 라인, 검색영역)
+- `DetailModal.tsx`: render 함수 시그니처 확장 (record 인자 추가)
 
 **산출물 위치:**
-- `.planning/phases/05-b-3/05-CONTEXT.md` — Phase 5 구현 결정 38개
-- `.planning/phases/05-b-3/05-DISCUSSION-LOG.md` — Phase 5 토론 기록
+- `spec-doc/` — 시스템 문서 6종 + PPT 생성 스크립트
+- `.planning/` — 80+ 마크다운 파일 (Phase 0~7 전체)
+- `src/shared/lib/military.ts` — 군번/계급/성명 헬퍼
 
 **GitHub:** https://github.com/lapiogga/navy-admin.git (master branch)
 

@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // 타입 정의
 interface ResearchItem {
@@ -8,6 +9,7 @@ interface ResearchItem {
   author: string
   department: string
   category: string
+  researchField: string
   description: string
   fileUrl: string
   fileName: string
@@ -15,7 +17,13 @@ interface ResearchItem {
   viewCount: number
   researchYear: number
   budget: number
+  researcherServiceNumber: string
+  researcherRank: string
+  researcherName: string
+  researcherType: string
   progressStatus: string
+  managerName: string
+  posterName: string
   createdAt: string
   updatedAt: string
 }
@@ -27,17 +35,22 @@ interface ResearchCategory {
   sortOrder: number
 }
 
-// Mock 카테고리 데이터
+// Mock 카테고리 데이터 (CSV 스펙 기준 10개)
 const categories: ResearchCategory[] = [
-  { id: 'cat-1', name: '전략연구', sortOrder: 1 },
-  { id: 'cat-2', name: '작전연구', sortOrder: 2 },
-  { id: 'cat-3', name: '교육훈련', sortOrder: 3 },
-  { id: 'cat-4', name: '인사관리', sortOrder: 4 },
-  { id: 'cat-5', name: '군수지원', sortOrder: 5 },
-  { id: 'cat-6', name: '기타', sortOrder: 6 },
+  { id: 'cat-1', name: '국방정책', sortOrder: 1 },
+  { id: 'cat-2', name: '개별사업', sortOrder: 2 },
+  { id: 'cat-3', name: '해사학술', sortOrder: 3 },
+  { id: 'cat-4', name: '군사학술', sortOrder: 4 },
+  { id: 'cat-5', name: '해군발전', sortOrder: 5 },
+  { id: 'cat-6', name: '함정정비', sortOrder: 6 },
+  { id: 'cat-7', name: '전투발전', sortOrder: 7 },
+  { id: 'cat-8', name: '전투실험', sortOrder: 8 },
+  { id: 'cat-9', name: '함정기술', sortOrder: 9 },
+  { id: 'cat-10', name: '장성정책연구', sortOrder: 10 },
 ]
 
-const CATEGORY_NAMES = ['전략연구', '작전연구', '교육훈련', '인사관리', '군수지원', '기타']
+// CSV 스펙 기준 10개 카테고리
+const CATEGORY_NAMES = ['국방정책', '개별사업', '해사학술', '군사학술', '해군발전', '함정정비', '전투발전', '전투실험', '함정기술', '장성정책연구']
 
 const PROGRESS_STATUSES = ['최초평가', '중간평가', '최종평가']
 
@@ -45,20 +58,28 @@ const PROGRESS_STATUSES = ['최초평가', '중간평가', '최종평가']
 const researchItems: ResearchItem[] = Array.from({ length: 30 }, (_, i) => {
   const category = CATEGORY_NAMES[i % CATEGORY_NAMES.length]
   const createdAt = faker.date.recent({ days: 180 }).toISOString().split('T')[0]
+  const researcherName = faker.person.lastName() + faker.person.firstName()
   return {
     id: `research-${i + 1}`,
     title: `[${category}] ${faker.lorem.words({ min: 3, max: 6 })} 연구`,
-    author: faker.person.lastName() + faker.person.firstName(),
+    author: researcherName,
     department: `제${faker.number.int({ min: 1, max: 5 })}대대`,
     category,
+    researchField: category,
     description: faker.lorem.paragraph(),
     fileUrl: `/files/research-${i + 1}.pdf`,
     fileName: `연구자료_${i + 1}.pdf`,
     downloadCount: faker.number.int({ min: 0, max: 200 }),
     viewCount: faker.number.int({ min: 10, max: 500 }),
     researchYear: faker.number.int({ min: 2020, max: 2026 }),
-    budget: faker.number.int({ min: 1000000, max: 100000000 }),
+    budget: faker.number.int({ min: 1000, max: 100000 }) * 10000,
+    researcherServiceNumber: randomServiceNumber(),
+    researcherRank: faker.helpers.arrayElement(['대위', '소령', '중령', '대령']),
+    researcherName,
+    researcherType: faker.helpers.arrayElement(['군내', '외부']),
     progressStatus: faker.helpers.arrayElement(PROGRESS_STATUSES),
+    managerName: faker.person.lastName() + faker.person.firstName(),
+    posterName: faker.person.lastName() + faker.person.firstName(),
     createdAt,
     updatedAt: createdAt,
   }
@@ -87,13 +108,17 @@ export const sys11Handlers = [
     const category = url.searchParams.get('category') || ''
     const progressStatus = url.searchParams.get('progressStatus') || ''
 
+    const researchYear = url.searchParams.get('researchYear') || ''
+    const researcher = url.searchParams.get('researcher') || ''
+    const manager = url.searchParams.get('manager') || ''
+
     let filtered = [...researchItems]
     if (keyword) {
       filtered = filtered.filter(
         (item) =>
           item.title.includes(keyword) ||
-          item.author.includes(keyword) ||
-          item.department.includes(keyword),
+          item.researcherName.includes(keyword) ||
+          item.managerName.includes(keyword),
       )
     }
     if (category) {
@@ -101,6 +126,15 @@ export const sys11Handlers = [
     }
     if (progressStatus) {
       filtered = filtered.filter((item) => item.progressStatus === progressStatus)
+    }
+    if (researchYear) {
+      filtered = filtered.filter((item) => String(item.researchYear) === researchYear)
+    }
+    if (researcher) {
+      filtered = filtered.filter((item) => item.researcherName.includes(researcher))
+    }
+    if (manager) {
+      filtered = filtered.filter((item) => item.managerName.includes(manager))
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
@@ -153,12 +187,14 @@ export const sys11Handlers = [
   // 연구자료 등록
   http.post('/api/sys11/research', async ({ request }) => {
     const body = await request.json() as Partial<ResearchItem>
+    const researcherName = (body.researcherName as string) || '홍길동'
     const newItem: ResearchItem = {
       id: `research-${Date.now()}`,
       title: body.title || '',
-      author: body.author || '홍길동',
+      author: researcherName,
       department: body.department || '제1대대',
       category: body.category || '기타',
+      researchField: (body.researchField as string) || body.category || '기타',
       description: body.description || '',
       fileUrl: `/files/research-${Date.now()}.pdf`,
       fileName: `연구자료_${Date.now()}.pdf`,
@@ -166,7 +202,13 @@ export const sys11Handlers = [
       viewCount: 0,
       researchYear: (body.researchYear as number) || new Date().getFullYear(),
       budget: (body.budget as number) || 0,
+      researcherServiceNumber: (body.researcherServiceNumber as string) || '',
+      researcherRank: (body.researcherRank as string) || '',
+      researcherName,
+      researcherType: (body.researcherType as string) || '군내',
       progressStatus: (body.progressStatus as string) || '최초평가',
+      managerName: (body.managerName as string) || '',
+      posterName: '현재사용자',
       createdAt: new Date().toISOString().split('T')[0],
       updatedAt: new Date().toISOString().split('T')[0],
     }
@@ -239,11 +281,15 @@ export const sys11Handlers = [
     const boardType = url.searchParams.get('boardType') || ''
     const items = Array.from({ length: 30 }, (_, i) => ({
       id: `dl-${i + 1}`,
+      downloaderServiceNumber: randomServiceNumber(),
+      downloaderRank: faker.helpers.arrayElement(['대위', '소령', '중령', '대령']),
       downloaderName: faker.person.lastName() + faker.person.firstName(),
       downloaderUnit: faker.helpers.arrayElement(['1사단', '2사단', '해병대사령부']),
+      ip: faker.internet.ip(),
       fileName: faker.system.fileName(),
       downloadedAt: faker.date.recent({ days: 60 }).toISOString().split('T')[0],
       boardType: faker.helpers.arrayElement(['연구자료', '자료실']),
+      postId: `research-${faker.number.int({ min: 1, max: 30 })}`,
     }))
     const filtered = boardType
       ? items.filter((item) => item.boardType === boardType)

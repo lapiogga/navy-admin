@@ -5,6 +5,8 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { PageContainer } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { Survey, SurveyStatus } from '@/shared/api/mocks/handlers/sys02'
 import SurveyResultPage from './SurveyResultPage'
@@ -18,16 +20,40 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   closed: '마감',
 }
 
+// 검색 필드 정의
+const searchFields: SearchField[] = [
+  {
+    name: 'keyword',
+    label: '설문명',
+    type: 'text',
+    placeholder: '설문명 검색',
+  },
+  {
+    name: 'period',
+    label: '설문기간',
+    type: 'dateRange',
+  },
+]
+
 // 지난 설문보기 (SURV-03) - closed 상태 설문만 조회
 export default function PastSurveyPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
 
   const { data, isLoading } = useQuery({
-    queryKey: ['sys02', 'past'],
+    queryKey: ['sys02', 'past', searchParams],
     queryFn: () => apiClient.get<Survey[]>('/sys02/surveys/past'),
   })
 
   const surveys = (data as Survey[] | undefined) || []
+
+  // 검색 필터링 (클라이언트 사이드)
+  const filteredSurveys = surveys.filter((s) => {
+    if (searchParams.keyword && !s.surveyName.includes(searchParams.keyword as string)) {
+      return false
+    }
+    return true
+  })
 
   const columns: ProColumns<Survey>[] = [
     {
@@ -99,11 +125,27 @@ export default function PastSurveyPage() {
     },
   ]
 
+  // 검색 처리
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+  }
+
   return (
     <PageContainer title="지난 설문보기">
+      {/* 검색영역 */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={handleSearch}
+        onReset={handleSearchReset}
+      />
+
       <DataTable<Survey>
         columns={columns}
-        dataSource={surveys}
+        dataSource={filteredSurveys}
         loading={isLoading}
         rowKey="id"
       />

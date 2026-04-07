@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Modal, Button, Divider, message, Timeline } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -6,7 +6,10 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { CrudFormField } from '@/shared/ui/CrudForm/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { Proposal, ActionItem, ActionHistory } from '@/shared/api/mocks/handlers/sys12'
@@ -32,12 +35,6 @@ const STATUS_OPTIONS = [
   { label: '지연', value: 'delayed' },
 ]
 
-const PROPOSER_OPTIONS = [
-  { label: '사령관', value: '사령관' },
-  { label: '참모장', value: '참모장' },
-  { label: '부사령관', value: '부사령관' },
-]
-
 const UNIT_OPTIONS = [
   { label: '1사단', value: '1사단' },
   { label: '2사단', value: '2사단' },
@@ -46,12 +43,13 @@ const UNIT_OPTIONS = [
   { label: '상륙기동단', value: '상륙기동단' },
 ]
 
-const CATEGORY_OPTIONS = [
-  { label: '작전', value: '작전' },
-  { label: '교육', value: '교육' },
-  { label: '군수', value: '군수' },
-  { label: '인사', value: '인사' },
-  { label: '정보화', value: '정보화' },
+// 검색 필드 정의 (CSV 검색조건: 건의일자, 건의자, 주관부대, 추진상태, 건의내용)
+const searchFields: SearchField[] = [
+  { name: 'proposalDateRange', label: '건의일자', type: 'dateRange' },
+  { name: 'proposer', label: '건의자', type: 'text', placeholder: '건의자명 검색' },
+  { name: 'managingUnit', label: '주관부대', type: 'select', options: UNIT_OPTIONS },
+  { name: 'progressStatus', label: '추진상태', type: 'select', options: STATUS_OPTIONS },
+  { name: 'keyword', label: '건의내용', type: 'text', placeholder: '건의내용 검색' },
 ]
 
 // API 함수
@@ -62,6 +60,10 @@ async function fetchProposals(params: PageRequest & Record<string, unknown>): Pr
       size: params.size,
       progressStatus: params.progressStatus || '',
       keyword: params.keyword || '',
+      proposer: params.proposer || '',
+      managingUnit: params.managingUnit || '',
+      proposalDateFrom: params.proposalDateFrom || '',
+      proposalDateTo: params.proposalDateTo || '',
     },
   })
   const data = (res as ApiResult<PageResponse<Proposal>>).data ?? (res as unknown as PageResponse<Proposal>)
@@ -74,14 +76,25 @@ async function fetchProposalHistory(id: string): Promise<ActionHistory[]> {
   return data
 }
 
-// CrudForm 필드 정의
+// CrudForm 필드 정의 (CSV 입력값: 건의자, 건의일자, 주관부대, 추진상태, 건의내용)
 const proposalFormFields: CrudFormField[] = [
   {
-    name: 'proposer',
-    label: '건의자',
-    type: 'select',
+    name: 'proposerServiceNumber',
+    label: '건의자 군번',
+    type: 'text',
     required: true,
-    options: PROPOSER_OPTIONS,
+  },
+  {
+    name: 'proposerRank',
+    label: '건의자 계급',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'proposerName',
+    label: '건의자 성명',
+    type: 'text',
+    required: true,
   },
   {
     name: 'proposalDate',
@@ -109,20 +122,25 @@ const proposalFormFields: CrudFormField[] = [
     type: 'textarea',
     required: true,
   },
-  {
-    name: 'category',
-    label: '종류',
-    type: 'select',
-    required: true,
-    options: CATEGORY_OPTIONS,
-  },
 ]
 
-// 조치사항 등록 폼 필드
+// 조치사항 등록 폼 필드 (CSV 입력값: 업무담당자, 추진상태, 추진계획, 추진내용, 첨부파일)
 const actionFormFields: CrudFormField[] = [
   {
-    name: 'assignee',
-    label: '업무담당자',
+    name: 'assigneeServiceNumber',
+    label: '담당자 군번',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'assigneeRank',
+    label: '담당자 계급',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'assigneeName',
+    label: '담당자 성명',
     type: 'text',
     required: true,
   },
@@ -148,6 +166,11 @@ const actionFormFields: CrudFormField[] = [
     label: '추진내용',
     type: 'textarea',
   },
+  {
+    name: 'attachments',
+    label: '첨부파일',
+    type: 'file',
+  },
 ]
 
 export default function ProposalListPage() {
@@ -158,6 +181,26 @@ export default function ProposalListPage() {
   const [actionFormOpen, setActionFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Proposal | null>(null)
   const [selectedProposal, setSelectedProposal] = useState<Proposal | null>(null)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // 검색 핸들러
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    const params: Record<string, unknown> = { ...values }
+    // dateRange를 from/to로 분리
+    if (values.proposalDateRange && Array.isArray(values.proposalDateRange)) {
+      const [from, to] = values.proposalDateRange as [{ format: (f: string) => string }, { format: (f: string) => string }]
+      params.proposalDateFrom = from?.format('YYYY-MM-DD') || ''
+      params.proposalDateTo = to?.format('YYYY-MM-DD') || ''
+      delete params.proposalDateRange
+    }
+    setSearchParams(params)
+    actionRef.current?.reload()
+  }, [])
+
+  const handleSearchReset = useCallback(() => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }, [])
 
   // 건의사항 처리 이력 조회
   const { data: history = [] } = useQuery({
@@ -224,15 +267,15 @@ export default function ProposalListPage() {
     {
       title: '관리번호',
       dataIndex: 'proposalNo',
-      width: 100,
+      width: 120,
       sorter: true,
     },
-    {
-      title: '건의자',
-      dataIndex: 'proposer',
-      width: 100,
-      sorter: true,
-    },
+    // 건의자: 군번/계급/성명 표시
+    militaryPersonColumn<Proposal>('건의자', {
+      serviceNumber: 'proposerServiceNumber',
+      rank: 'proposerRank',
+      name: 'proposerName',
+    }),
     {
       title: '건의일자',
       dataIndex: 'proposalDate',
@@ -263,12 +306,6 @@ export default function ProposalListPage() {
           labelMap={STATUS_LABEL_MAP}
         />
       ),
-    },
-    {
-      title: '종류',
-      dataIndex: 'category',
-      width: 100,
-      sorter: true,
     },
     {
       title: '작업',
@@ -311,10 +348,13 @@ export default function ProposalListPage() {
 
   return (
     <PageContainer title="건의사항 목록">
+      {/* 검색영역 (CSV 검색조건: 건의일자, 건의자, 주관부대, 추진상태, 건의내용) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<Proposal>
         rowKey="id"
         columns={columns}
-        request={(params) => fetchProposals(params as PageRequest & Record<string, unknown>)}
+        request={(params) => fetchProposals({ ...params, ...searchParams } as PageRequest & Record<string, unknown>)}
         actionRef={actionRef}
         toolBarRender={() => [
           <Button
@@ -383,13 +423,11 @@ export default function ProposalListPage() {
               <dt>관리번호</dt>
               <dd>{selectedProposal.proposalNo}</dd>
               <dt>건의자</dt>
-              <dd>{selectedProposal.proposer}</dd>
+              <dd>{selectedProposal.proposerServiceNumber} / {selectedProposal.proposerRank} / {selectedProposal.proposerName}</dd>
               <dt>건의일자</dt>
               <dd>{selectedProposal.proposalDate}</dd>
               <dt>주관부대</dt>
               <dd>{selectedProposal.managingUnit}</dd>
-              <dt>종류</dt>
-              <dd>{selectedProposal.category}</dd>
               <dt>추진상태</dt>
               <dd>
                 <StatusBadge

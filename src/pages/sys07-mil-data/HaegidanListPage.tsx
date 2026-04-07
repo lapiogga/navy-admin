@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { HaegidanDoc } from '@/shared/api/mocks/handlers/sys07'
@@ -37,6 +38,8 @@ async function fetchHaegidanDocs(params: PageRequest & Record<string, unknown>):
   query.set('size', String(params.size))
   if (params.department) query.set('department', String(params.department))
   if (params.keyword) query.set('keyword', String(params.keyword))
+  if (params.managerPosition) query.set('managerPosition', String(params.managerPosition))
+  if (params.fileFolder) query.set('fileFolder', String(params.fileFolder))
   const res = await fetch(`/api/sys07/haegidan?${query}`)
   const json: ApiResult<PageResponse<HaegidanDoc>> = await res.json()
   return json.data ?? { content: [], totalElements: 0, totalPages: 0, size: 10, number: 0 }
@@ -88,6 +91,12 @@ export default function HaegidanListPage() {
     },
     { title: '발행년도', dataIndex: 'publishYear', width: 90 },
     { title: '보관장소', dataIndex: 'storageLocation', width: 120 },
+    // R6: 관리자 군번/계급/성명 통합 컬럼
+    militaryPersonColumn<HaegidanDoc>('관리자', {
+      serviceNumber: 'managerServiceNumber',
+      rank: 'managerRank',
+      name: 'managerName',
+    }),
     { title: '등록일', dataIndex: 'registeredAt', width: 110 },
     {
       title: '관리',

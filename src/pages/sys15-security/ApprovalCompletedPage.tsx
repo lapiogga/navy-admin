@@ -5,6 +5,7 @@ import type { ProColumns } from '@ant-design/pro-components'
 import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { ApprovalRecord } from '@/shared/api/mocks/handlers/sys15-security'
@@ -46,7 +47,7 @@ export default function ApprovalCompletedPage() {
   const columns: ProColumns<ApprovalRecord>[] = [
     { title: '문서유형', dataIndex: 'docType', width: 120 },
     { title: '제목', dataIndex: 'title' },
-    { title: '제출자', dataIndex: 'submitter', width: 100 },
+    militaryPersonColumn<ApprovalRecord>('제출자', { serviceNumber: 'submitterServiceNumber', rank: 'submitterRank', name: 'submitter' }),
     { title: '부대(서)', dataIndex: 'department', width: 120 },
     { title: '제출일', dataIndex: 'submittedAt', width: 120 },
     { title: '결재일', dataIndex: 'approvedAt', width: 120 },

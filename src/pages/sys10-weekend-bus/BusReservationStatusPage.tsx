@@ -4,7 +4,9 @@ import { PrinterOutlined, DownloadOutlined } from '@ant-design/icons'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
 import { TicketPrint } from './TicketPrint'
@@ -19,6 +21,8 @@ interface ReservationRecord extends Record<string, unknown> {
   reservedCount: number
   unit: string
   userName: string
+  serviceNumber: string
+  rank: string
   seatNo: string
   status: 'reserved' | 'cancelled' | 'waiting'
 }
@@ -81,7 +85,12 @@ export function BusReservationStatusPage() {
     { title: '전체좌석', dataIndex: 'totalSeats', width: 80 },
     { title: '예약인원', dataIndex: 'reservedCount', width: 80 },
     { title: '부대(서)', dataIndex: 'unit', width: 100 },
-    { title: '예약자', dataIndex: 'userName', width: 90 },
+    // 예약자: 군번/계급/성명 통합 표시 (R6)
+    militaryPersonColumn<ReservationRecord>('예약자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'userName',
+    }),
     { title: '좌석번호', dataIndex: 'seatNo', width: 80 },
     {
       title: '상태',
@@ -199,8 +208,8 @@ export function BusReservationStatusPage() {
               stopover: '-',
               seatNo: selectedRecord.seatNo,
               userName: selectedRecord.userName,
-              rank: '-',
-              militaryId: '-',
+              rank: selectedRecord.rank ?? '-',
+              militaryId: selectedRecord.serviceNumber ?? '-',
               unit: selectedRecord.unit,
             }}
           />
@@ -219,7 +228,7 @@ export function BusReservationStatusPage() {
           <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 12 }}>
             <thead>
               <tr>
-                {['운행일자', '노선', '출발시간', '부대(서)', '예약자', '좌석번호', '상태'].map((h) => (
+                {['운행일자', '노선', '출발시간', '부대(서)', '군번', '계급', '예약자', '좌석번호', '상태'].map((h) => (
                   <th
                     key={h}
                     style={{ border: '1px solid #ccc', padding: '4px 8px', background: '#f5f5f5' }}
@@ -236,6 +245,8 @@ export function BusReservationStatusPage() {
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.routeName}</td>
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.departureTime}</td>
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.unit}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.serviceNumber}</td>
+                  <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.rank}</td>
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.userName}</td>
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>{row.seatNo}</td>
                   <td style={{ border: '1px solid #ccc', padding: '4px 8px' }}>

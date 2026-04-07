@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Modal, Button, message, Select, Tabs, Timeline, Upload } from 'antd'
+import { Modal, Button, message, Select, Tabs, Timeline, Upload, Radio } from 'antd'
 import { PlusOutlined, DownloadOutlined, UploadOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -7,6 +7,9 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { InspectionTask, InspActionHistory } from '@/shared/api/mocks/handlers/sys17'
@@ -34,6 +37,19 @@ const DEPT_OPTIONS = [
   { label: '정보처', value: '정보처' },
   { label: '교육처', value: '교육처' },
 ]
+
+const DISPOSITION_TYPE_OPTIONS = [
+  { label: '시정', value: '시정' },
+  { label: '주의', value: '주의' },
+  { label: '경고', value: '경고' },
+  { label: '개선', value: '개선' },
+  { label: '보완', value: '보완' },
+]
+
+const YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => {
+  const year = (2020 + i).toString()
+  return { label: year, value: year }
+})
 
 const PROGRESS_STATUS_OPTIONS = [
   { label: '미조치', value: 'notStarted' },
@@ -76,11 +92,22 @@ type TaskFormValues = {
   planId: string
   targetUnit: string
   managingDept: string
+  /** 담당검열관 군번 */
+  inspectorServiceNumber: string
+  /** 담당검열관 계급 */
+  inspectorRank: string
+  /** 담당검열관 성명 */
+  inspectorName: string
+  /** 공개여부 */
+  isPublic: boolean
+  /** 과제번호 */
+  taskNo: string
   inspField: string
+  /** 처분종류 */
+  dispositionType: string
   taskName: string
+  /** 주요내용 */
   taskContent: string
-  dueDate: string
-  remarks?: string
 }
 
 type ResultFormValues = {
@@ -184,7 +211,13 @@ function TaskDetailModal({ task, open, onClose }: TaskDetailModalProps) {
         <br />
         <strong>주관부서:</strong> {task.managingDept}
         <br />
+        <strong>담당검열관:</strong> {task.inspectorServiceNumber} / {task.inspectorRank} / {task.inspectorName}
+        <br />
+        <strong>공개여부:</strong> {task.isPublic ? '공개' : '비공개'}
+        <br />
         <strong>검열분야:</strong> {task.inspField}
+        <br />
+        <strong>처분종류:</strong> {task.dispositionType}
         <br />
         <strong>진행상태:</strong>{' '}
         <StatusBadge
@@ -193,7 +226,7 @@ function TaskDetailModal({ task, open, onClose }: TaskDetailModalProps) {
           labelMap={STATUS_LABEL_MAP}
         />
         <br />
-        <strong>완료기한:</strong> {task.dueDate}
+        <strong>주요내용:</strong> {task.taskContent}
       </div>
 
       <div style={{ marginBottom: 16 }}>
@@ -329,9 +362,27 @@ export default function InspectionResultPage() {
       width: 120,
       sorter: true,
     },
+    // 담당검열관: 군번/계급/성명 통합 표시
+    militaryPersonColumn<InspectionTask>('담당검열관', {
+      serviceNumber: 'inspectorServiceNumber',
+      rank: 'inspectorRank',
+      name: 'inspectorName',
+    }),
+    {
+      title: '공개여부',
+      dataIndex: 'isPublic',
+      width: 80,
+      render: (_, record) => (record.isPublic ? '공개' : '비공개'),
+    },
     {
       title: '검열분야',
       dataIndex: 'inspField',
+      width: 100,
+      sorter: true,
+    },
+    {
+      title: '처분종류',
+      dataIndex: 'dispositionType',
       width: 100,
       sorter: true,
     },
@@ -346,12 +397,6 @@ export default function InspectionResultPage() {
           labelMap={STATUS_LABEL_MAP}
         />
       ),
-    },
-    {
-      title: '완료기한',
-      dataIndex: 'dueDate',
-      width: 120,
-      sorter: true,
     },
     {
       title: '관리',
@@ -386,6 +431,12 @@ export default function InspectionResultPage() {
       dataIndex: 'managingDept',
       width: 120,
     },
+    // 담당검열관: 군번/계급/성명 통합 표시
+    militaryPersonColumn<InspectionTask>('담당검열관', {
+      serviceNumber: 'inspectorServiceNumber',
+      rank: 'inspectorRank',
+      name: 'inspectorName',
+    }),
     {
       title: '진행상태',
       dataIndex: 'progressStatus',
@@ -405,11 +456,12 @@ export default function InspectionResultPage() {
     },
   ]
 
+  // 조치과제 목록 검색: 연도, 대상부대, 과제명, 진행상태, 검열분야
   const searchFields = [
     {
       name: 'inspYear',
       label: '연도',
-      render: () => <Select options={[]} placeholder="연도 선택" allowClear style={{ width: '100%' }} />,
+      render: () => <Select options={YEAR_OPTIONS} placeholder="연도 선택" allowClear style={{ width: '100%' }} />,
     },
     {
       name: 'targetUnit',
@@ -433,12 +485,21 @@ export default function InspectionResultPage() {
     },
   ]
 
+  // 조치결과 목록 검색: 과제번호, 과제명, 주관부서, 진행상태
+  const resultSearchFields: SearchField[] = [
+    { name: 'taskNo', label: '과제번호', type: 'text' },
+    { name: 'taskName', label: '과제명', type: 'text' },
+    { name: 'managingDept', label: '주관부서', type: 'select', options: DEPT_OPTIONS },
+    { name: 'progressStatus', label: '진행상태', type: 'select', options: PROGRESS_STATUS_OPTIONS.map((o) => ({ label: o.label, value: o.value })) },
+  ]
+
+  // CSV 입력값: 검열계획, 대상부대, 주관부서, 담당검열관, 공개여부, 과제번호, 검열분야, 처분종류, 과제명, 주요내용, 첨부파일
   const formFields = [
     {
       name: 'planId',
       label: '검열계획',
       rules: [{ required: true, message: '검열계획을 선택하세요' }],
-      render: () => <Select options={[]} placeholder="검열계획 선택" style={{ width: '100%' }} />,
+      render: () => <Select options={[]} placeholder="상단 검열계획 목록에서 선택" style={{ width: '100%' }} />,
     },
     {
       name: 'targetUnit',
@@ -453,10 +514,51 @@ export default function InspectionResultPage() {
       render: () => <Select options={DEPT_OPTIONS} placeholder="부서 선택" style={{ width: '100%' }} />,
     },
     {
+      name: 'inspectorServiceNumber',
+      label: '담당검열관 군번',
+      type: 'text' as const,
+      rules: [{ required: true, message: '군번을 입력하세요' }],
+    },
+    {
+      name: 'inspectorRank',
+      label: '담당검열관 계급',
+      type: 'text' as const,
+      rules: [{ required: true, message: '계급을 입력하세요' }],
+    },
+    {
+      name: 'inspectorName',
+      label: '담당검열관 성명',
+      type: 'text' as const,
+      rules: [{ required: true, message: '성명을 입력하세요' }],
+    },
+    {
+      name: 'isPublic',
+      label: '공개여부',
+      rules: [{ required: true, message: '공개여부를 선택하세요' }],
+      render: () => (
+        <Radio.Group>
+          <Radio value={true}>공개</Radio>
+          <Radio value={false}>비공개</Radio>
+        </Radio.Group>
+      ),
+    },
+    {
+      name: 'taskNo',
+      label: '과제번호',
+      type: 'text' as const,
+      rules: [{ required: true, message: '과제번호를 입력하세요' }],
+    },
+    {
       name: 'inspField',
       label: '검열분야',
       rules: [{ required: true, message: '검열분야를 선택하세요' }],
       render: () => <Select options={INSP_FIELD_OPTIONS} placeholder="분야 선택" style={{ width: '100%' }} />,
+    },
+    {
+      name: 'dispositionType',
+      label: '처분종류',
+      rules: [{ required: true, message: '처분종류를 선택하세요' }],
+      render: () => <Select options={DISPOSITION_TYPE_OPTIONS} placeholder="처분종류 선택" style={{ width: '100%' }} />,
     },
     {
       name: 'taskName',
@@ -466,20 +568,9 @@ export default function InspectionResultPage() {
     },
     {
       name: 'taskContent',
-      label: '과제내용',
+      label: '주요내용',
       type: 'textarea' as const,
-      rules: [{ required: true, message: '과제내용을 입력하세요' }],
-    },
-    {
-      name: 'dueDate',
-      label: '완료기한',
-      type: 'date' as const,
-      rules: [{ required: true, message: '완료기한을 선택하세요' }],
-    },
-    {
-      name: 'remarks',
-      label: '비고',
-      type: 'textarea' as const,
+      rules: [{ required: true, message: '주요내용을 입력하세요' }],
     },
     {
       name: 'attachments',
@@ -527,12 +618,19 @@ export default function InspectionResultPage() {
       key: '2',
       label: '조치결과 목록',
       children: (
-        <DataTable<InspectionTask>
-          queryKey={['sys17', 'tasks', 'results']}
-          requestFn={(params) => fetchTasks({ ...params })}
-          columns={resultColumns}
-          rowKey="id"
-        />
+        <div>
+          <SearchForm
+            fields={resultSearchFields}
+            onSearch={(values) => setSearchParams(values as SearchParams)}
+            onReset={() => setSearchParams({})}
+          />
+          <DataTable<InspectionTask>
+            queryKey={['sys17', 'tasks', 'results', searchParams]}
+            requestFn={(params) => fetchTasks({ ...params, ...searchParams })}
+            columns={resultColumns}
+            rowKey="id"
+          />
+        </div>
       ),
     },
   ]

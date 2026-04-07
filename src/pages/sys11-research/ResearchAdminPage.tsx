@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery, useQueryClient } from '@tanstack/react-query'
 import { PageContainer } from '@ant-design/pro-components'
-import { Tabs, Modal, Button, Popconfirm, Statistic, Row, Col, Card, Table, Select, message } from 'antd'
+import { Tabs, Modal, Button, Popconfirm, Statistic, Row, Col, Card, Table, Select, Input, message } from 'antd'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
@@ -234,17 +234,24 @@ function AuthManagementTab() {
 }
 
 // 다운로드 이력 탭
+// CSV 스펙: 순번, 게시판이름, 게시글번호, 사용자정보(군번/계급/성명), IP, 다운로드일시, 파일명
 interface DownloadHistoryItem extends Record<string, unknown> {
   id: string
+  downloaderServiceNumber: string
+  downloaderRank: string
   downloaderName: string
   downloaderUnit: string
+  ip: string
   fileName: string
   downloadedAt: string
   boardType: string
+  postId: string
 }
 
 function DownloadHistoryTab() {
   const [boardFilter, setBoardFilter] = useState('')
+  const [searchField, setSearchField] = useState('downloaderServiceNumber')
+  const [searchValue, setSearchValue] = useState('')
 
   async function fetchDownloadHistory(params: PageRequest): Promise<PageResponse<DownloadHistoryItem>> {
     const url = new URL('/api/sys11/download-history', window.location.origin)
@@ -253,32 +260,60 @@ function DownloadHistoryTab() {
     if (boardFilter) {
       url.searchParams.set('boardType', boardFilter)
     }
+    if (searchValue) {
+      url.searchParams.set('searchField', searchField)
+      url.searchParams.set('searchValue', searchValue)
+    }
     const res = await fetch(url.toString())
     const json = await res.json()
     return json.data
   }
 
   const columns: ProColumns<DownloadHistoryItem>[] = [
-    { title: '번호', dataIndex: 'id', width: 80 },
-    { title: '다운로더', dataIndex: 'downloaderName', width: 100 },
-    { title: '소속', dataIndex: 'downloaderUnit', width: 120 },
-    { title: '파일명', dataIndex: 'fileName', ellipsis: true },
-    { title: '다운로드일시', dataIndex: 'downloadedAt', width: 150 },
+    { title: '순번', dataIndex: 'id', width: 80 },
     { title: '게시판', dataIndex: 'boardType', width: 100 },
+    { title: '게시글번호', dataIndex: 'postId', width: 110 },
+    { title: '군번', dataIndex: 'downloaderServiceNumber', width: 120 },
+    { title: '계급', dataIndex: 'downloaderRank', width: 80 },
+    { title: '성명', dataIndex: 'downloaderName', width: 100 },
+    { title: 'IP', dataIndex: 'ip', width: 130 },
+    { title: '다운로드일시', dataIndex: 'downloadedAt', width: 150 },
+    { title: '파일명', dataIndex: 'fileName', ellipsis: true },
   ]
 
   return (
     <>
-      <Select
-        value={boardFilter}
-        onChange={setBoardFilter}
-        style={{ width: 200, marginBottom: 16 }}
-        options={[
-          { label: '전체', value: '' },
-          { label: '연구자료', value: '연구자료' },
-          { label: '자료실', value: '자료실' },
-        ]}
-      />
+      {/* CSV 스펙: 조건1(게시판), 조건2(군번/성명/IP/파일이름), 조건3(검색내용) */}
+      <div style={{ display: 'flex', gap: 8, marginBottom: 16, alignItems: 'center' }}>
+        <Select
+          value={boardFilter}
+          onChange={setBoardFilter}
+          style={{ width: 150 }}
+          options={[
+            { label: '전체', value: '' },
+            { label: '연구자료', value: '연구자료' },
+            { label: '자료실', value: '자료실' },
+          ]}
+        />
+        <Select
+          value={searchField}
+          onChange={setSearchField}
+          style={{ width: 130 }}
+          options={[
+            { label: '군번', value: 'downloaderServiceNumber' },
+            { label: '성명', value: 'downloaderName' },
+            { label: 'IP', value: 'ip' },
+            { label: '파일이름', value: 'fileName' },
+          ]}
+        />
+        <Input
+          value={searchValue}
+          onChange={(e) => setSearchValue(e.target.value)}
+          placeholder="검색내용"
+          style={{ width: 200 }}
+          allowClear
+        />
+      </div>
       <DataTable<DownloadHistoryItem>
         columns={columns}
         request={fetchDownloadHistory}

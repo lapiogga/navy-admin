@@ -5,6 +5,9 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
@@ -12,11 +15,28 @@ interface DutyWorker extends Record<string, unknown> {
   id: string
   name: string
   rank: string
+  serviceNumber: string
   unitName: string
   dutyDate: string
   dutyPost: string
   status: string
 }
+
+/** 검색 필드 정의 */
+const dutyWorkerSearchFields: SearchField[] = [
+  { name: 'name', label: '성명', type: 'text', placeholder: '성명 검색' },
+  { name: 'dutyDate', label: '당직일', type: 'date' },
+  { name: 'dutyPost', label: '당직개소', type: 'select', options: [
+    { label: '제1당직실', value: '제1당직실' },
+    { label: '제2당직실', value: '제2당직실' },
+    { label: '본부 당직실', value: '본부 당직실' },
+    { label: '지휘통제실', value: '지휘통제실' },
+  ]},
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '근무중', value: '근무중' },
+    { label: '교대완료', value: '교대완료' },
+  ]},
+]
 
 const STATUS_COLOR_MAP: Record<string, string> = { 근무중: 'blue', 교대완료: 'green' }
 const STATUS_LABEL_MAP: Record<string, string> = { 근무중: '근무중', 교대완료: '교대완료' }
@@ -61,8 +81,7 @@ export default function OtDutyWorkerPage() {
   }
 
   const columns: ProColumns<DutyWorker>[] = [
-    { title: '성명', dataIndex: 'name', width: 90 },
-    { title: '계급', dataIndex: 'rank', width: 80 },
+    militaryPersonColumn<DutyWorker>('군번/계급/성명', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'name' }),
     { title: '부대(서)', dataIndex: 'unitName', width: 120 },
     { title: '당직일', dataIndex: 'dutyDate', width: 110 },
     { title: '당직개소', dataIndex: 'dutyPost', width: 120 },
@@ -86,6 +105,7 @@ export default function OtDutyWorkerPage() {
 
   return (
     <PageContainer title="초과근무자 관리">
+      <SearchForm fields={dutyWorkerSearchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <DataTable<DutyWorker>
         columns={columns}
         request={fetchDutyWorkers}

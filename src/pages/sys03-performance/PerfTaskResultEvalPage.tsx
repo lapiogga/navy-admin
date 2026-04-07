@@ -4,6 +4,10 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
+import { formatMilitaryPerson } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { TaskEval, EvalGrade } from '@/shared/api/mocks/handlers/sys03-performance'
@@ -24,15 +28,21 @@ const GRADE_COLOR: Record<EvalGrade, string> = {
   D: 'red',
 }
 
-async function fetchTaskEvals(params: PageRequest): Promise<PageResponse<TaskEval>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '과제명/부대(서)/담당자', type: 'text', placeholder: '과제명, 부대(서) 또는 담당자 검색' },
+]
+
+async function fetchTaskEvals(params: PageRequest & { keyword?: string }): Promise<PageResponse<TaskEval>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<TaskEval>>>('/sys03/task-evals', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<TaskEval>>).data ?? (res as unknown as PageResponse<TaskEval>)
 }
 
 export default function PerfTaskResultEvalPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [evalOpen, setEvalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TaskEval | null>(null)
   const [form] = Form.useForm()
@@ -55,7 +65,7 @@ export default function PerfTaskResultEvalPage() {
     { title: '번호', dataIndex: 'index', valueType: 'index', width: 60 },
     { title: '상세과제명', dataIndex: 'taskTitle' },
     { title: '부대(서)', dataIndex: 'deptName', width: 120 },
-    { title: '담당자', dataIndex: 'manager', width: 100 },
+    militaryPersonColumn<TaskEval>('담당자', { serviceNumber: 'managerServiceNumber', rank: 'managerRank', name: 'manager' }),
     {
       title: '평가상태',
       dataIndex: 'status',
@@ -98,12 +108,13 @@ export default function PerfTaskResultEvalPage() {
 
   return (
     <PageContainer title="과제실적 평가">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<TaskEval>
         rowKey="id"
         columns={columns}
         headerTitle="과제실적 평가 목록"
         actionRef={actionRef}
-        request={(params) => fetchTaskEvals(params)}
+        request={(params) => fetchTaskEvals({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
       />
 
       <Modal
@@ -123,7 +134,7 @@ export default function PerfTaskResultEvalPage() {
             <Descriptions column={2} bordered style={{ marginBottom: 16 }}>
               <Descriptions.Item label="상세과제명" span={2}>{selectedItem.taskTitle}</Descriptions.Item>
               <Descriptions.Item label="부대(서)">{selectedItem.deptName}</Descriptions.Item>
-              <Descriptions.Item label="담당자">{selectedItem.manager}</Descriptions.Item>
+              <Descriptions.Item label="담당자">{formatMilitaryPerson({ serviceNumber: selectedItem.managerServiceNumber, rank: selectedItem.managerRank, name: selectedItem.manager })}</Descriptions.Item>
             </Descriptions>
             <Form form={form} layout="vertical" onFinish={(values) => evalMutation.mutate(values)}>
               <Form.Item name="grade" label="평가 등급" rules={[{ required: true, message: '등급을 선택하세요' }]}>

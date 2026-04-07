@@ -44,14 +44,18 @@ interface PageResponse<T> {
   totalElements: number
 }
 
-// 소개자료 카드 데이터
+// CSV 스펙 기준 10개 카테고리 소개자료
 const INTRO_DATA = [
-  { category: '전략연구', description: '해병대 전략 및 정책 관련 연구자료를 제공합니다.' },
-  { category: '작전연구', description: '작전 수행 관련 연구 및 분석 자료입니다.' },
-  { category: '교육훈련', description: '교육훈련 개선 및 발전 관련 연구자료입니다.' },
-  { category: '인사관리', description: '인사제도 및 관리 관련 연구자료입니다.' },
-  { category: '군수지원', description: '군수지원 체계 및 개선 관련 자료입니다.' },
-  { category: '기타', description: '기타 분야 연구자료를 확인할 수 있습니다.' },
+  { category: '국방정책', description: '국방정책 관련 연구자료를 제공합니다.' },
+  { category: '개별사업', description: '개별사업 관련 연구 및 분석 자료입니다.' },
+  { category: '해사학술', description: '해사학술 분야 연구자료입니다.' },
+  { category: '군사학술', description: '군사학술 분야 연구자료입니다.' },
+  { category: '해군발전', description: '해군발전 관련 연구자료입니다.' },
+  { category: '함정정비', description: '함정정비 관련 연구자료입니다.' },
+  { category: '전투발전', description: '전투발전 관련 연구자료입니다.' },
+  { category: '전투실험', description: '전투실험 관련 연구자료입니다.' },
+  { category: '함정기술', description: '함정기술 관련 연구자료입니다.' },
+  { category: '장성정책연구', description: '장성정책연구 관련 자료입니다.' },
 ]
 
 async function fetchStats(): Promise<ResearchStats> {
@@ -208,10 +212,10 @@ export default function ResearchMainPage() {
         </Col>
       </Row>
 
-      {/* 소개자료 카드 그리드 */}
+      {/* 소개자료 카드 그리드 (10개 카테고리, 5열x2행) */}
       <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
         {INTRO_DATA.map((item) => (
-          <Col span={8} key={item.category}>
+          <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.category}>
             <Card
               title={item.category}
               size="small"

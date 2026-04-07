@@ -1,6 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // ==================== 타입 정의 ====================
 
@@ -28,6 +29,7 @@ export interface EvalGroup extends Record<string, unknown> {
 
 export interface IndividualTarget extends Record<string, unknown> {
   id: string
+  serviceNumber: string
   name: string
   rank: string
   deptName: string
@@ -73,6 +75,8 @@ export interface DetailTask extends Record<string, unknown> {
   subTaskTitle: string
   title: string
   deptName: string
+  managerServiceNumber: string
+  managerRank: string
   manager: string
   weight: number
 }
@@ -99,6 +103,8 @@ export interface TaskEval extends Record<string, unknown> {
   detailTaskId: string
   taskTitle: string
   deptName: string
+  managerServiceNumber: string
+  managerRank: string
   manager: string
   status: 'pending' | 'evaluated'
   grade?: EvalGrade
@@ -108,6 +114,7 @@ export interface TaskEval extends Record<string, unknown> {
 export interface IndividualResultEval extends Record<string, unknown> {
   id: string
   targetId: string
+  serviceNumber: string
   name: string
   rank: string
   deptName: string
@@ -170,6 +177,7 @@ const evalGroups: EvalGroup[] = [
 
 const individualTargets: IndividualTarget[] = Array.from({ length: 20 }, (_, i) => ({
   id: `it-${i + 1}`,
+  serviceNumber: randomServiceNumber(),
   name: faker.person.lastName() + faker.person.firstName(),
   rank: faker.helpers.arrayElement(RANKS),
   deptName: faker.helpers.arrayElement(DEPT_NAMES),
@@ -236,6 +244,8 @@ const detailTasks: DetailTask[] = subTasks.map((sub) => {
     subTaskTitle: sub.title,
     title: `${sub.title} 추진`,
     deptName: sub.deptName,
+    managerServiceNumber: randomServiceNumber(),
+    managerRank: faker.helpers.arrayElement(RANKS),
     manager: faker.person.lastName() + faker.person.firstName(),
     weight: faker.number.int({ min: 10, max: 40 }),
   }
@@ -264,6 +274,8 @@ const taskEvals: TaskEval[] = detailTasks.map((dt, i) => ({
   detailTaskId: dt.id,
   taskTitle: dt.title,
   deptName: dt.deptName,
+  managerServiceNumber: dt.managerServiceNumber,
+  managerRank: dt.managerRank,
   manager: dt.manager,
   status: i % 3 === 0 ? 'evaluated' : 'pending',
   grade: i % 3 === 0 ? GRADES[i % 5] : undefined,
@@ -273,6 +285,7 @@ const taskEvals: TaskEval[] = detailTasks.map((dt, i) => ({
 const individualEvals: IndividualResultEval[] = individualTargets.map((it, i) => ({
   id: `ie-${i + 1}`,
   targetId: it.id,
+  serviceNumber: it.serviceNumber,
   name: it.name,
   rank: it.rank,
   deptName: it.deptName,
@@ -355,7 +368,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(baseYears, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? baseYears.filter((x) => x.year.includes(keyword)) : baseYears
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/base-years', async ({ request }) => {
     const body = (await request.json()) as Partial<BaseYear>
@@ -385,7 +400,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(evalOrgs, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? evalOrgs.filter((x) => x.deptName.includes(keyword) || x.deptCode.includes(keyword)) : evalOrgs
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/eval-orgs', async ({ request }) => {
     const body = (await request.json()) as Partial<EvalOrg>
@@ -415,7 +432,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(evalGroups, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? evalGroups.filter((x) => x.groupName.includes(keyword)) : evalGroups
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/eval-groups', async ({ request }) => {
     const body = (await request.json()) as Partial<EvalGroup>
@@ -446,12 +465,18 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(individualTargets, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const year = url.searchParams.get('year') ?? ''
+    let filtered = individualTargets
+    if (keyword) filtered = filtered.filter((x) => x.name.includes(keyword) || x.deptName.includes(keyword))
+    if (year) filtered = filtered.filter((x) => x.year === year)
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/individual-targets', async ({ request }) => {
     const body = (await request.json()) as Partial<IndividualTarget>
     const newItem: IndividualTarget = {
       id: `it-${Date.now()}`,
+      serviceNumber: body.serviceNumber ?? '',
       name: body.name ?? '',
       rank: body.rank ?? '',
       deptName: body.deptName ?? '',
@@ -477,7 +502,12 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(policies, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const year = url.searchParams.get('year') ?? ''
+    let filtered = policies
+    if (keyword) filtered = filtered.filter((x) => x.title.includes(keyword))
+    if (year) filtered = filtered.filter((x) => x.year === year)
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/policies', async ({ request }) => {
     const body = (await request.json()) as Partial<Policy>
@@ -507,7 +537,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(mainTasks, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? mainTasks.filter((x) => x.title.includes(keyword) || x.policyTitle.includes(keyword)) : mainTasks
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/main-tasks', async ({ request }) => {
     const body = (await request.json()) as Partial<MainTask>
@@ -539,7 +571,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(midTasks, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? midTasks.filter((x) => x.title.includes(keyword) || x.deptName.includes(keyword)) : midTasks
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/mid-tasks', async ({ request }) => {
     const body = (await request.json()) as Partial<MidTask>
@@ -575,7 +609,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(subTasks, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? subTasks.filter((x) => x.title.includes(keyword) || x.deptName.includes(keyword)) : subTasks
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/sub-tasks', async ({ request }) => {
     const body = (await request.json()) as Partial<SubTask>
@@ -611,7 +647,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(detailTasks, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? detailTasks.filter((x) => x.title.includes(keyword) || x.deptName.includes(keyword) || x.manager.includes(keyword)) : detailTasks
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/detail-tasks', async ({ request }) => {
     const body = (await request.json()) as Partial<DetailTask>
@@ -622,6 +660,8 @@ export const sys03Handlers = [
       subTaskTitle: sub?.title ?? '',
       title: body.title ?? '',
       deptName: body.deptName ?? '',
+      managerServiceNumber: body.managerServiceNumber ?? '',
+      managerRank: body.managerRank ?? '',
       manager: body.manager ?? '',
       weight: body.weight ?? 0,
     }
@@ -646,7 +686,9 @@ export const sys03Handlers = [
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
     const status = url.searchParams.get('status')
-    const filtered = status ? taskResults.filter((r) => r.status === status) : taskResults
+    const keyword = url.searchParams.get('keyword') ?? ''
+    let filtered = status ? taskResults.filter((r) => r.status === status) : taskResults
+    if (keyword) filtered = filtered.filter((r) => r.detailTaskTitle.includes(keyword) || r.deptName.includes(keyword))
     return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/task-results', async ({ request }) => {
@@ -715,7 +757,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(taskEvals, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? taskEvals.filter((x) => x.taskTitle.includes(keyword) || x.deptName.includes(keyword) || x.manager.includes(keyword)) : taskEvals
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/task-evals', async ({ request }) => {
     const body = (await request.json()) as { id: string; grade: EvalGrade }
@@ -736,7 +780,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(individualEvals, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? individualEvals.filter((x) => x.name.includes(keyword) || x.deptName.includes(keyword)) : individualEvals
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/individual-evals', async ({ request }) => {
     const body = (await request.json()) as { id: string; grade: EvalGrade }
@@ -757,7 +803,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(evalResults, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? evalResults.filter((x) => x.deptName.includes(keyword)) : evalResults
+    return ok(paginate(filtered, page, pageSize))
   }),
 
   // 업무실적 입력현황
@@ -765,7 +813,9 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(inputStatuses, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const filtered = keyword ? inputStatuses.filter((x) => x.deptName.includes(keyword)) : inputStatuses
+    return ok(paginate(filtered, page, pageSize))
   }),
 
   // 추진진도율
@@ -773,7 +823,13 @@ export const sys03Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
-    return ok(paginate(progressRates, page, pageSize))
+    const keyword = url.searchParams.get('keyword') ?? ''
+    const year = url.searchParams.get('year') ?? ''
+    const deptName = url.searchParams.get('deptName') ?? ''
+    let filtered = progressRates
+    if (keyword) filtered = filtered.filter((x) => x.unitName.includes(keyword) || x.deptName.includes(keyword))
+    if (deptName) filtered = filtered.filter((x) => x.deptName === deptName)
+    return ok(paginate(filtered, page, pageSize))
   }),
   http.post('/api/sys03/progress-rates/export', () => {
     return ok({ message: '추진진도율 엑셀 다운로드가 준비되었습니다.' })

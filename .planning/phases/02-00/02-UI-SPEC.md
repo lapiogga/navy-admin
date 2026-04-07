@@ -351,3 +351,18 @@ Idle 임계값: 60초 (IDLE_TIMEOUT_MS = 60_000) — MVP 테스트 용이성 확
 - [ ] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 0 공통 컴포넌트 강화에 따른 포탈 UI-SPEC 보충.
+
+### UI 변경 반영
+
+1. **테이블 스타일**: 포탈 내 테이블 요소에 `navy-bordered-table` CSS 자동 적용 (군청색 상단 2px/하단 1px)
+2. **색상 일관성**: 추가된 CSS의 군청색(#003366)은 기존 디자인 토큰(#1E3A5F navy theme)과 조화를 이루며, 군 행정 포탈 브랜딩을 강화
+
+### 기존 UI-SPEC 호환성
+
+포탈 레이아웃(ProLayout), 대시보드(카드 그리드), 서브시스템 전환 UI는 변경 없음.

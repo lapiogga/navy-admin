@@ -108,3 +108,9 @@ requirements: [BUS-05, BUS-07, BUS-08]
 - commit dee412e: FOUND
 - commit 5830fb4: FOUND
 - 테스트 67개 통과 확인됨
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS10 주말버스예약관리체계 후속 기능(대기자/위규자/외부사용자)에 동일한 6대 규칙 소급 적용. militaryPersonColumn, SearchForm, navy-bordered-table CSS 통일 적용.

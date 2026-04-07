@@ -234,3 +234,31 @@ MVP는 "프론트엔드 화면 우선" 원칙에 따라 실제 데이터 처리 
 - [Korea eGovFrame Common Components](https://www.egovframe.go.kr/eng/main.do) — HIGH confidence (한국 정부 표준 프레임워크)
 - [DoD Administrative System Access Control Patterns](https://www.esd.whs.mil/Portals/54/Documents/DD/issuances/dodi/852004p.pdf) — MEDIUM confidence
 - [Modern Enterprise UI Design - Tables](https://medium.com/pulsar/modern-enterprise-ui-design-part-1-tables-ad8ee1b9feb) — MEDIUM confidence
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+### 표준화된 GAP 규칙 6개 (전체 서브시스템 공통 적용)
+
+req_spec 기반 GAP 분석 결과, 아래 6개 규칙이 18개 서브시스템 전체에 표준 기능으로 적용됨.
+
+| 규칙 | 명칭 | 설명 | 적용 범위 |
+|------|------|------|----------|
+| **R1** | 입력값 컬럼 반영 | CSV '입력값' 항목의 모든 컬럼을 CrudForm 필드에 반영 | 등록/수정 화면 전체 |
+| **R2** | 검색영역 100px | 목록 그리드 상단에 높이 100px SearchForm 고정 영역 | 목록 화면 전체 |
+| **R3** | 규칙/예외사항 구현 | CSV '규칙/예외조건' 내용을 UI 로직/안내문/제한조건으로 구현 | 해당 프로세스 |
+| **R4** | 관리자 메뉴 | 18개 서브시스템 각각에 관리자 기능 메뉴 포함 | 전체 서브시스템 |
+| **R5** | 테이블 군청색 라인 | 최상단 군청색(#003366) 2px, 최하단 1px 보더 | DataTable 전체 |
+| **R6** | 군번/계급/성명 표시 | 신청자/사용자 정보에 군번/계급/성명 3항목 동시 표시 | 인물 정보 컬럼 전체 |
+
+### 공통 컴포넌트 기능 추가
+
+| 컴포넌트 | 추가 기능 |
+|----------|----------|
+| DataTable | navy-bordered-table CSS 클래스 (R5) |
+| SearchForm | search-form-container wrapper div (R2) |
+| CrudForm | file, dateRange, checkbox 필드 타입 (R1) |
+| DetailModal | render 시그니처 record 인자 추가 |
+| military.ts (신규) | formatMilitaryPerson(), militaryPersonColumn() 헬퍼 (R6) |
+| index.css | 글로벌 CSS: 테이블 보더 + 검색 컨테이너 (R2, R5) |

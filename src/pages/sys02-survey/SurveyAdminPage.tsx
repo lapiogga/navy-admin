@@ -21,6 +21,9 @@ import { PageContainer } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { CrudForm } from '@/shared/ui/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type {
   Survey,
@@ -32,6 +35,31 @@ import type {
 
 const { TextArea } = Input
 const { Text } = Typography
+
+// 승인대기 검색 필드
+const pendingSearchFields: SearchField[] = [
+  { name: 'keyword', label: '설문명', type: 'text', placeholder: '설문명 검색' },
+  { name: 'period', label: '제출기간', type: 'dateRange' },
+]
+
+// 승인완료/전체 검색 필드
+const allSearchFields: SearchField[] = [
+  { name: 'keyword', label: '설문명', type: 'text', placeholder: '설문명 검색' },
+  {
+    name: 'status',
+    label: '상태',
+    type: 'select',
+    options: [
+      { label: '작성중', value: 'draft' },
+      { label: '제출됨', value: 'submitted' },
+      { label: '승인', value: 'approved' },
+      { label: '반려', value: 'rejected' },
+      { label: '진행중', value: 'active' },
+      { label: '마감', value: 'closed' },
+    ],
+  },
+  { name: 'period', label: '설문기간', type: 'dateRange' },
+]
 
 const STATUS_COLOR_MAP: Record<SurveyStatus, string> = {
   draft: 'default',
@@ -56,9 +84,10 @@ function PendingTab() {
   const queryClient = useQueryClient()
   const [rejectModal, setRejectModal] = useState<{ open: boolean; id: string }>({ open: false, id: '' })
   const [rejectForm] = Form.useForm()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
 
   const { data, isLoading } = useQuery({
-    queryKey: ['sys02', 'pending'],
+    queryKey: ['sys02', 'pending', searchParams],
     queryFn: () => apiClient.get<Survey[]>('/sys02/surveys/pending'),
   })
 
@@ -82,6 +111,14 @@ function PendingTab() {
   })
 
   const surveys = (data as Survey[] | undefined) || []
+
+  // 검색 필터링 (클라이언트 사이드)
+  const filteredSurveys = surveys.filter((s) => {
+    if (searchParams.keyword && !s.surveyName.includes(searchParams.keyword as string)) {
+      return false
+    }
+    return true
+  })
 
   const columns: ProColumns<Survey>[] = [
     {
@@ -137,9 +174,16 @@ function PendingTab() {
 
   return (
     <>
+      {/* 검색영역 */}
+      <SearchForm
+        fields={pendingSearchFields}
+        onSearch={(values) => setSearchParams(values)}
+        onReset={() => setSearchParams({})}
+      />
+
       <DataTable<Survey>
         columns={columns}
-        dataSource={surveys}
+        dataSource={filteredSurveys}
         loading={isLoading}
         rowKey="id"
       />
@@ -170,12 +214,25 @@ function PendingTab() {
 
 // ===== Tab 2: 전체 설문관리 =====
 function AllSurveysTab() {
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
   const { data, isLoading } = useQuery({
-    queryKey: ['sys02', 'all'],
+    queryKey: ['sys02', 'all', searchParams],
     queryFn: () => apiClient.get<{ content: Survey[] }>('/sys02/surveys/all'),
   })
 
   const surveys = (data as { content: Survey[] } | undefined)?.content || []
+
+  // 검색 필터링 (클라이언트 사이드)
+  const filteredSurveys = surveys.filter((s) => {
+    if (searchParams.keyword && !s.surveyName.includes(searchParams.keyword as string)) {
+      return false
+    }
+    if (searchParams.status && s.status !== searchParams.status) {
+      return false
+    }
+    return true
+  })
 
   const columns: ProColumns<Survey>[] = [
     {
@@ -229,12 +286,21 @@ function AllSurveysTab() {
   ]
 
   return (
-    <DataTable<Survey>
-      columns={columns}
-      dataSource={surveys}
-      loading={isLoading}
-      rowKey="id"
-    />
+    <>
+      {/* 검색영역 */}
+      <SearchForm
+        fields={allSearchFields}
+        onSearch={(values) => setSearchParams(values)}
+        onReset={() => setSearchParams({})}
+      />
+
+      <DataTable<Survey>
+        columns={columns}
+        dataSource={filteredSurveys}
+        loading={isLoading}
+        rowKey="id"
+      />
+    </>
   )
 }
 
@@ -420,20 +486,16 @@ function TargetTab() {
   const targets = (targetsData as SurveyTarget[] | undefined) || []
 
   const columns: ProColumns<SurveyTarget>[] = [
-    {
-      title: '대상자명',
-      dataIndex: 'targetName',
-      width: 100,
-    },
+    // 군번/계급/성명 통합 컬럼
+    militaryPersonColumn<SurveyTarget>('대상자(군번/계급/성명)', {
+      serviceNumber: 'serviceNumber',
+      rank: 'targetRank',
+      name: 'targetName',
+    }),
     {
       title: '소속부대',
       dataIndex: 'targetUnit',
       width: 150,
-    },
-    {
-      title: '직급/계급',
-      dataIndex: 'targetRank',
-      width: 100,
     },
     {
       title: '응답 여부',

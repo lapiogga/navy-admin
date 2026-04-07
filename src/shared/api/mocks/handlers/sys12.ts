@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 // 타입 정의
@@ -8,12 +10,18 @@ export type ProgressStatus = 'notStarted' | 'inProgress' | 'completed' | 'delaye
 export interface Directive extends Record<string, unknown> {
   id: string
   directiveNo: string
+  // 지시자 (군번/계급/성명)
+  directorServiceNumber: string
+  directorRank: string
+  directorName: string
   director: string
   directiveDate: string
   targetUnit: string
   content: string
   progressStatus: ProgressStatus
   category: string
+  // 지시사항 종류 (문서/구두)
+  directiveType: '문서' | '구두'
   attachments: string[]
   createdAt: string
 }
@@ -21,6 +29,10 @@ export interface Directive extends Record<string, unknown> {
 export interface Proposal extends Record<string, unknown> {
   id: string
   proposalNo: string
+  // 건의자 (군번/계급/성명)
+  proposerServiceNumber: string
+  proposerRank: string
+  proposerName: string
   proposer: string
   proposalDate: string
   managingUnit: string
@@ -35,6 +47,10 @@ export interface ActionItem extends Record<string, unknown> {
   id: string
   parentId: string
   parentType: 'directive' | 'proposal'
+  // 업무담당자 (군번/계급/성명)
+  assigneeServiceNumber: string
+  assigneeRank: string
+  assigneeName: string
   assignee: string
   progressStatus: ProgressStatus
   plan: string
@@ -52,51 +68,78 @@ export interface ActionHistory extends Record<string, unknown> {
   content: string
 }
 
-const UNITS = ['1사단', '2사단', '해병대사령부', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const CATEGORIES = ['작전', '교육', '군수', '인사', '정보화']
 const DIRECTORS = ['사령관', '참모장', '부사령관']
 const STATUSES: ProgressStatus[] = ['notStarted', 'inProgress', 'completed', 'delayed']
+const DIRECTIVE_TYPES: Array<'문서' | '구두'> = ['문서', '구두']
+const RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '상사', '중사']
 
 // 지시사항 Mock 데이터 20건
-let directives: Directive[] = Array.from({ length: 20 }, (_, i) => ({
-  id: `dir-${i + 1}`,
-  directiveNo: `DIR-${2025}-${String(i + 1).padStart(3, '0')}`,
-  director: DIRECTORS[i % DIRECTORS.length],
-  directiveDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
-  targetUnit: UNITS[i % UNITS.length],
-  content: faker.lorem.sentence(),
-  progressStatus: STATUSES[i % STATUSES.length],
-  category: CATEGORIES[i % CATEGORIES.length],
-  attachments: [],
-  createdAt: faker.date.recent({ days: 180 }).toISOString(),
-}))
+let directives: Directive[] = Array.from({ length: 20 }, (_, i) => {
+  const sn = randomServiceNumber()
+  const rank = RANKS[i % RANKS.length]
+  const name = faker.person.lastName() + faker.person.firstName()
+  return {
+    id: `dir-${i + 1}`,
+    directiveNo: `DIR-${2025}-${String(i + 1).padStart(3, '0')}`,
+    directorServiceNumber: sn,
+    directorRank: rank,
+    directorName: name,
+    director: `${sn} / ${rank} / ${name}`,
+    directiveDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
+    targetUnit: UNITS[i % UNITS.length],
+    content: faker.lorem.sentence(),
+    progressStatus: STATUSES[i % STATUSES.length],
+    category: CATEGORIES[i % CATEGORIES.length],
+    directiveType: DIRECTIVE_TYPES[i % DIRECTIVE_TYPES.length],
+    attachments: [],
+    createdAt: faker.date.recent({ days: 180 }).toISOString(),
+  }
+})
 
 // 건의사항 Mock 데이터 15건
-let proposals: Proposal[] = Array.from({ length: 15 }, (_, i) => ({
-  id: `prop-${i + 1}`,
-  proposalNo: `PROP-${2025}-${String(i + 1).padStart(3, '0')}`,
-  proposer: faker.helpers.arrayElement(DIRECTORS),
-  proposalDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
-  managingUnit: UNITS[i % UNITS.length],
-  content: faker.lorem.sentence(),
-  progressStatus: STATUSES[i % STATUSES.length],
-  category: CATEGORIES[i % CATEGORIES.length],
-  attachments: [],
-  createdAt: faker.date.recent({ days: 180 }).toISOString(),
-}))
+let proposals: Proposal[] = Array.from({ length: 15 }, (_, i) => {
+  const sn = randomServiceNumber()
+  const rank = RANKS[i % RANKS.length]
+  const name = faker.person.lastName() + faker.person.firstName()
+  return {
+    id: `prop-${i + 1}`,
+    proposalNo: `PROP-${2025}-${String(i + 1).padStart(3, '0')}`,
+    proposerServiceNumber: sn,
+    proposerRank: rank,
+    proposerName: name,
+    proposer: `${sn} / ${rank} / ${name}`,
+    proposalDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
+    managingUnit: UNITS[i % UNITS.length],
+    content: faker.lorem.sentence(),
+    progressStatus: STATUSES[i % STATUSES.length],
+    category: CATEGORIES[i % CATEGORIES.length],
+    attachments: [],
+    createdAt: faker.date.recent({ days: 180 }).toISOString(),
+  }
+})
 
 // 조치사항 Mock 데이터 30건
-let actions: ActionItem[] = Array.from({ length: 30 }, (_, i) => ({
-  id: `act-${i + 1}`,
-  parentId: i < 20 ? `dir-${(i % 20) + 1}` : `prop-${(i % 15) + 1}`,
-  parentType: (i < 20 ? 'directive' : 'proposal') as 'directive' | 'proposal',
-  assignee: faker.person.lastName() + faker.person.firstName(),
-  progressStatus: STATUSES[i % STATUSES.length],
-  plan: faker.lorem.sentence(),
-  result: faker.lorem.sentence(),
-  attachments: [],
-  createdAt: faker.date.recent({ days: 90 }).toISOString(),
-}))
+let actions: ActionItem[] = Array.from({ length: 30 }, (_, i) => {
+  const sn = randomServiceNumber()
+  const rank = RANKS[i % RANKS.length]
+  const name = faker.person.lastName() + faker.person.firstName()
+  return {
+    id: `act-${i + 1}`,
+    parentId: i < 20 ? `dir-${(i % 20) + 1}` : `prop-${(i % 15) + 1}`,
+    parentType: (i < 20 ? 'directive' : 'proposal') as 'directive' | 'proposal',
+    assigneeServiceNumber: sn,
+    assigneeRank: rank,
+    assigneeName: name,
+    assignee: `${sn} / ${rank} / ${name}`,
+    progressStatus: STATUSES[i % STATUSES.length],
+    plan: faker.lorem.sentence(),
+    result: faker.lorem.sentence(),
+    attachments: [],
+    createdAt: faker.date.recent({ days: 90 }).toISOString(),
+  }
+})
 
 // 이력 Mock 데이터 60건
 const histories: ActionHistory[] = Array.from({ length: 60 }, (_, i) => ({
@@ -160,11 +203,17 @@ export const sys12Handlers = [
     const progressStatus = url.searchParams.get('progressStatus') || ''
     const director = url.searchParams.get('director') || ''
     const keyword = url.searchParams.get('keyword') || ''
+    const targetUnit = url.searchParams.get('targetUnit') || ''
+    const directiveDateFrom = url.searchParams.get('directiveDateFrom') || ''
+    const directiveDateTo = url.searchParams.get('directiveDateTo') || ''
 
     let filtered = [...directives]
     if (progressStatus) filtered = filtered.filter((d) => d.progressStatus === progressStatus)
-    if (director) filtered = filtered.filter((d) => d.director === director)
+    if (director) filtered = filtered.filter((d) => d.directorName.includes(director) || d.director.includes(director))
     if (keyword) filtered = filtered.filter((d) => d.content.includes(keyword))
+    if (targetUnit) filtered = filtered.filter((d) => d.targetUnit === targetUnit)
+    if (directiveDateFrom) filtered = filtered.filter((d) => d.directiveDate >= directiveDateFrom)
+    if (directiveDateTo) filtered = filtered.filter((d) => d.directiveDate <= directiveDateTo)
 
     const result: ApiResult<PageResponse<Directive>> = {
       success: true,
@@ -198,12 +247,16 @@ export const sys12Handlers = [
     const newItem: Directive = {
       id: `dir-${Date.now()}`,
       directiveNo: `DIR-${Date.now()}`,
-      director: body.director || '사령관',
+      directorServiceNumber: (body.directorServiceNumber as string) || '',
+      directorRank: (body.directorRank as string) || '',
+      directorName: (body.directorName as string) || '',
+      director: body.director || '',
       directiveDate: body.directiveDate || new Date().toISOString().split('T')[0],
       targetUnit: body.targetUnit || '해병대사령부',
       content: body.content || '',
       progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
       category: body.category || '작전',
+      directiveType: (body.directiveType as '문서' | '구두') || '문서',
       attachments: [],
       createdAt: new Date().toISOString(),
     }
@@ -246,11 +299,14 @@ export const sys12Handlers = [
       id: `act-${Date.now()}`,
       parentId: params.id as string,
       parentType: 'directive',
+      assigneeServiceNumber: (body.assigneeServiceNumber as string) || '',
+      assigneeRank: (body.assigneeRank as string) || '',
+      assigneeName: (body.assigneeName as string) || '',
       assignee: body.assignee || '',
       progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
       plan: body.plan || '',
       result: body.result || '',
-      attachments: [],
+      attachments: (body.attachments as string[]) || [],
       createdAt: new Date().toISOString(),
     }
     actions = [newItem, ...actions]
@@ -274,10 +330,18 @@ export const sys12Handlers = [
     const size = parseInt(url.searchParams.get('size') || '10')
     const progressStatus = url.searchParams.get('progressStatus') || ''
     const keyword = url.searchParams.get('keyword') || ''
+    const proposer = url.searchParams.get('proposer') || ''
+    const managingUnit = url.searchParams.get('managingUnit') || ''
+    const proposalDateFrom = url.searchParams.get('proposalDateFrom') || ''
+    const proposalDateTo = url.searchParams.get('proposalDateTo') || ''
 
     let filtered = [...proposals]
     if (progressStatus) filtered = filtered.filter((p) => p.progressStatus === progressStatus)
     if (keyword) filtered = filtered.filter((p) => p.content.includes(keyword))
+    if (proposer) filtered = filtered.filter((p) => p.proposerName.includes(proposer) || p.proposer.includes(proposer))
+    if (managingUnit) filtered = filtered.filter((p) => p.managingUnit === managingUnit)
+    if (proposalDateFrom) filtered = filtered.filter((p) => p.proposalDate >= proposalDateFrom)
+    if (proposalDateTo) filtered = filtered.filter((p) => p.proposalDate <= proposalDateTo)
 
     const result: ApiResult<PageResponse<Proposal>> = {
       success: true,
@@ -311,7 +375,10 @@ export const sys12Handlers = [
     const newItem: Proposal = {
       id: `prop-${Date.now()}`,
       proposalNo: `PROP-${Date.now()}`,
-      proposer: body.proposer || '사령관',
+      proposerServiceNumber: (body.proposerServiceNumber as string) || '',
+      proposerRank: (body.proposerRank as string) || '',
+      proposerName: (body.proposerName as string) || '',
+      proposer: body.proposer || '',
       proposalDate: body.proposalDate || new Date().toISOString().split('T')[0],
       managingUnit: body.managingUnit || '해병대사령부',
       content: body.content || '',
@@ -359,11 +426,14 @@ export const sys12Handlers = [
       id: `act-${Date.now()}`,
       parentId: params.id as string,
       parentType: 'proposal',
+      assigneeServiceNumber: (body.assigneeServiceNumber as string) || '',
+      assigneeRank: (body.assigneeRank as string) || '',
+      assigneeName: (body.assigneeName as string) || '',
       assignee: body.assignee || '',
       progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
       plan: body.plan || '',
       result: body.result || '',
-      attachments: [],
+      attachments: (body.attachments as string[]) || [],
       createdAt: new Date().toISOString(),
     }
     actions = [newItem, ...actions]

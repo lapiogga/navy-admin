@@ -109,6 +109,10 @@ TimePicker 자동계산 + Steps 결재 + ConfirmDialog 마감 워크플로우 + 
 - 엑셀저장/자료출력: `message.success('자료 출력이 완료되었습니다.')` Mock (백엔드 연동 시 실제 파일 생성 필요)
 - 마감기한 설정 저장: `message.success('마감기한이 설정되었습니다.')` Mock (PUT /api/sys01/monthly-closing/deadline 미연동)
 
+## GAP 수정 반영 (2026-04-07)
+
+SYS01 초과근무관리체계에 req_spec 기반 6대 규칙 적용. SearchForm 다수 추가 (14개 파일), militaryPersonColumn(군번/계급/성명) 적용, HTML 테이블을 DataTable 컴포넌트로 전환하여 navy-bordered-table CSS 통일 적용.
+
 ## Self-Check: PASSED
 
 | 항목 | 결과 |

@@ -98,3 +98,9 @@ metrics:
 - FOUND: commit 5f90235 (Task 1)
 - FOUND: commit c4ffb10 (Task 2)
 - 전체 98/98 테스트 통과
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 01 (대시보드/공지사항) 화면은 직접 수정 대상 아님. 공지사항 목록 테이블에 navy-bordered-table CSS가 자동 적용됨.

@@ -6,10 +6,26 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { JobDesc, JobDescType } from '@/shared/api/mocks/handlers/sys18'
 import JobDescFormPage from './JobDescFormPage'
+
+// 검색 필드 정의 (CSV 행 11, 19, 22: 검색기능 추가)
+const SEARCH_FIELDS: SearchField[] = [
+  { name: 'diagnosisName', label: '조직진단명', type: 'text', placeholder: '진단명 검색' },
+  { name: 'keyword', label: '작성자/부서', type: 'text', placeholder: '작성자 또는 부서 검색' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '작성중', value: 'draft' },
+    { label: '제출됨', value: 'submitted' },
+    { label: '1차 완료', value: 'approved_1st' },
+    { label: '완료', value: 'completed' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 const JD_STATUS_COLOR_MAP: Record<string, string> = {
   draft: 'default',
@@ -49,6 +65,17 @@ interface TabContentProps {
 function JobDescTabContent({ type, onWrite }: TabContentProps) {
   const actionRef = useRef<ActionType>()
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }
 
   const deleteMutation = useMutation({
     mutationFn: (id: string) => apiClient.delete(`/sys18/job-descs/${id}`),
@@ -81,11 +108,12 @@ function JobDescTabContent({ type, onWrite }: TabContentProps) {
     },
     ...(type === 'personal'
       ? [
-          {
-            title: '작성자',
-            dataIndex: 'writerName',
-            width: 100,
-          } as ProColumns<JobDesc>,
+          // 군번/계급/성명 동시 표시 (R6)
+          militaryPersonColumn<JobDesc>('작성자', {
+            serviceNumber: 'writerMilitaryId',
+            rank: 'rank',
+            name: 'writerName',
+          }),
         ]
       : []),
     {
@@ -174,9 +202,12 @@ function JobDescTabContent({ type, onWrite }: TabContentProps) {
 
   return (
     <>
+      {/* 검색 영역 (R2) */}
+      <SearchForm fields={SEARCH_FIELDS} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<JobDesc>
         columns={columns}
-        request={(params) => fetchJobDescs({ ...params, type })}
+        request={(params) => fetchJobDescs({ ...params, type, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle={JD_TYPE_LABEL_MAP[type]}

@@ -12,6 +12,11 @@ import type { InspectionTask } from '@/shared/api/mocks/handlers/sys17'
 
 const { TextArea } = Input
 
+const YEAR_OPTIONS = Array.from({ length: 11 }, (_, i) => {
+  const year = (2020 + i).toString()
+  return { label: year, value: year }
+})
+
 const INSP_FIELD_OPTIONS = [
   { label: '전투준비태세', value: '전투준비태세' },
   { label: '교육훈련', value: '교육훈련' },
@@ -290,11 +295,12 @@ export default function InspectionApprovalPage() {
     },
   ]
 
+  // CSV 검색조건: 연도, 대상부대, 검열분야, 조치부대, 과제명
   const searchFields = [
     {
       name: 'inspYear',
       label: '연도',
-      render: () => <Select options={[]} placeholder="연도 선택" allowClear style={{ width: '100%' }} />,
+      render: () => <Select options={YEAR_OPTIONS} placeholder="연도 선택" allowClear style={{ width: '100%' }} />,
     },
     {
       name: 'targetUnit',

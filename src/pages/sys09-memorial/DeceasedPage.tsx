@@ -1,11 +1,14 @@
-import { useState } from 'react'
-import { Modal, Button, message, Select } from 'antd'
+import { useState, useCallback } from 'react'
+import { Modal, Button, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { Deceased } from '@/shared/api/mocks/handlers/sys09'
@@ -54,6 +57,17 @@ const DEATH_TYPE_OPTIONS = [
   { label: '사고사', value: 'accident' },
 ]
 
+// CSV 검색조건: 군구분, 군번, 성명, 주민번호(생년월일), 계급, 소속
+const searchFields: SearchField[] = [
+  { name: 'militaryType', label: '군구분', type: 'select', options: MILITARY_TYPE_OPTIONS },
+  { name: 'serviceNumber', label: '군번', type: 'text', placeholder: '군번 입력' },
+  { name: 'name', label: '성명', type: 'text', placeholder: '성명 입력' },
+  { name: 'residentNumber', label: '주민번호', type: 'text', placeholder: '생년월일 6자리' },
+  { name: 'rank', label: '계급', type: 'select', options: RANK_OPTIONS },
+  { name: 'unit', label: '소속', type: 'select', options: UNIT_OPTIONS },
+  { name: 'deathType', label: '사망구분', type: 'select', options: DEATH_TYPE_OPTIONS },
+]
+
 type FormValues = {
   serviceNumber: string
   name: string
@@ -63,9 +77,11 @@ type FormValues = {
   enlistDate: string
   phone: string
   deathType: string
+  deathTypeCode: string
   deathDate: string
   deathPlace: string
   deathCause: string
+  deathAddress: string
   burialPlace: string
   familyContact: string
   remarks: string
@@ -120,18 +136,23 @@ export default function DeceasedPage() {
     },
   })
 
+  // 검색 처리
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }, [])
+
+  const handleSearchReset = useCallback(() => {
+    setSearchParams({})
+  }, [])
+
   const columns: ProColumns<Deceased>[] = [
+    // R6: 군번/계급/성명 동시 표시
     {
-      title: '군번',
-      dataIndex: 'serviceNumber',
-      width: 120,
-      sorter: true,
-    },
-    {
-      title: '성명',
-      dataIndex: 'name',
-      width: 100,
-      sorter: true,
+      ...militaryPersonColumn<Deceased>('사망자', {
+        serviceNumber: 'serviceNumber',
+        rank: 'rank',
+        name: 'name',
+      }),
       render: (_, record) => (
         <a
           onClick={() => {
@@ -139,15 +160,9 @@ export default function DeceasedPage() {
             setModalOpen(true)
           }}
         >
-          {record.name}
+          {`${record.serviceNumber} / ${record.rank} / ${record.name}`}
         </a>
       ),
-    },
-    {
-      title: '계급',
-      dataIndex: 'rank',
-      width: 80,
-      sorter: true,
     },
     {
       title: '소속',
@@ -167,6 +182,12 @@ export default function DeceasedPage() {
           labelMap={DEATH_TYPE_LABEL_MAP}
         />
       ),
+    },
+    {
+      title: '사망구분기호',
+      dataIndex: 'deathTypeCode',
+      width: 100,
+      sorter: true,
     },
     {
       title: '사망일자',
@@ -205,7 +226,9 @@ export default function DeceasedPage() {
     },
   ]
 
+  // CSV 입력값: 군번, 성명, 주민등록번호, 계급, 소속, 입대일자, 전화번호, 사망구분, 사망구분기호, 사망자주소
   const formFields = [
+    { name: 'militaryType', label: '군구분', type: 'select' as const, options: MILITARY_TYPE_OPTIONS },
     { name: 'serviceNumber', label: '군번', type: 'text' as const, required: true },
     { name: 'name', label: '성명', type: 'text' as const, required: true },
     { name: 'residentNumber', label: '주민등록번호', type: 'text' as const, required: true, placeholder: '앞6-*******' },
@@ -214,12 +237,13 @@ export default function DeceasedPage() {
     { name: 'enlistDate', label: '입대일자', type: 'date' as const, required: true },
     { name: 'phone', label: '전화번호', type: 'text' as const },
     { name: 'deathType', label: '사망구분', type: 'select' as const, required: true, options: DEATH_TYPE_OPTIONS },
+    { name: 'deathTypeCode', label: '사망구분 기호', type: 'text' as const, placeholder: '예: A1' },
     { name: 'deathDate', label: '사망일자', type: 'date' as const, required: true },
     { name: 'deathPlace', label: '사망장소', type: 'text' as const },
+    { name: 'deathAddress', label: '사망자 주소', type: 'text' as const },
     { name: 'deathCause', label: '사망원인', type: 'textarea' as const },
     { name: 'burialPlace', label: '안장지', type: 'text' as const },
     { name: 'familyContact', label: '유족 연락처', type: 'text' as const },
-    { name: 'militaryType', label: '군구분', type: 'select' as const, options: MILITARY_TYPE_OPTIONS },
     { name: 'remarks', label: '비고', type: 'textarea' as const },
   ]
 
@@ -233,29 +257,8 @@ export default function DeceasedPage() {
 
   return (
     <PageContainer title="사망자 관리">
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <Select
-          placeholder="군구분"
-          allowClear
-          style={{ width: 120 }}
-          options={MILITARY_TYPE_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, militaryType: val }))}
-        />
-        <Select
-          placeholder="계급"
-          allowClear
-          style={{ width: 120 }}
-          options={RANK_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, rank: val }))}
-        />
-        <Select
-          placeholder="소속"
-          allowClear
-          style={{ width: 160 }}
-          options={UNIT_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, unit: val }))}
-        />
-      </div>
+      {/* R2: CSV 검색조건 반영 SearchForm */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<Deceased>
         queryKey="sys09/deceased"
         requestFn={(params) => fetchDeceased({ ...params, ...searchParams })}

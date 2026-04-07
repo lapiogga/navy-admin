@@ -146,3 +146,9 @@ tests-added: 25
 - FOUND: StandardWorkTimePage.tsx
 - FOUND: commit 0c94709
 - FOUND: commit e6486ba
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS18 직무기술서관리체계 후속 기능(관리자/표준업무시간)에 동일한 6대 규칙 소급 적용. SearchForm, navy-bordered-table CSS, 관리자 메뉴 포함 통일.

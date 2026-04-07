@@ -1220,3 +1220,27 @@ interface ActionHistory {
 - [ ] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 4 UI-SPEC 기반 176개 프로세스에 대해 6개 규칙 기반 GAP 수정이 적용되었다.
+
+### 적용된 공통 패턴
+
+1. **SearchForm 패턴**: 모든 목록 화면 상단에 `<SearchForm>` 컴포넌트 배치 (높이 100px, search-form-container CSS)
+2. **militaryPersonColumn 패턴**: 인물 관련 컬럼에 `militaryPersonColumn()` 헬퍼 적용 — 군번/계급/성명 3항목 동시 표시
+3. **DataTable CSS 패턴**: `navy-bordered-table` 클래스로 최상단 군청색 2px, 최하단 1px 라인
+4. **CrudForm 확장**: file/dateRange 타입 필드 추가, CSV 입력값 항목 전체 반영
+
+### 서브시스템별 GAP 해소
+
+| 서브시스템 | 주요 변경 |
+|-----------|----------|
+| SYS13 지식관리 | SearchForm 5개 조건, militaryPersonColumn, keywords/attachments 필드 |
+| SYS17 검열결과 | CSV 11 입력항목 전부 반영, militaryPersonColumn, 공개여부/처분종류 |
+| SYS06 해병대규정 | SYS05에서 독립, 전용 4페이지 신규 생성 + API 핸들러 |
+| SYS02 설문관리 | SearchForm, 대상필드 4개, 첨부파일 3종 |
+| SYS12 지시건의 | SearchForm, militaryPersonColumn, directiveType(문서/구두) |
+| SYS09 영현보훈 | SearchForm 7개 필드, 추가 필드 다수 |

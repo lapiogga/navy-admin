@@ -709,3 +709,26 @@ Status 색상:
 - [ ] Dimension 6 Registry Safety: PASS
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 3 UI-SPEC에서 식별된 31개 GAP(HIGH 14, MEDIUM 14, LOW 3)에 대해 6개 규칙 기반 수정이 적용되었다.
+
+### 적용된 공통 패턴
+
+1. **SearchForm 패턴**: 모든 목록 화면 상단에 `<SearchForm>` 컴포넌트 배치 (높이 100px, search-form-container CSS)
+2. **militaryPersonColumn 패턴**: 인물 관련 컬럼에 `militaryPersonColumn()` 헬퍼 적용 — 군번/계급/성명 3항목 동시 표시
+3. **DataTable CSS 패턴**: `navy-bordered-table` 클래스로 최상단 군청색 2px, 최하단 1px 라인
+4. **CrudForm 확장**: file/dateRange 타입 필드 추가, CSV 입력값 항목 전체 반영
+
+### 서브시스템별 GAP 해소
+
+| 서브시스템 | GAP 해소 건수 | 주요 변경 |
+|-----------|-------------|----------|
+| SYS04 | 5/5 | SearchForm 3개 조건, militaryPersonColumn, 소속기관/활용동의 |
+| SYS05 | 5/5 | SearchForm (규정명/문서번호/분류), militaryPersonColumn |
+| SYS14 | 10/10 | SearchForm 4개 조건, militaryPersonColumn('제언자'), 반려사유 모달 |
+| SYS11 | 6/6 | SearchForm 5개 조건, militaryPersonColumn, 첨부파일 구분 4종 |
+| SYS16 | 5/5 | 회의명/등급/주관부서 폼, SearchForm, militaryPersonColumn |

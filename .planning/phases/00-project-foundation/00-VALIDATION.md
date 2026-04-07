@@ -96,3 +96,34 @@ created: 2026-04-05
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 0에서 제공하는 공통 컴포넌트 5개가 GAP 분석 결과에 따라 수정/신규 생성되었다. 기존 검증 항목은 유효하며, 아래 변경사항이 추가 반영됨.
+
+### 수정된 공통 컴포넌트
+
+| 컴포넌트 | 변경 내용 |
+|----------|----------|
+| **DataTable.tsx** | `navy-bordered-table` CSS 클래스 추가 (상단 2px #003366, 하단 1px #003366 보더) |
+| **SearchForm.tsx** | `search-form-container` div wrapper 추가 (height 100px, background #fafafa) |
+| **CrudForm.tsx** | `file`, `dateRange`, `checkbox` 필드 타입 추가 (ProFormUploadButton, ProFormDateRangePicker, ProFormCheckbox) |
+| **DetailModal.tsx** | render 시그니처 확장: 두 번째 `record` 인자 추가 |
+| **index.css** | 글로벌 CSS: navy 테이블 보더 + 검색 폼 컨테이너 스타일 |
+
+### 신규 생성 파일
+
+| 파일 | 설명 |
+|------|------|
+| **shared/lib/military.ts** | `formatMilitaryPerson()` + `militaryPersonColumn()` 헬퍼 (군번/계급/성명 3항목 동시 표시) |
+
+### 적용된 GAP 규칙 (R1-R6)
+
+1. **R1**: 등록 화면에 CSV 입력값 항목의 모든 컬럼을 CrudForm 필드에 반영
+2. **R2**: 목록 그리드 상단에 높이 100px SearchForm (CSV 검색기능 항목 반영)
+3. **R3**: CSV 규칙/예외조건을 UI 로직/안내문/제한조건으로 구현
+4. **R4**: 18개 서브시스템에 관리자 기능 메뉴 포함
+5. **R5**: 테이블 최상단 군청색 2px, 최하단 군청색 1px (navy-bordered-table)
+6. **R6**: 신청자/사용자에 군번/계급/성명 3항목 동시 표시 (militaryPersonColumn)

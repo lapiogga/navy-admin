@@ -18,9 +18,12 @@ interface MeetingRoom {
 interface ReserveFormValues {
   managingUnit: string
   roomId: string
+  meetingName: string
   date: import('dayjs').Dayjs
   startTime: import('dayjs').Dayjs
   endTime: import('dayjs').Dayjs
+  meetingGrade: string
+  hostDepartment: string
   purpose: string
   attendeeCount: number
   attendees: string
@@ -65,9 +68,12 @@ export default function MeetingReservePage() {
       const payload = {
         managingUnit: values.managingUnit,
         roomId: values.roomId,
+        meetingName: values.meetingName,
         date: values.date.format('YYYY-MM-DD'),
         startTime: values.startTime.format('HH:mm'),
         endTime: values.endTime.format('HH:mm'),
+        meetingGrade: values.meetingGrade,
+        hostDepartment: values.hostDepartment,
         purpose: values.purpose,
         attendeeCount: values.attendeeCount,
         attendees: values.attendees,
@@ -125,6 +131,14 @@ export default function MeetingReservePage() {
           </Form.Item>
 
           <Form.Item
+            name="meetingName"
+            label="회의명"
+            rules={[{ required: true, message: '회의명을 입력하세요' }]}
+          >
+            <Input placeholder="회의명을 입력하세요" />
+          </Form.Item>
+
+          <Form.Item
             name="date"
             label="예약일"
             rules={[{ required: true, message: '예약일을 선택하세요' }]}
@@ -146,6 +160,37 @@ export default function MeetingReservePage() {
             rules={[{ required: true, message: '종료 시간을 선택하세요' }]}
           >
             <TimePicker format="HH:mm" minuteStep={30} style={{ width: '100%' }} />
+          </Form.Item>
+
+          <Form.Item
+            name="meetingGrade"
+            label="회의등급"
+            rules={[{ required: true, message: '회의등급을 선택하세요' }]}
+          >
+            <Select
+              placeholder="회의등급 선택"
+              options={[
+                { label: '일반', value: '일반' },
+                { label: '비밀', value: '비밀' },
+                { label: '대외비', value: '대외비' },
+              ]}
+            />
+          </Form.Item>
+
+          <Form.Item
+            name="hostDepartment"
+            label="주관부서"
+            rules={[{ required: true, message: '주관부서를 선택하세요' }]}
+          >
+            <Select
+              placeholder="주관부서 선택"
+              options={[
+                { label: '작전과', value: '작전과' },
+                { label: '인사과', value: '인사과' },
+                { label: '군수과', value: '군수과' },
+                { label: '정보통신과', value: '정보통신과' },
+              ]}
+            />
           </Form.Item>
 
           <Form.Item

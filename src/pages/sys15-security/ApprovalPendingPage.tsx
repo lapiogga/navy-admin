@@ -5,7 +5,10 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { ApprovalRecord } from '@/shared/api/mocks/handlers/sys15-security'
@@ -177,6 +180,25 @@ function ApprovalDetailModal({ record, open, onClose }: ApprovalDetailModalProps
   )
 }
 
+// 검색 필드 정의 (CSV line 70: 검색기능 추가)
+const approvalSearchFields: SearchField[] = [
+  { name: 'docType', label: '문서유형', type: 'select', options: [
+    { label: '개인일일결산', value: '개인일일결산' },
+    { label: '사무실결산', value: '사무실결산' },
+    { label: '당직표', value: '당직표' },
+    { label: '보안교육', value: '보안교육' },
+    { label: '부재', value: '부재' },
+  ] },
+  { name: 'keyword', label: '제출자', type: 'text', placeholder: '성명 검색' },
+  { name: 'department', label: '부대(서)', type: 'select', options: [
+    { label: '1함대', value: '1함대' },
+    { label: '2함대', value: '2함대' },
+    { label: '3함대', value: '3함대' },
+    { label: '해군사령부', value: '해군사령부' },
+    { label: '해병대사령부', value: '해병대사령부' },
+  ] },
+]
+
 export default function ApprovalPendingPage() {
   const [selectedRecord, setSelectedRecord] = useState<ApprovalRecord | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
@@ -185,7 +207,7 @@ export default function ApprovalPendingPage() {
   const columns: ProColumns<ApprovalRecord>[] = [
     { title: '문서유형', dataIndex: 'docType', width: 120 },
     { title: '제목', dataIndex: 'title' },
-    { title: '제출자', dataIndex: 'submitter', width: 100 },
+    militaryPersonColumn<ApprovalRecord>('제출자', { serviceNumber: 'submitterServiceNumber', rank: 'submitterRank', name: 'submitter' }),
     { title: '부대(서)', dataIndex: 'department', width: 120 },
     { title: '제출일', dataIndex: 'submittedAt', width: 120 },
     {
@@ -222,6 +244,11 @@ export default function ApprovalPendingPage() {
 
   return (
     <PageContainer title="결재대기">
+      <SearchForm
+        fields={approvalSearchFields}
+        onSearch={() => actionRef.current?.reload()}
+        onReset={() => actionRef.current?.reload()}
+      />
       <DataTable<ApprovalRecord>
         actionRef={actionRef}
         queryKey={['sys15-approvals-pending']}

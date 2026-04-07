@@ -5,9 +5,26 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtMonthlyClosing } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 검색 필드 정의 */
+const monthlyStatusSearchFields: SearchField[] = [
+  { name: 'year', label: '대상연도', type: 'select', options: [
+    { label: '2026', value: '2026' },
+    { label: '2025', value: '2025' },
+  ]},
+  { name: 'month', label: '대상월', type: 'select', options: Array.from({ length: 12 }, (_, i) => ({
+    label: `${i + 1}월`, value: String(i + 1),
+  }))},
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '작성중', value: 'draft' },
+    { label: '마감완료', value: 'closed' },
+  ]},
+]
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   draft: 'orange',
@@ -57,6 +74,7 @@ export default function OtMonthlyStatusPage() {
 
   return (
     <PageContainer title="월말결산 현황">
+      <SearchForm fields={monthlyStatusSearchFields} onSearch={(values) => console.log('검색:', values)} />
       <div style={{ marginBottom: 12, textAlign: 'right' }}>
         <Button icon={<DownloadOutlined />} onClick={() => void message.success('엑셀 저장이 완료되었습니다.')}>
           엑셀저장

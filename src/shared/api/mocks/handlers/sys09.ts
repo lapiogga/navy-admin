@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 
 // 타입 정의
 export type DeathType = 'combat' | 'duty' | 'disease' | 'accident'
@@ -17,9 +19,11 @@ export interface Deceased extends Record<string, unknown> {
   enlistDate: string
   phone: string
   deathType: DeathType
+  deathTypeCode: string      // 사망구분기호
   deathDate: string
   deathPlace: string
   deathCause: string
+  deathAddress: string       // 사망자 주소
   burialPlace: string
   familyContact: string
   remarks: string
@@ -35,47 +39,54 @@ export interface Injured extends Record<string, unknown> {
   unit: string
   enlistDate: string
   phone: string
-  address: string
+  address: string            // 현주소
   injuryType: InjuryType
   injuryGrade: string        // 1~7급
   injuryDate: string
   injuryPlace: string
   injuryCause: string
   hospitalName: string
+  veteransOfficeName: string // 보훈청명
+  diseaseName: string        // 병명
+  combatInjuryYn: string     // 전공상 여부 (Y/N)
   remarks: string
   militaryType: string
 }
 
 export interface CombatReview extends Record<string, unknown> {
   id: string
-  reviewRound: string        // "제1차" etc
-  reviewDate: string
+  reviewRound: string        // "제1차" etc (심사차수)
+  reviewDate: string         // 심사일자
   name: string
   serviceNumber: string
   birthDate: string
   enlistDate: string
   rank: string
   unit: string
+  diseaseName: string        // 병명
   incidentType: string       // 전사/순직/전상/공상
   incidentDate: string
   incidentCause: string
-  result: ReviewResult
+  combatCategory: string     // 전공상 분류
+  result: ReviewResult       // 소속부대 심사결과
   resultDetail: string
   remarks: string
 }
 
 const MILITARY_TYPES = ['해병', '해군', '육군', '공군']
 const RANKS = ['이병', '일병', '상병', '병장', '하사', '중사', '상사', '원사', '소위', '중위', '대위', '소령', '중령', '대령']
-const UNITS = ['1사단', '2사단', '해병대사령부', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const DEATH_TYPES: DeathType[] = ['combat', 'duty', 'disease', 'accident']
 const INJURY_TYPES: InjuryType[] = ['combat', 'duty']
 const INJURY_GRADES = ['1급', '2급', '3급', '4급', '5급', '6급', '7급']
 const INCIDENT_TYPES = ['전사', '순직', '전상', '공상']
 
 // Mock 데이터 생성
+const DEATH_TYPE_CODES = ['A1', 'B2', 'C3', 'D4']
+
 let deceasedList: Deceased[] = Array.from({ length: 25 }, (_, i) => ({
   id: `deceased-${i + 1}`,
-  serviceNumber: `M-${faker.string.numeric(8)}`,
+  serviceNumber: randomServiceNumber(),
   name: faker.person.lastName() + faker.person.firstName(),
   residentNumber: faker.string.numeric(6) + '-*******',
   rank: RANKS[i % RANKS.length],
@@ -83,18 +94,23 @@ let deceasedList: Deceased[] = Array.from({ length: 25 }, (_, i) => ({
   enlistDate: faker.date.past({ years: 10 }).toISOString().split('T')[0],
   phone: faker.phone.number(),
   deathType: DEATH_TYPES[i % DEATH_TYPES.length],
+  deathTypeCode: DEATH_TYPE_CODES[i % DEATH_TYPE_CODES.length],
   deathDate: faker.date.past({ years: 5 }).toISOString().split('T')[0],
   deathPlace: faker.location.city(),
   deathCause: faker.lorem.sentence(),
+  deathAddress: faker.location.streetAddress(),
   burialPlace: faker.location.city() + ' 국립묘지',
   familyContact: faker.phone.number(),
   remarks: '',
   militaryType: MILITARY_TYPES[i % MILITARY_TYPES.length],
 }))
 
+const VETERANS_OFFICES = ['서울보훈청', '부산보훈청', '대전보훈청', '광주보훈청', '인천보훈청']
+const DISEASE_NAMES = ['요추간판탈출증', '외상성 뇌손상', '슬관절 인대파열', '경추 염좌', '척추골절']
+
 let injuredList: Injured[] = Array.from({ length: 20 }, (_, i) => ({
   id: `injured-${i + 1}`,
-  serviceNumber: `M-${faker.string.numeric(8)}`,
+  serviceNumber: randomServiceNumber(),
   name: faker.person.lastName() + faker.person.firstName(),
   residentNumber: faker.string.numeric(6) + '-*******',
   rank: RANKS[i % RANKS.length],
@@ -108,23 +124,30 @@ let injuredList: Injured[] = Array.from({ length: 20 }, (_, i) => ({
   injuryPlace: faker.location.city(),
   injuryCause: faker.lorem.sentence(),
   hospitalName: faker.company.name() + ' 병원',
+  veteransOfficeName: VETERANS_OFFICES[i % VETERANS_OFFICES.length],
+  diseaseName: DISEASE_NAMES[i % DISEASE_NAMES.length],
+  combatInjuryYn: i % 2 === 0 ? 'Y' : 'N',
   remarks: '',
   militaryType: MILITARY_TYPES[i % MILITARY_TYPES.length],
 }))
+
+const COMBAT_CATEGORIES = ['전투상이', '공무상이', '교육훈련상이', '직무수행상이']
 
 let reviewList: CombatReview[] = Array.from({ length: 15 }, (_, i) => ({
   id: `review-${i + 1}`,
   reviewRound: `제${i + 1}차`,
   reviewDate: faker.date.past({ years: 3 }).toISOString().split('T')[0],
   name: faker.person.lastName() + faker.person.firstName(),
-  serviceNumber: `M-${faker.string.numeric(8)}`,
+  serviceNumber: randomServiceNumber(),
   birthDate: faker.string.numeric(6) + '-*******',
   enlistDate: faker.date.past({ years: 8 }).toISOString().split('T')[0],
   rank: RANKS[i % RANKS.length],
   unit: UNITS[i % UNITS.length],
+  diseaseName: DISEASE_NAMES[i % DISEASE_NAMES.length],
   incidentType: INCIDENT_TYPES[i % INCIDENT_TYPES.length],
   incidentDate: faker.date.past({ years: 4 }).toISOString().split('T')[0],
   incidentCause: faker.lorem.sentence(),
+  combatCategory: COMBAT_CATEGORIES[i % COMBAT_CATEGORIES.length],
   result: (i % 3 === 0 ? 'ineligible' : 'eligible') as ReviewResult,
   resultDetail: faker.lorem.sentence(),
   remarks: '',
@@ -155,12 +178,17 @@ export const sys09Handlers = [
     const rank = url.searchParams.get('rank') || ''
     const unit = url.searchParams.get('unit') || ''
 
+    const residentNumber = url.searchParams.get('residentNumber') || ''
+    const deathType = url.searchParams.get('deathType') || ''
+
     let filtered = [...deceasedList]
     if (militaryType) filtered = filtered.filter((d) => d.militaryType === militaryType)
     if (serviceNumber) filtered = filtered.filter((d) => d.serviceNumber.includes(serviceNumber))
     if (name) filtered = filtered.filter((d) => d.name.includes(name))
+    if (residentNumber) filtered = filtered.filter((d) => d.residentNumber.includes(residentNumber))
     if (rank) filtered = filtered.filter((d) => d.rank === rank)
     if (unit) filtered = filtered.filter((d) => d.unit === unit)
+    if (deathType) filtered = filtered.filter((d) => d.deathType === deathType)
 
     const result: ApiResult<PageResponse<Deceased>> = {
       success: true,
@@ -190,9 +218,11 @@ export const sys09Handlers = [
       enlistDate: body.enlistDate || '',
       phone: body.phone || '',
       deathType: (body.deathType as DeathType) || 'duty',
+      deathTypeCode: (body.deathTypeCode as string) || '',
       deathDate: body.deathDate || '',
       deathPlace: body.deathPlace || '',
       deathCause: body.deathCause || '',
+      deathAddress: (body.deathAddress as string) || '',
       burialPlace: body.burialPlace || '',
       familyContact: body.familyContact || '',
       remarks: body.remarks || '',
@@ -232,10 +262,13 @@ export const sys09Handlers = [
     const rank = url.searchParams.get('rank') || ''
     const unit = url.searchParams.get('unit') || ''
 
+    const residentNumber = url.searchParams.get('residentNumber') || ''
+
     let filtered = [...injuredList]
     if (militaryType) filtered = filtered.filter((d) => d.militaryType === militaryType)
     if (serviceNumber) filtered = filtered.filter((d) => d.serviceNumber.includes(serviceNumber))
     if (name) filtered = filtered.filter((d) => d.name.includes(name))
+    if (residentNumber) filtered = filtered.filter((d) => d.residentNumber.includes(residentNumber))
     if (rank) filtered = filtered.filter((d) => d.rank === rank)
     if (unit) filtered = filtered.filter((d) => d.unit === unit)
 
@@ -273,6 +306,9 @@ export const sys09Handlers = [
       injuryPlace: body.injuryPlace || '',
       injuryCause: body.injuryCause || '',
       hospitalName: body.hospitalName || '',
+      veteransOfficeName: (body.veteransOfficeName as string) || '',
+      diseaseName: (body.diseaseName as string) || '',
+      combatInjuryYn: (body.combatInjuryYn as string) || 'N',
       remarks: body.remarks || '',
       militaryType: body.militaryType || '해병',
     }
@@ -304,14 +340,18 @@ export const sys09Handlers = [
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
+    const militaryType = url.searchParams.get('militaryType') || ''
     const name = url.searchParams.get('name') || ''
     const serviceNumber = url.searchParams.get('serviceNumber') || ''
+    const residentNumber = url.searchParams.get('residentNumber') || ''
     const rank = url.searchParams.get('rank') || ''
     const unit = url.searchParams.get('unit') || ''
 
     let filtered = [...reviewList]
+    if (militaryType) filtered = filtered.filter((d) => d.unit.includes(militaryType))
     if (name) filtered = filtered.filter((d) => d.name.includes(name))
     if (serviceNumber) filtered = filtered.filter((d) => d.serviceNumber.includes(serviceNumber))
+    if (residentNumber) filtered = filtered.filter((d) => d.birthDate.includes(residentNumber))
     if (rank) filtered = filtered.filter((d) => d.rank === rank)
     if (unit) filtered = filtered.filter((d) => d.unit === unit)
 
@@ -343,9 +383,11 @@ export const sys09Handlers = [
       enlistDate: body.enlistDate || '',
       rank: body.rank || '',
       unit: body.unit || '',
+      diseaseName: (body.diseaseName as string) || '',
       incidentType: body.incidentType || '순직',
       incidentDate: body.incidentDate || '',
       incidentCause: body.incidentCause || '',
+      combatCategory: (body.combatCategory as string) || '',
       result: (body.result as ReviewResult) || 'eligible',
       resultDetail: body.resultDetail || '',
       remarks: body.remarks || '',
@@ -395,9 +437,16 @@ export const sys09Handlers = [
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
+    const unit = url.searchParams.get('unit') || ''
+    const rank = url.searchParams.get('rank') || ''
+
+    let filtered = [...deceasedList]
+    if (unit) filtered = filtered.filter((d) => d.unit === unit)
+    if (rank) filtered = filtered.filter((d) => d.rank === rank)
+
     const result: ApiResult<PageResponse<Deceased>> = {
       success: true,
-      data: paginate(deceasedList, page, size),
+      data: paginate(filtered, page, size),
     }
     return HttpResponse.json(result)
   }),
@@ -464,9 +513,18 @@ export const sys09Handlers = [
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
+    const unit = url.searchParams.get('unit') || ''
+    const rank = url.searchParams.get('rank') || ''
+    const deathType = url.searchParams.get('deathType') || ''
+
+    let filtered = [...deceasedList]
+    if (unit) filtered = filtered.filter((d) => d.unit === unit)
+    if (rank) filtered = filtered.filter((d) => d.rank === rank)
+    if (deathType) filtered = filtered.filter((d) => d.deathType === deathType)
+
     const result: ApiResult<PageResponse<Deceased>> = {
       success: true,
-      data: paginate(deceasedList, page, size),
+      data: paginate(filtered, page, size),
     }
     return HttpResponse.json(result)
   }),

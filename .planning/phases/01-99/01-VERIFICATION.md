@@ -193,3 +193,26 @@ Step 7b: TypeScript 컴파일 및 테스트 실행으로 대체
 
 _Verified: 2026-04-05T10:15:00Z_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 1 공통 기능은 직접 수정 대상이 아니나, Phase 0 공통 컴포넌트 강화로 인해 Phase 1이 의존하는 컴포넌트 계약이 변경됨.
+
+### 영향받는 공통 컴포넌트
+
+| 컴포넌트 | 변경 | Phase 1 영향 |
+|----------|------|-------------|
+| DataTable | navy-bordered-table CSS 자동 적용 | 시스템관리/코드관리/게시판 목록 테이블에 군청색 보더 자동 반영 |
+| SearchForm | search-form-container wrapper | 공통게시판/코드관리 검색 영역 높이 100px 고정 |
+| CrudForm | file/dateRange/checkbox 타입 추가 | 공통게시판 첨부파일, 기간 검색 등에 활용 가능 |
+| DetailModal | render 시그니처 record 인자 추가 | 기존 render(value) 호출은 하위 호환 유지 |
+
+### 신규 헬퍼 (Phase 1에서 미사용, Phase 3+ 활용)
+
+- `military.ts`: 군번/계급/성명 헬퍼 -- Phase 1 공통기능에서는 사용하지 않으나, Phase 3+ 서브시스템에서 사용
+
+### 검증 상태
+
+기존 Phase 1 검증 결과(PASSED)는 유효함. 공통 컴포넌트 변경은 하위 호환성을 유지하며 적용됨.

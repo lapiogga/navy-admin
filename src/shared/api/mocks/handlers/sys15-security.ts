@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { ALL_UNITS } from '../mockUnits'
 
 // ──────────────────────────────────────────────────
 // 타입 정의
@@ -17,9 +19,15 @@ export interface SecretItem extends Record<string, unknown> {
   classification: SecretClassification
   registrationNo: string
   registrant: string
+  registrantServiceNumber: string
+  registrantRank: string
   department: string
   registeredAt: string
   status: SecretStatus
+  changeType: string
+  changeStatus: string
+  quantity: number
+  remark: string
   noticeDue?: string
   hasNoticeDoc?: boolean
 }
@@ -30,12 +38,16 @@ export interface MediaItem extends Record<string, unknown> {
   classification: SecretClassification
   registrationNo: string
   registrant: string
+  registrantServiceNumber: string
+  registrantRank: string
   department: string
   registeredAt: string
   status: SecretStatus
   mediaType: MediaType
   serialNo: string
   capacity: string
+  changeQuantity: number
+  remark: string
 }
 
 export interface EquipmentItem extends Record<string, unknown> {
@@ -44,12 +56,16 @@ export interface EquipmentItem extends Record<string, unknown> {
   classification: SecretClassification
   registrationNo: string
   registrant: string
+  registrantServiceNumber: string
+  registrantRank: string
   department: string
   registeredAt: string
   status: SecretStatus
   equipmentType: EquipmentType
   modelName: string
   installLocation: string
+  changeQuantity: number
+  remark: string
 }
 
 export interface NoticeDoc extends Record<string, unknown> {
@@ -135,8 +151,12 @@ export interface DutySchedule extends Record<string, unknown> {
   id: string
   date: string
   officerName: string
+  serviceNumber: string
   rank: string
   department: string
+  approverName: string
+  approverServiceNumber: string
+  approverRank: string
   status: 'draft' | 'submitted' | 'approved'
 }
 
@@ -153,12 +173,16 @@ export interface DutyInspection extends Record<string, unknown> {
 export interface SecurityLevelRecord extends Record<string, unknown> {
   id: string
   targetName: string
+  targetServiceNumber: string
+  targetRank: string
   department: string
   evalType: '수시' | '정기'
   evalDate: string
   score: number
   grade: 'A' | 'B' | 'C' | 'D'
   evaluator: string
+  evaluatorServiceNumber: string
+  evaluatorRank: string
   status: 'draft' | 'approved'
 }
 
@@ -185,9 +209,12 @@ export interface SecurityEduRecord extends Record<string, unknown> {
   eduType: '정기교육' | '특별교육' | '직무교육' | '기타'
   eduDate: string
   duration: number
-  instructor: string
+  instructorName: string
+  instructorRank: string
+  instructorServiceNumber: string
   participants: number
   content: string
+  etcContent: string
   department: string
   status: 'draft' | 'completed'
 }
@@ -197,6 +224,8 @@ export interface ApprovalRecord extends Record<string, unknown> {
   docType: '개인일일결산' | '사무실결산' | '당직표' | '보안교육' | '부재'
   title: string
   submitter: string
+  submitterServiceNumber: string
+  submitterRank: string
   department: string
   submittedAt: string
   status: 'submitted' | 'approved' | 'rejected'
@@ -207,7 +236,7 @@ export interface ApprovalRecord extends Record<string, unknown> {
 // ──────────────────────────────────────────────────
 // 내부 상수
 // ──────────────────────────────────────────────────
-const UNITS = ['1함대', '2함대', '3함대', '해군사령부', '교육사령부', '군수사령부', '해병대사령부']
+const UNITS = ALL_UNITS
 const RANKS = ['중위', '대위', '소령', '중령', '대령', '하사', '중사', '상사']
 const CLASSIFICATIONS: SecretClassification[] = ['1급', '2급', '3급', 'II급', 'III급']
 const STATUSES: SecretStatus[] = ['active', 'expired', 'transferred', 'destroyed']
@@ -225,9 +254,15 @@ let secrets: SecretItem[] = Array.from({ length: 20 }, () => ({
   classification: faker.helpers.arrayElement(CLASSIFICATIONS),
   registrationNo: `비-${faker.string.numeric(6)}`,
   registrant: randomName(),
+  registrantServiceNumber: randomServiceNumber(),
+  registrantRank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
   registeredAt: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
   status: faker.helpers.arrayElement(STATUSES),
+  changeType: faker.helpers.arrayElement(['증가', '감소']),
+  changeStatus: faker.helpers.arrayElement(['신규등록', '인계', '폐기', '재분류']),
+  quantity: faker.number.int({ min: 1, max: 10 }),
+  remark: faker.helpers.arrayElement(['', '긴급', '정기점검', '']),
   noticeDue: faker.date.future({ years: 1 }).toISOString().split('T')[0],
   hasNoticeDoc: faker.datatype.boolean(),
 }))
@@ -238,12 +273,16 @@ let media: MediaItem[] = Array.from({ length: 20 }, () => ({
   classification: faker.helpers.arrayElement(CLASSIFICATIONS),
   registrationNo: `매-${faker.string.numeric(6)}`,
   registrant: randomName(),
+  registrantServiceNumber: randomServiceNumber(),
+  registrantRank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
   registeredAt: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
   status: faker.helpers.arrayElement(STATUSES),
   mediaType: faker.helpers.arrayElement(['USB', 'HDD', 'SSD', 'CD/DVD', '기타'] as MediaType[]),
   serialNo: faker.string.alphanumeric(12).toUpperCase(),
   capacity: faker.helpers.arrayElement(['4GB', '8GB', '16GB', '32GB', '64GB', '128GB', '1TB', '2TB']),
+  changeQuantity: faker.number.int({ min: -5, max: 10 }),
+  remark: faker.helpers.arrayElement(['', '신규', '반납', '']),
 }))
 
 let equipment: EquipmentItem[] = Array.from({ length: 20 }, () => ({
@@ -252,12 +291,16 @@ let equipment: EquipmentItem[] = Array.from({ length: 20 }, () => ({
   classification: faker.helpers.arrayElement(CLASSIFICATIONS),
   registrationNo: `장-${faker.string.numeric(6)}`,
   registrant: randomName(),
+  registrantServiceNumber: randomServiceNumber(),
+  registrantRank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
   registeredAt: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
   status: faker.helpers.arrayElement(STATUSES),
   equipmentType: faker.helpers.arrayElement(['암호장비', '보안카드단말기', '보안USB관리기', '지문인식기', '기타'] as EquipmentType[]),
   modelName: faker.helpers.arrayElement(['KY-Series', 'HX-320', 'AN/PYQ-10', 'SAVILLE', 'KG-84']),
   installLocation: faker.helpers.arrayElement(['지휘통제실', '통신실', '작전실', '본부동', '별관']),
+  changeQuantity: faker.number.int({ min: -3, max: 5 }),
+  remark: faker.helpers.arrayElement(['', '정비중', '신규배치', '']),
 }))
 
 let noticeDocs: NoticeDoc[] = Array.from({ length: 20 }, () => {
@@ -318,8 +361,12 @@ let dutySchedules: DutySchedule[] = Array.from({ length: 15 }, () => ({
   id: faker.string.uuid(),
   date: faker.date.soon({ days: 30 }).toISOString().split('T')[0],
   officerName: randomName(),
+  serviceNumber: randomServiceNumber(),
   rank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
+  approverName: randomName(),
+  approverServiceNumber: randomServiceNumber(),
+  approverRank: faker.helpers.arrayElement(['소령', '중령', '대령']),
   status: faker.helpers.arrayElement(['draft', 'submitted', 'approved'] as ('draft' | 'submitted' | 'approved')[]),
 }))
 
@@ -336,12 +383,16 @@ let dutyInspections: DutyInspection[] = Array.from({ length: 15 }, () => ({
 let securityLevels: SecurityLevelRecord[] = Array.from({ length: 20 }, () => ({
   id: faker.string.uuid(),
   targetName: randomName(),
+  targetServiceNumber: randomServiceNumber(),
+  targetRank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
   evalType: faker.helpers.arrayElement(['수시', '정기'] as ('수시' | '정기')[]),
   evalDate: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
   score: faker.number.int({ min: 60, max: 100 }),
   grade: faker.helpers.arrayElement(['A', 'B', 'C', 'D'] as ('A' | 'B' | 'C' | 'D')[]),
   evaluator: randomName(),
+  evaluatorServiceNumber: randomServiceNumber(),
+  evaluatorRank: faker.helpers.arrayElement(RANKS),
   status: faker.helpers.arrayElement(['draft', 'approved'] as ('draft' | 'approved')[]),
 }))
 
@@ -361,9 +412,12 @@ let securityEduRecords: SecurityEduRecord[] = Array.from({ length: 15 }, () => (
   eduType: faker.helpers.arrayElement(['정기교육', '특별교육', '직무교육', '기타'] as ('정기교육' | '특별교육' | '직무교육' | '기타')[]),
   eduDate: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
   duration: faker.number.int({ min: 1, max: 8 }),
-  instructor: randomName(),
+  instructorName: randomName(),
+  instructorRank: faker.helpers.arrayElement(RANKS),
+  instructorServiceNumber: randomServiceNumber(),
   participants: faker.number.int({ min: 5, max: 50 }),
   content: faker.lorem.sentence(),
+  etcContent: '',
   department: faker.helpers.arrayElement(UNITS),
   status: faker.helpers.arrayElement(['draft', 'completed'] as ('draft' | 'completed')[]),
 }))
@@ -373,6 +427,8 @@ let approvalRecords: ApprovalRecord[] = Array.from({ length: 20 }, () => ({
   docType: faker.helpers.arrayElement(['개인일일결산', '사무실결산', '당직표', '보안교육', '부재'] as ('개인일일결산' | '사무실결산' | '당직표' | '보안교육' | '부재')[]),
   title: `보안결산-${faker.string.numeric(4)}`,
   submitter: randomName(),
+  submitterServiceNumber: randomServiceNumber(),
+  submitterRank: faker.helpers.arrayElement(RANKS),
   department: faker.helpers.arrayElement(UNITS),
   submittedAt: faker.date.recent({ days: 10 }).toISOString().split('T')[0],
   status: faker.helpers.arrayElement(['submitted', 'approved', 'rejected'] as ('submitted' | 'approved' | 'rejected')[]),
@@ -541,9 +597,15 @@ export const sys15Handlers = [
       classification: body.classification ?? '3급',
       registrationNo: `비-${faker.string.numeric(6)}`,
       registrant: body.registrant ?? '홍길동',
+      registrantServiceNumber: body.registrantServiceNumber ?? randomServiceNumber(),
+      registrantRank: body.registrantRank ?? '대위',
       department: body.department ?? '해군사령부',
       registeredAt: new Date().toISOString().split('T')[0],
       status: 'active',
+      changeType: body.changeType ?? '증가',
+      changeStatus: body.changeStatus ?? '신규등록',
+      quantity: body.quantity ?? 1,
+      remark: body.remark ?? '',
       hasNoticeDoc: false,
     }
     secrets = [item, ...secrets]
@@ -575,12 +637,16 @@ export const sys15Handlers = [
       classification: body.classification ?? '3급',
       registrationNo: `매-${faker.string.numeric(6)}`,
       registrant: body.registrant ?? '홍길동',
+      registrantServiceNumber: body.registrantServiceNumber ?? randomServiceNumber(),
+      registrantRank: body.registrantRank ?? '대위',
       department: body.department ?? '해군사령부',
       registeredAt: new Date().toISOString().split('T')[0],
       status: 'active',
       mediaType: body.mediaType ?? 'USB',
       serialNo: body.serialNo ?? faker.string.alphanumeric(12).toUpperCase(),
       capacity: body.capacity ?? '16GB',
+      changeQuantity: body.changeQuantity ?? 1,
+      remark: body.remark ?? '',
     }
     media = [item, ...media]
     return ok(item)
@@ -611,12 +677,16 @@ export const sys15Handlers = [
       classification: body.classification ?? '3급',
       registrationNo: `장-${faker.string.numeric(6)}`,
       registrant: body.registrant ?? '홍길동',
+      registrantServiceNumber: body.registrantServiceNumber ?? randomServiceNumber(),
+      registrantRank: body.registrantRank ?? '대위',
       department: body.department ?? '해군사령부',
       registeredAt: new Date().toISOString().split('T')[0],
       status: 'active',
       equipmentType: body.equipmentType ?? '암호장비',
       modelName: body.modelName ?? '',
       installLocation: body.installLocation ?? '',
+      changeQuantity: body.changeQuantity ?? 1,
+      remark: body.remark ?? '',
     }
     equipment = [item, ...equipment]
     return ok(item)
@@ -857,8 +927,12 @@ export const sys15Handlers = [
       id: faker.string.uuid(),
       date: String(body.date ?? ''),
       officerName: String(body.officerName ?? ''),
+      serviceNumber: String(body.serviceNumber ?? randomServiceNumber()),
       rank: String(body.rank ?? ''),
       department: String(body.department ?? ''),
+      approverName: String(body.approverName ?? randomName()),
+      approverServiceNumber: String(body.approverServiceNumber ?? randomServiceNumber()),
+      approverRank: String(body.approverRank ?? '중령'),
       status: 'draft',
     }
     dutySchedules = [item, ...dutySchedules]
@@ -886,12 +960,16 @@ export const sys15Handlers = [
     const item: SecurityLevelRecord = {
       id: faker.string.uuid(),
       targetName: body.targetName ?? '',
+      targetServiceNumber: body.targetServiceNumber ?? randomServiceNumber(),
+      targetRank: body.targetRank ?? '대위',
       department: body.department ?? '해군사령부',
       evalType: body.evalType ?? '수시',
       evalDate: body.evalDate ?? new Date().toISOString().split('T')[0],
       score: body.score ?? 0,
       grade: body.grade ?? 'B',
       evaluator: body.evaluator ?? '현재사용자',
+      evaluatorServiceNumber: body.evaluatorServiceNumber ?? randomServiceNumber(),
+      evaluatorRank: body.evaluatorRank ?? '소령',
       status: 'draft',
     }
     securityLevels = [item, ...securityLevels]
@@ -972,9 +1050,12 @@ export const sys15Handlers = [
       eduType: body.eduType ?? '정기교육',
       eduDate: body.eduDate ?? new Date().toISOString().split('T')[0],
       duration: body.duration ?? 1,
-      instructor: body.instructor ?? '',
+      instructorName: body.instructorName ?? '',
+      instructorRank: body.instructorRank ?? '대위',
+      instructorServiceNumber: body.instructorServiceNumber ?? randomServiceNumber(),
       participants: body.participants ?? 0,
       content: body.content ?? '',
+      etcContent: body.etcContent ?? '',
       department: body.department ?? '해군사령부',
       status: 'draft',
     }

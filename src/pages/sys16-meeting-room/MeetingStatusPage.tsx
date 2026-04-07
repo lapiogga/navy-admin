@@ -1,11 +1,13 @@
-import { useState } from 'react'
-import { Space, Select, DatePicker } from 'antd'
+import { useState, useCallback } from 'react'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
 import axios from 'axios'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
 interface Reservation extends Record<string, unknown> {
@@ -21,6 +23,9 @@ interface Reservation extends Record<string, unknown> {
   status: 'pending' | 'approved' | 'rejected'
   createdAt: string
   processedAt?: string
+  reserverServiceNumber: string
+  reserverRank: string
+  reserverName: string
 }
 
 interface MeetingRoom {
@@ -39,9 +44,7 @@ const UNIT_OPTIONS = [
 ]
 
 export default function MeetingStatusPage() {
-  const [managingUnit, setManagingUnit] = useState<string>('')
-  const [selectedRoom, setSelectedRoom] = useState<string>('')
-  const [dateRange, setDateRange] = useState<[string, string] | null>(null)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
 
   // 회의실 목록 (필터용)
   const { data: roomsData } = useQuery({
@@ -55,17 +58,43 @@ export default function MeetingStatusPage() {
   })
   const rooms = roomsData ?? []
 
+  // 검색 필드 정의 (CSV 검색조건: 회의실 관리 부대, 회의실, 회의일자)
+  const searchFields: SearchField[] = [
+    {
+      name: 'managingUnit',
+      label: '관리부대',
+      type: 'select',
+      options: UNIT_OPTIONS,
+    },
+    {
+      name: 'roomId',
+      label: '회의실',
+      type: 'select',
+      options: rooms.map((r) => ({ label: r.name, value: r.id })),
+    },
+    { name: 'meetingDate', label: '회의일자', type: 'date' },
+  ]
+
+  // 검색 핸들러
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }, [])
+
+  const handleReset = useCallback(() => {
+    setSearchParams({})
+  }, [])
+
   // 회의현황 request 함수
   const fetchStatus = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
     const queryParams: Record<string, unknown> = {
       page: params.page,
       size: params.size,
     }
-    if (managingUnit) queryParams.managingUnit = managingUnit
-    if (selectedRoom) queryParams.roomId = selectedRoom
-    if (dateRange) {
-      queryParams.startDate = dateRange[0]
-      queryParams.endDate = dateRange[1]
+    if (searchParams.managingUnit) queryParams.managingUnit = searchParams.managingUnit
+    if (searchParams.roomId) queryParams.roomId = searchParams.roomId
+    if (searchParams.meetingDate) {
+      const dateVal = searchParams.meetingDate as import('dayjs').Dayjs
+      queryParams.meetingDate = dateVal.format('YYYY-MM-DD')
     }
     const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/status', {
       params: queryParams,
@@ -76,7 +105,11 @@ export default function MeetingStatusPage() {
   const columns: ProColumns<Reservation>[] = [
     { title: '번호', dataIndex: 'id', width: 80, render: (_, __, index) => index + 1 },
     { title: '회의실', dataIndex: 'roomName', width: 120 },
-    { title: '신청자', dataIndex: 'applicant', width: 100 },
+    militaryPersonColumn<Reservation>('예약자', {
+      serviceNumber: 'reserverServiceNumber',
+      rank: 'reserverRank',
+      name: 'reserverName',
+    }),
     { title: '예약일', dataIndex: 'date', width: 110 },
     {
       title: '시간',
@@ -100,38 +133,7 @@ export default function MeetingStatusPage() {
 
   return (
     <PageContainer title="회의현황">
-      <Space style={{ marginBottom: 16 }}>
-        <Select
-          placeholder="관리 부대"
-          style={{ width: 140 }}
-          allowClear
-          value={managingUnit || undefined}
-          onChange={(value) => setManagingUnit(value ?? '')}
-          options={UNIT_OPTIONS}
-        />
-        <Select
-          placeholder="회의실 선택"
-          style={{ width: 180 }}
-          allowClear
-          value={selectedRoom || undefined}
-          onChange={(value) => setSelectedRoom(value ?? '')}
-        >
-          {rooms.map((room) => (
-            <Select.Option key={room.id} value={room.id}>
-              {room.name}
-            </Select.Option>
-          ))}
-        </Select>
-        <DatePicker.RangePicker
-          onChange={(_, dateStrings) => {
-            if (dateStrings[0] && dateStrings[1]) {
-              setDateRange([dateStrings[0], dateStrings[1]])
-            } else {
-              setDateRange(null)
-            }
-          }}
-        />
-      </Space>
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleReset} />
       <DataTable<Reservation>
         columns={columns}
         request={fetchStatus}

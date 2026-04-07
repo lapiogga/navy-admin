@@ -96,3 +96,13 @@ sys11 연구자료종합관리체계 — 통계 메인화면 + CRUD + 자료실 
 | 3c58f35 | feat | sys11 연구자료 4개 페이지 + 37개 테스트 통과 |
 
 ## Self-Check: PASSED
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS11 연구자료종합관리체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CrudForm에 첨부파일 구분 4종 (연구보고서/논문/발표자료/기타) 필드 추가
+- **R2**: 목록 화면 상단에 SearchForm 5개 조건 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 작성자/등록자 컬럼에 militaryPersonColumn() 헬퍼 적용 (군번/계급/성명)

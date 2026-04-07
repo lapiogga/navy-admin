@@ -6,6 +6,9 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtApproval } from '@/shared/api/mocks/handlers/sys01-overtime'
@@ -24,6 +27,20 @@ const STATUS_LABEL_MAP: Record<string, string> = {
   approved: '승인',
   rejected: '반려',
 }
+
+/** 검색 필드 정의 */
+const approvalSearchFields: SearchField[] = [
+  { name: 'requestType', label: '신청서 종류', type: 'select', options: [
+    { label: '사전', value: '사전' },
+    { label: '사후', value: '사후' },
+  ]},
+  { name: 'workDate', label: '근무일', type: 'date' },
+  { name: 'approvalStatus', label: '결재상태', type: 'select', options: [
+    { label: '결재대기', value: 'pending' },
+    { label: '승인', value: 'approved' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 const APPROVAL_STEPS = [
   { title: '작성', description: '신청자' },
@@ -99,6 +116,7 @@ function ApprovalModal({ record, open, onClose }: ApprovalModalProps) {
         <p><strong>근무일:</strong> {record.workDate}</p>
         <p><strong>총근무시간:</strong> {record.totalHours}시간</p>
         <p><strong>근무사유:</strong> {record.reason}</p>
+        <p><strong>결재자:</strong> {[record.approverServiceNumber, record.approverRank, record.approverName].filter(Boolean).join(' / ')}</p>
         <p><strong>결재상태:</strong> <StatusBadge status={record.approvalStatus} colorMap={STATUS_COLOR_MAP} labelMap={STATUS_LABEL_MAP} /></p>
       </div>
       <div style={{ marginBottom: 24 }}>
@@ -142,8 +160,9 @@ export default function OtApprovalPage() {
     { title: '신청서 종류', dataIndex: 'requestType', width: 100 },
     { title: '근무일', dataIndex: 'workDate', width: 110 },
     { title: '총근무시간(h)', dataIndex: 'totalHours', width: 110 },
-    { title: '신청자', dataIndex: 'applicantName', width: 90 },
+    militaryPersonColumn<OtApproval>('신청자', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'applicantName' }),
     { title: '부대(서)', dataIndex: 'applicantUnit', width: 100 },
+    militaryPersonColumn<OtApproval>('결재자', { serviceNumber: 'approverServiceNumber', rank: 'approverRank', name: 'approverName' }),
     { title: '근무사유', dataIndex: 'reason', ellipsis: true },
     {
       title: '결재상태',
@@ -168,24 +187,30 @@ export default function OtApprovalPage() {
       key: 'pending',
       label: '결재대기',
       children: (
-        <DataTable<OtApproval>
-          columns={columns}
-          request={(params) => fetchApprovals(params)}
-          rowKey="id"
-          headerTitle="결재대기 목록"
-        />
+        <>
+          <SearchForm fields={approvalSearchFields} onSearch={(values) => console.log('검색:', values)} />
+          <DataTable<OtApproval>
+            columns={columns}
+            request={(params) => fetchApprovals(params)}
+            rowKey="id"
+            headerTitle="결재대기 목록"
+          />
+        </>
       ),
     },
     {
       key: 'approved',
       label: '결재완료',
       children: (
-        <DataTable<OtApproval>
-          columns={columns}
-          request={(params) => fetchApprovals(params)}
-          rowKey="id"
-          headerTitle="결재완료 목록"
-        />
+        <>
+          <SearchForm fields={approvalSearchFields} onSearch={(values) => console.log('검색:', values)} />
+          <DataTable<OtApproval>
+            columns={columns}
+            request={(params) => fetchApprovals(params)}
+            rowKey="id"
+            headerTitle="결재완료 목록"
+          />
+        </>
       ),
     },
   ]

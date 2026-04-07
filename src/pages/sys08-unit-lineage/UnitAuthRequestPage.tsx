@@ -1,5 +1,6 @@
 import { useState, useRef } from 'react'
-import { Button, Form, Input, Select, message, Card } from 'antd'
+import { Button, Form, Input, Select, Upload, message, Card } from 'antd'
+import { UploadOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
@@ -46,7 +47,7 @@ export default function UnitAuthRequestPage() {
   const queryClient = useQueryClient()
 
   const requestMutation = useMutation({
-    mutationFn: async (values: { requestUnit: string; requestRole: string; reason: string }) => {
+    mutationFn: async (values: { requestUnit: string; requestRole: string; milPhone: string; personnelOrderBasis: string; reason: string }) => {
       return apiClient.post('/sys08/auth-request', values)
     },
     onSuccess: () => {
@@ -61,6 +62,7 @@ export default function UnitAuthRequestPage() {
   const columns: ProColumns<UnitAuthRequest>[] = [
     { title: '관리부대', dataIndex: 'requestUnit', width: 150 },
     { title: '요청권한', dataIndex: 'requestRole', width: 130 },
+    { title: '군 전화번호', dataIndex: 'milPhone', width: 120 },
     { title: '사유', dataIndex: 'reason', ellipsis: true },
     {
       title: '상태',
@@ -82,7 +84,7 @@ export default function UnitAuthRequestPage() {
 
   return (
     <PageContainer title="권한신청">
-      {/* 신청 폼 */}
+      {/* 신청 폼 - CSV 입력값 반영 (R1 규칙) */}
       <Card title="권한신청" style={{ marginBottom: 24 }}>
         <Form
           form={form}
@@ -105,11 +107,23 @@ export default function UnitAuthRequestPage() {
             <Select options={ROLE_OPTIONS} placeholder="요청권한 선택" />
           </Form.Item>
           <Form.Item
+            name="milPhone"
+            label="군 전화번호"
+            rules={[{ required: true, message: '군 전화번호를 입력하세요' }]}
+          >
+            <Input placeholder="예: 123-4567" />
+          </Form.Item>
+          <Form.Item
             name="reason"
             label="사유"
             rules={[{ required: true, message: '사유를 입력하세요' }]}
           >
             <TextArea rows={4} placeholder="권한 신청 사유를 입력하세요" />
+          </Form.Item>
+          <Form.Item label="인사명령 근거(첨부파일)">
+            <Upload beforeUpload={() => false} maxCount={1}>
+              <Button icon={<UploadOutlined />}>파일 선택</Button>
+            </Upload>
           </Form.Item>
           <Form.Item>
             <Button type="primary" htmlType="submit" loading={requestMutation.isPending}>

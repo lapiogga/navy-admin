@@ -7,9 +7,26 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtMonthlyClosing } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 검색 필드 정의 */
+const closingSearchFields: SearchField[] = [
+  { name: 'year', label: '연도', type: 'select', options: [
+    { label: '2026', value: '2026' },
+    { label: '2025', value: '2025' },
+  ]},
+  { name: 'month', label: '월', type: 'select', options: Array.from({ length: 12 }, (_, i) => ({
+    label: `${i + 1}월`, value: String(i + 1),
+  }))},
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '작성중', value: 'draft' },
+    { label: '마감완료', value: 'closed' },
+  ]},
+]
 
 const STATUS_COLOR_MAP: Record<string, string> = {
   draft: 'orange',
@@ -133,6 +150,7 @@ export default function OtMonthlyClosingPage() {
 
   return (
     <PageContainer title="월말결산">
+      <SearchForm fields={closingSearchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <div style={{ marginBottom: 12, textAlign: 'right' }}>
         <Button onClick={() => setDeadlineEditOpen(true)}>마감기한 설정 (관리자)</Button>
       </div>

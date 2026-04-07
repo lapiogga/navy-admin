@@ -4,6 +4,7 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { InspectionTask } from '@/shared/api/mocks/handlers/sys17'
@@ -76,11 +77,29 @@ export default function InspectionResultDataPage() {
       width: 120,
       sorter: true,
     },
+    // 담당검열관: 군번/계급/성명 통합 표시
+    militaryPersonColumn<InspectionTask>('담당검열관', {
+      serviceNumber: 'inspectorServiceNumber',
+      rank: 'inspectorRank',
+      name: 'inspectorName',
+    }),
     {
       title: '검열분야',
       dataIndex: 'inspField',
       width: 100,
       sorter: true,
+    },
+    {
+      title: '처분종류',
+      dataIndex: 'dispositionType',
+      width: 100,
+      sorter: true,
+    },
+    {
+      title: '공개여부',
+      dataIndex: 'isPublic',
+      width: 80,
+      render: (_, record) => (record.isPublic ? '공개' : '비공개'),
     },
     {
       title: '진행상태',
@@ -93,12 +112,6 @@ export default function InspectionResultDataPage() {
           labelMap={STATUS_LABEL_MAP}
         />
       ),
-    },
-    {
-      title: '완료기한',
-      dataIndex: 'dueDate',
-      width: 120,
-      sorter: true,
     },
   ]
 
@@ -132,7 +145,10 @@ export default function InspectionResultDataPage() {
             <p><strong>검열계획:</strong> {selectedTask.planName}</p>
             <p><strong>대상부대:</strong> {selectedTask.targetUnit}</p>
             <p><strong>주관부서:</strong> {selectedTask.managingDept}</p>
+            <p><strong>담당검열관:</strong> {selectedTask.inspectorServiceNumber} / {selectedTask.inspectorRank} / {selectedTask.inspectorName}</p>
+            <p><strong>공개여부:</strong> {selectedTask.isPublic ? '공개' : '비공개'}</p>
             <p><strong>검열분야:</strong> {selectedTask.inspField}</p>
+            <p><strong>처분종류:</strong> {selectedTask.dispositionType}</p>
             <p>
               <strong>진행상태:</strong>{' '}
               <StatusBadge
@@ -141,7 +157,7 @@ export default function InspectionResultDataPage() {
                 labelMap={STATUS_LABEL_MAP}
               />
             </p>
-            <p><strong>완료기한:</strong> {selectedTask.dueDate}</p>
+            <p><strong>주요내용:</strong> {selectedTask.taskContent || '-'}</p>
             <p><strong>문제점:</strong> {selectedTask.issues || '-'}</p>
             <p><strong>조치결과:</strong> {selectedTask.actionResult || '-'}</p>
           </div>

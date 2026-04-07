@@ -5,19 +5,23 @@ import {
   ProFormSelect,
   ProFormDatePicker,
   ProFormDigit,
+  ProFormUploadButton,
+  ProFormDateRangePicker,
+  ProFormCheckbox,
 } from '@ant-design/pro-components'
 import type { Rule } from 'antd/es/form'
 
 export interface CrudFormField {
   name: string
   label: string
-  type: 'text' | 'textarea' | 'select' | 'date' | 'number'
+  type: 'text' | 'textarea' | 'select' | 'date' | 'dateRange' | 'number' | 'file' | 'checkbox'
   required?: boolean
   options?: { label: string; value: string | number }[]
   disabled?: boolean
   rules?: Rule[]
   placeholder?: string
   colSpan?: number
+  maxFiles?: number
 }
 
 export interface CrudFormProps<T extends Record<string, unknown>> {
@@ -58,8 +62,14 @@ export function CrudForm<T extends Record<string, unknown>>({
         return <ProFormSelect {...commonProps} options={field.options} />
       case 'date':
         return <ProFormDatePicker {...commonProps} />
+      case 'dateRange':
+        return <ProFormDateRangePicker {...commonProps} />
       case 'number':
         return <ProFormDigit {...commonProps} />
+      case 'file':
+        return <ProFormUploadButton {...commonProps} max={field.maxFiles ?? 5} title="파일 선택" />
+      case 'checkbox':
+        return <ProFormCheckbox {...commonProps} />
       default:
         return <ProFormText {...commonProps} />
     }

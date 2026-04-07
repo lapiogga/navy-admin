@@ -5,6 +5,13 @@ import type { ProColumns, ProTableProps, ActionType } from '@ant-design/pro-comp
 import { ProTable } from '@ant-design/pro-components'
 import type { ListParams, PageResponse } from '@/shared/api/types'
 
+/** 군청색 테이블 스타일: 최상단 2px, 최하단 1px */
+const NAVY_TABLE_STYLE: React.CSSProperties = {
+  borderTop: '2px solid #003366',
+}
+
+const NAVY_TABLE_CLASS = 'navy-bordered-table'
+
 export interface DataTableProps<T extends Record<string, unknown>> {
   columns: ProColumns<T>[]
   request: (params: ListParams) => Promise<PageResponse<T>>
@@ -68,8 +75,11 @@ export function DataTable<T extends Record<string, unknown>>({
       pagination={{ showSizeChanger: true, defaultPageSize: 10 }}
       search={false}
       dateFormatter="string"
+      options={{ density: false }}
       onRow={onRow}
       actionRef={actionRef}
+      className={NAVY_TABLE_CLASS}
+      style={NAVY_TABLE_STYLE}
     />
   )
 }

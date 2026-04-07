@@ -113,6 +113,10 @@ Tests  871 passed (871)
 
 없음 - MSW 핸들러(sys01-overtime.ts)에 Plan 03용 엔드포인트 사전 정의, 실제 API 연동 구현됨.
 
+## GAP 수정 반영 (2026-04-07)
+
+SYS01 초과근무관리체계 후속 기능(근무시간/휴일/한도/개인설정)에 동일한 6대 규칙 소급 적용. SearchForm, militaryPersonColumn, navy-bordered-table CSS 통일 적용.
+
 ## Self-Check: PASSED
 
 - OtWorkHoursPage.tsx: FOUND

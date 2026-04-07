@@ -110,3 +110,13 @@ TypeScript 컴파일 오류: 없음 (npx tsc --noEmit 통과)
 - [x] knowledge.test.ts 파일 존재 확인
 - [x] 테스트 36/36 통과 확인
 - [x] TypeScript 컴파일 오류 없음 확인
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS13 지식관리체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CrudForm에 keywords, attachments 필드 추가
+- **R2**: 목록 화면 상단에 SearchForm 5개 조건 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 작성자 컬럼에 militaryPersonColumn() 헬퍼 적용 (군번/계급/성명)

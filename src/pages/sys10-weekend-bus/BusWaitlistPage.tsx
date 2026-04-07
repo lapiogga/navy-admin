@@ -3,6 +3,8 @@ import { Button, Modal, Select, message } from 'antd'
 import type { ActionType, ProColumns } from '@ant-design/pro-components'
 import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
@@ -38,6 +40,35 @@ export function BusWaitlistPage() {
   const [availableSeats, setAvailableSeats] = useState<{ id: string; seatNo: string }[]>([])
   const [selectedSeatId, setSelectedSeatId] = useState<string | undefined>()
   const [manualLoading, setManualLoading] = useState(false)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // 검색 필드 정의 (CSV: 대기자 현황 검색기능 추가)
+  const searchFields: SearchField[] = [
+    { name: 'dateRange', label: '운행일자', type: 'dateRange' },
+    {
+      name: 'route',
+      label: '노선',
+      type: 'select',
+      options: [
+        { label: '서울→포항', value: '서울→포항' },
+        { label: '서울→청주', value: '서울→청주' },
+        { label: '서울→대전', value: '서울→대전' },
+        { label: '서울→광주', value: '서울→광주' },
+        { label: '서울→부산', value: '서울→부산' },
+      ],
+    },
+    { name: 'keyword', label: '신청자 성명', type: 'text', placeholder: '성명 검색' },
+    {
+      name: 'status',
+      label: '상태',
+      type: 'select',
+      options: [
+        { label: '대기중', value: 'waiting' },
+        { label: '배정완료', value: 'assigned' },
+        { label: '취소됨', value: 'cancelled' },
+      ],
+    },
+  ]
 
   const columns: ProColumns<WaitlistItem>[] = [
     { title: '순번', dataIndex: 'waitingNo', width: 60 },
@@ -82,9 +113,16 @@ export function BusWaitlistPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/sys10/waitlist', {
-      params: { page: params.page, size: params.size },
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      ...Object.fromEntries(
+        Object.entries(searchParams)
+          .filter(([, v]) => v != null && v !== '')
+          .map(([k, v]) => [k, String(v)])
+      ),
     })
+    const res = await apiClient.get(`/sys10/waitlist?${qs.toString()}`)
     return res.data
   }
 
@@ -134,6 +172,19 @@ export function BusWaitlistPage() {
 
   return (
     <>
+      {/* 검색영역 (R2: CSV 검색기능 추가) */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
+
       <DataTable<WaitlistItem>
         headerTitle="대기자 관리"
         columns={columns}

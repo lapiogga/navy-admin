@@ -201,3 +201,41 @@ human_verification:
 
 _Verified: 2026-04-06T16:37:48Z_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+2026-04-07 전체 18개 서브시스템 대상 req_spec 기반 GAP 수정이 적용되었다. Phase 5 소속 서브시스템(SYS07, SYS10, SYS18)에 대한 변경 내역:
+
+### 적용 규칙 6개
+
+| 규칙 | 내용 | 적용 대상 |
+|------|------|----------|
+| R1 | 입력값 컬럼 반영 (CSV 입력값 → CrudForm fields) | SYS07 (17개 필드), SYS10, SYS18 |
+| R2 | 검색영역 100px SearchForm 추가 | SYS07 (5→14개 검색조건), SYS10 다수, SYS18 |
+| R3 | 규칙/예외사항 UI 로직 반영 | SYS18 (결재자지정, 엑셀가져오기, 초과근무실적연동) |
+| R4 | 관리자 메뉴 포함 | SYS07, SYS10, SYS18 |
+| R5 | 테이블 군청색 라인 (DataTable CSS) | 전체 (공통 컴포넌트 수정) |
+| R6 | 신청자 = 군번/계급/성명 (militaryPersonColumn) | SYS07, SYS10 |
+
+### SYS07 군사자료관리체계
+
+- 검색조건 5개 → 14개로 확대 (자료분류, 보안등급, 자료상태, 등록기간 등)
+- CSV 입력값 17개 필드 CrudForm 반영 (자료번호, 자료명, 분류코드, 보안등급, 발간일자 등)
+- militaryPersonColumn 적용 (등록자/신청자 컬럼)
+
+### SYS10 주말버스예약관리체계
+
+- militaryPersonColumn 적용 (예약자/신청자 컬럼)
+- SearchForm 다수 페이지 추가
+- 외부사용자 관련 필드 확장
+
+### SYS18 직무기술서관리체계
+
+- SearchForm 추가
+- 결재자지정 UI 로직 반영
+- 엑셀가져오기 기능 반영
+- 초과근무실적연동 규칙 반영
+
+**GAP 수정 상태:** 완료 (공통 컴포넌트 + 서브시스템 개별 수정)

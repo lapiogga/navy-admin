@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // 타입 정의
 interface Suggestion {
@@ -7,6 +8,8 @@ interface Suggestion {
   title: string
   content: string
   authorName: string
+  serviceNumber: string
+  rank: string
   authorUnit: string
   authorPosition?: string
   authorPhone?: string
@@ -68,21 +71,24 @@ const suggestions: Suggestion[] = Array.from({ length: 25 }, (_, i) => {
 
   const createdAt = faker.date.recent({ days: 90 }).toISOString().split('T')[0]
   const hasAnswer = status === 'completed'
-  const deptList = ['기획부', '인사부', '작전부', '정보부', '군수부']
-  const actionTypes = ['시정', '개선', '검토완료']
+  const deptList = ['작전과', '인사과', '군수과', '정보통신과', '기획부']
+  // CSV 스펙: 정책반영, 업무추진, 기추진, 업무참고
+  const actionTypes = ['정책반영', '업무추진', '기추진', '업무참고']
 
   return {
     id: `sug-${i + 1}`,
     title: faker.lorem.words({ min: 3, max: 7 }),
     content: faker.lorem.paragraphs(2),
     authorName: faker.person.lastName() + faker.person.firstName(),
+    serviceNumber: randomServiceNumber(),
+    rank: faker.helpers.arrayElement(['이병', '일병', '상병', '병장', '하사', '중사', '상사', '원사', '준위', '소위', '중위', '대위', '소령', '중령', '대령']),
     authorUnit: `제${faker.number.int({ min: 1, max: 5 })}대대`,
-    authorPosition: faker.helpers.arrayElement(['대위', '소령', '중령', '상사', '중사']),
+    authorPosition: faker.helpers.arrayElement(['과장', '계장', '담당관', '참모']),
     authorPhone: faker.phone.number({ style: 'national' }),
     status,
     assignedDept: faker.helpers.arrayElement(deptList),
     actionDate: (status === 'completed' || status === 'processing') ? faker.date.recent({ days: 30 }).toISOString().split('T')[0] : undefined,
-    actionType: (status === 'completed' || status === 'processing') ? faker.helpers.arrayElement(actionTypes) : (status === 'rejected' ? '반려' : undefined),
+    actionType: (status === 'completed' || status === 'processing') ? faker.helpers.arrayElement(actionTypes) : undefined,
     rejectReason: status === 'rejected' ? faker.lorem.sentence() : undefined,
     isPrivate: faker.datatype.boolean({ probability: 0.2 }),
     recommendCount: faker.number.int({ min: 0, max: 30 }),
@@ -149,6 +155,8 @@ export const sys14Handlers = [
     const size = parseInt(url.searchParams.get('size') || '10')
     const keyword = url.searchParams.get('keyword') || ''
     const status = url.searchParams.get('status') || ''
+    const actionType = url.searchParams.get('actionType') || ''
+    const author = url.searchParams.get('author') || ''
 
     let filtered = [...suggestions]
     if (keyword) {
@@ -161,6 +169,12 @@ export const sys14Handlers = [
     }
     if (status) {
       filtered = filtered.filter((s) => s.status === status)
+    }
+    if (actionType) {
+      filtered = filtered.filter((s) => s.actionType === actionType)
+    }
+    if (author) {
+      filtered = filtered.filter((s) => s.authorName.includes(author))
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
@@ -182,8 +196,10 @@ export const sys14Handlers = [
       title: body.title || '',
       content: body.content || '',
       authorName: body.authorName || '홍길동',
+      serviceNumber: body.serviceNumber || 'M-20260001',
+      rank: body.rank || '대위',
       authorUnit: body.authorUnit || '해병대사령부',
-      authorPosition: body.authorPosition || '대위',
+      authorPosition: body.authorPosition || '과장',
       authorPhone: body.authorPhone || '010-1234-5678',
       status: 'registered',
       assignedDept: '',
@@ -272,6 +288,7 @@ export const sys14Handlers = [
       status: Suggestion['status']
       actionType?: string
       actionDate?: string
+      assignedDept?: string
       rejectReason?: string
     }
     const item = suggestions.find((s) => s.id === params.id)
@@ -281,8 +298,8 @@ export const sys14Handlers = [
     item.status = body.status
     if (body.actionType) item.actionType = body.actionType
     if (body.actionDate) item.actionDate = body.actionDate
+    if (body.assignedDept) item.assignedDept = body.assignedDept
     if (body.rejectReason) item.rejectReason = body.rejectReason
-    if (body.actionType === '반려') item.status = 'rejected'
     item.updatedAt = new Date().toISOString().split('T')[0]
     return HttpResponse.json({ success: true, data: item })
   }),

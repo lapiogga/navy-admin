@@ -111,3 +111,13 @@ handlers/index.ts가 병렬 실행 에이전트들에 의해 이미 sys02/sys13/
 - FOUND: .planning/phases/04-a-6/04-05-SUMMARY.md
 - COMMIT 814298e: FOUND
 - COMMIT 89a9b08: FOUND
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS12 지시건의사항관리체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CrudForm에 directiveType(문서/구두) 필드 추가
+- **R2**: 목록 화면 상단에 SearchForm 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 지시자/건의자 컬럼에 militaryPersonColumn() 헬퍼 적용 (군번/계급/성명)

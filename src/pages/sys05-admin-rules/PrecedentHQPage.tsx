@@ -5,6 +5,9 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { CrudFormField } from '@/shared/ui/CrudForm/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse } from '@/shared/api/types'
 
 interface Regulation extends Record<string, unknown> {
@@ -15,7 +18,16 @@ interface Regulation extends Record<string, unknown> {
   department: string
   effectiveDate: string
   content: string
+  serviceNumber?: string
+  rank?: string
+  authorName?: string
 }
+
+// 검색 필드 정의 (R2) - CSV '검색기능 추가' 반영
+const SEARCH_FIELDS: SearchField[] = [
+  { name: 'title', label: '예규명', type: 'text' },
+  { name: 'docNumber', label: '문서번호', type: 'text' },
+]
 
 // CrudForm 필드 정의 (G07)
 const PRECEDENT_HQ_FIELDS: CrudFormField[] = [
@@ -38,10 +50,19 @@ const PRECEDENT_HQ_FIELDS: CrudFormField[] = [
   { name: 'content', label: '내용', type: 'textarea' as const, required: true },
 ]
 
-async function fetchPrecedentsHQ(params: PageRequest): Promise<PageResponse<Regulation>> {
+async function fetchPrecedentsHQ(
+  params: PageRequest,
+  searchParams?: Record<string, unknown>,
+): Promise<PageResponse<Regulation>> {
   const url = new URL('/api/sys05/precedents/hq', window.location.origin)
   url.searchParams.set('page', String(params.page))
   url.searchParams.set('size', String(params.size))
+  // 검색 파라미터 전달
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value) url.searchParams.set(key, String(value))
+    })
+  }
   const res = await fetch(url.toString())
   const json = (await res.json()) as { success: boolean; data: PageResponse<Regulation> }
   return json.data
@@ -61,7 +82,19 @@ export default function PrecedentHQPage() {
   const [crudOpen, setCrudOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Regulation | null>(null)
   const [loading, setLoading] = useState(false)
+  const [searchValues, setSearchValues] = useState<Record<string, unknown>>({})
   const actionRef = useRef<ActionType>(null)
+
+  // 검색 핸들러 (R2)
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchValues(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchValues({})
+    actionRef.current?.reload()
+  }
 
   const handleCreate = () => {
     setEditTarget(null)
@@ -114,6 +147,11 @@ export default function PrecedentHQPage() {
     { title: '분류', dataIndex: 'category', width: 100 },
     { title: '담당부서', dataIndex: 'department', width: 120 },
     { title: '시행일', dataIndex: 'effectiveDate', width: 120 },
+    militaryPersonColumn<Regulation>('등록자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     {
       title: '액션',
       width: 140,
@@ -151,9 +189,11 @@ export default function PrecedentHQPage() {
 
   return (
     <PageContainer title="예규 - 해군본부">
+      {/* 검색영역 (R2) */}
+      <SearchForm fields={SEARCH_FIELDS} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<Regulation>
         columns={columns}
-        request={fetchPrecedentsHQ}
+        request={(params) => fetchPrecedentsHQ(params, searchValues)}
         rowKey="id"
         headerTitle="해군본부 예규 목록"
         actionRef={actionRef}
@@ -192,6 +232,9 @@ export default function PrecedentHQPage() {
             <Descriptions.Item label="담당부서">{selected.department}</Descriptions.Item>
             <Descriptions.Item label="시행일">{selected.effectiveDate}</Descriptions.Item>
             <Descriptions.Item label="내용">{selected.content}</Descriptions.Item>
+            <Descriptions.Item label="등록자">
+              {[selected.serviceNumber, selected.rank, selected.authorName].filter(Boolean).join(' / ')}
+            </Descriptions.Item>
           </Descriptions>
         )}
       </Modal>

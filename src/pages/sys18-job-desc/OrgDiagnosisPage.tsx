@@ -7,11 +7,30 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OrgDiagnosis } from '@/shared/api/mocks/handlers/sys18'
 
 const { RangePicker } = DatePicker
+
+// 검색 필드 정의
+const SEARCH_FIELDS: SearchField[] = [
+  { name: 'diagnosisName', label: '조직진단명', type: 'text', placeholder: '조직진단명 검색' },
+  { name: 'diagnosisUnit', label: '부대(서)', type: 'select', options: [
+    { label: '해병대사령부', value: '해병대사령부' },
+    { label: '1사단', value: '1사단' },
+    { label: '2사단', value: '2사단' },
+    { label: '교육훈련단', value: '교육훈련단' },
+    { label: '상륙기동단', value: '상륙기동단' },
+  ]},
+  { name: 'progressStatus', label: '진행상태', type: 'select', options: [
+    { label: '준비중', value: 'preparing' },
+    { label: '진행중', value: 'inProgress' },
+    { label: '완료', value: 'completed' },
+  ]},
+]
 
 const PROGRESS_STATUS_COLOR_MAP: Record<string, string> = {
   preparing: 'orange',
@@ -41,9 +60,16 @@ const USER_OPTIONS = [
   { label: '최지수 (중위)', value: 'user-5' },
 ]
 
-async function fetchOrgDiagnoses(params: PageRequest): Promise<PageResponse<OrgDiagnosis>> {
+// 제외대상자 옵션
+const EXCLUDE_USER_OPTIONS = [
+  { label: '정대현 (상사)', value: 'user-6' },
+  { label: '한민호 (중사)', value: 'user-7' },
+  { label: '오지현 (하사)', value: 'user-8' },
+]
+
+async function fetchOrgDiagnoses(params: PageRequest & Record<string, unknown>): Promise<PageResponse<OrgDiagnosis>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<OrgDiagnosis>>>('/sys18/org-diagnosis', {
-    params: { page: params.page, size: params.size },
+    params: { page: params.page, size: params.size, ...params },
   })
   const data = (res as ApiResult<PageResponse<OrgDiagnosis>>).data ?? (res as unknown as PageResponse<OrgDiagnosis>)
   return data
@@ -55,6 +81,7 @@ export default function OrgDiagnosisPage() {
   const [crudOpen, setCrudOpen] = useState(false)
   const [editRecord, setEditRecord] = useState<OrgDiagnosis | null>(null)
   const [form] = Form.useForm()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
 
   const createMutation = useMutation({
     mutationFn: (data: Partial<OrgDiagnosis>) => apiClient.post('/sys18/org-diagnosis', data),
@@ -103,8 +130,20 @@ export default function OrgDiagnosisPage() {
       writePeriod: [dayjs(record.writePeriodStart), dayjs(record.writePeriodEnd)],
       diagnosisPeriod: [dayjs(record.diagnosisPeriodStart), dayjs(record.diagnosisPeriodEnd)],
       targetUsers: record.targetUsers,
+      excludedUsers: record.excludedUsers,
     })
     setCrudOpen(true)
+  }
+
+  // 검색 처리
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    actionRef.current?.reload()
   }
 
   const handleSubmit = async () => {
@@ -119,6 +158,8 @@ export default function OrgDiagnosisPage() {
         diagnosisPeriodEnd: values.diagnosisPeriod[1].format('YYYY-MM-DD'),
         targetUsers: values.targetUsers,
         targetCount: (values.targetUsers as string[]).length,
+        excludedUsers: values.excludedUsers ?? [],
+        excludedCount: ((values.excludedUsers as string[]) ?? []).length,
       }
       if (editRecord) {
         await updateMutation.mutateAsync({ id: editRecord.id, data: payload })
@@ -144,6 +185,7 @@ export default function OrgDiagnosisPage() {
     { title: '진단기간 시작', dataIndex: 'diagnosisPeriodStart', width: 120 },
     { title: '진단기간 종료', dataIndex: 'diagnosisPeriodEnd', width: 120 },
     { title: '대상자 수', dataIndex: 'targetCount', width: 90 },
+    { title: '제외대상자 수', dataIndex: 'excludedCount', width: 110 },
     {
       title: '진행상태',
       dataIndex: 'progressStatus',
@@ -206,9 +248,12 @@ export default function OrgDiagnosisPage() {
 
   return (
     <PageContainer title="조직진단 대상 관리">
+      {/* 검색 영역 */}
+      <SearchForm fields={SEARCH_FIELDS} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<OrgDiagnosis>
         columns={columns}
-        request={fetchOrgDiagnoses}
+        request={(params) => fetchOrgDiagnoses({ ...params, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle="조직진단 목록"
@@ -271,6 +316,17 @@ export default function OrgDiagnosisPage() {
               mode="multiple"
               options={USER_OPTIONS}
               placeholder="대상자 선택"
+              style={{ width: '100%' }}
+            />
+          </Form.Item>
+          <Form.Item
+            name="excludedUsers"
+            label="제외대상자"
+          >
+            <Select
+              mode="multiple"
+              options={EXCLUDE_USER_OPTIONS}
+              placeholder="제외대상자 선택"
               style={{ width: '100%' }}
             />
           </Form.Item>

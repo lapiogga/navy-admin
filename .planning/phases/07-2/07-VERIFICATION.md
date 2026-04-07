@@ -277,3 +277,35 @@ Phase 7 검증 결과 전체 1159개 테스트 통과 및 REQUIREMENTS 46개 ID 
 
 _Verified: 2026-04-06T21:50:41Z_
 _Verifier: Claude (gsd-verifier)_
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+2026-04-07 전체 18개 서브시스템 대상 req_spec 기반 GAP 수정이 적용되었다. Phase 7 소속 서브시스템(SYS03, SYS15)에 대한 변경 내역:
+
+### 적용 규칙 6개
+
+| 규칙 | 내용 | 적용 대상 |
+|------|------|----------|
+| R1 | 입력값 컬럼 반영 (CSV 입력값 → CrudForm fields) | SYS03, SYS15 |
+| R2 | 검색영역 100px SearchForm 추가 | SYS03 (15개 페이지), SYS15 |
+| R3 | 규칙/예외사항 UI 로직 반영 | SYS15 (미실시자/부재자 사유 필수 규칙) |
+| R4 | 관리자 메뉴 포함 | SYS03, SYS15 |
+| R5 | 테이블 군청색 라인 (DataTable CSS) | 전체 (공통 컴포넌트 수정) |
+| R6 | 신청자 = 군번/계급/성명 (militaryPersonColumn) | SYS03 (4개 페이지), SYS15 |
+
+### SYS03 성과관리체계
+
+- 15개 페이지에 SearchForm 추가 (검색필터 15개)
+- 4개 페이지에 militaryPersonColumn 적용 (과제담당자/입력자/평가자)
+- DataTable navy-bordered-table CSS 적용
+
+### SYS15 보안일일결산체계
+
+- SearchForm 다수 페이지 추가
+- militaryPersonColumn 적용 (보안담당자/점검자)
+- 미실시자/부재자 사유 필수 입력 규칙 UI 로직 구현
+- DataTable navy-bordered-table CSS 적용
+
+**GAP 수정 상태:** 완료 (공통 컴포넌트 + 서브시스템 개별 수정)

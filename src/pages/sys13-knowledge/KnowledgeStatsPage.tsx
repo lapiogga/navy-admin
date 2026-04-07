@@ -8,6 +8,7 @@ import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { DatePicker } from 'antd'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 const { RangePicker } = DatePicker
@@ -27,6 +28,8 @@ interface UnitStat {
 
 interface AuthorStat extends Record<string, unknown> {
   unit: string
+  serviceNumber: string
+  rank: string
   authorName: string
   count: number
   recommendCount: number
@@ -37,6 +40,8 @@ interface AuthorStat extends Record<string, unknown> {
 interface UnitListItem extends Record<string, unknown> {
   id: string
   title: string
+  serviceNumber: string
+  rank: string
   authorName: string
   authorUnit: string
   category: string
@@ -124,21 +129,29 @@ export default function KnowledgeStatsPage() {
     { title: '평균평점', dataIndex: 'avgRating', width: 100 },
   ]
 
-  // 작성자별 테이블 컬럼
+  // 작성자별 테이블 컬럼 (R6: 군번/계급/성명)
   const authorColumns: ProColumns<AuthorStat>[] = [
     { title: '부대명', dataIndex: 'unit', width: 150 },
-    { title: '작성자', dataIndex: 'authorName', width: 120 },
+    militaryPersonColumn<AuthorStat>('작성자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     { title: '작성수', dataIndex: 'count', width: 100, valueType: 'digit' },
     { title: '추천수', dataIndex: 'recommendCount', width: 100, valueType: 'digit' },
     { title: '평점', dataIndex: 'rating', width: 100 },
     { title: '조회수', dataIndex: 'viewCount', width: 100, valueType: 'digit' },
   ]
 
-  // 부대별 작성 목록 컬럼
+  // 부대별 작성 목록 컬럼 (R6: 군번/계급/성명)
   const unitListColumns: ProColumns<UnitListItem>[] = [
     { title: '부대명', dataIndex: 'authorUnit', width: 120 },
     { title: '제목', dataIndex: 'title', width: 250, ellipsis: true },
-    { title: '작성자', dataIndex: 'authorName', width: 100 },
+    militaryPersonColumn<UnitListItem>('작성자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     { title: '유형', dataIndex: 'category', width: 100 },
     { title: '등록일', dataIndex: 'createdAt', width: 120 },
     { title: '조회수', dataIndex: 'viewCount', width: 80, valueType: 'digit' },

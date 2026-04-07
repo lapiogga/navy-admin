@@ -1,6 +1,6 @@
 import { useState, useRef } from 'react'
-import { Card, Tree, Modal, Button, Form, Input, DatePicker, message, Space } from 'antd'
-import { PlusOutlined, EditOutlined, DeleteOutlined } from '@ant-design/icons'
+import { Card, Tree, Modal, Button, Form, Input, DatePicker, Upload, message, Space } from 'antd'
+import { PlusOutlined, EditOutlined, DeleteOutlined, UploadOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
@@ -11,7 +11,7 @@ import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { UnitTreeNode, UnitLineage } from '@/shared/api/mocks/handlers/sys08-unit-lineage'
 import dayjs from 'dayjs'
 
-const { TextArea: _TextArea } = Input
+const { TextArea } = Input
 
 async function fetchUnitTree(): Promise<UnitTreeNode[]> {
   const res = await apiClient.get<never, ApiResult<UnitTreeNode[]>>('/sys08/unit-tree')
@@ -71,6 +71,7 @@ export default function UnitLineageTreePage() {
     { title: '계승번호', dataIndex: 'lineageNo', width: 120 },
     { title: '부대명', dataIndex: 'unitName', width: 160 },
     { title: '창설일자', dataIndex: 'establishDate', width: 120 },
+    { title: '소재지 주소', dataIndex: 'address', width: 180, ellipsis: true },
     { title: '관련기관', dataIndex: 'relatedOrg', ellipsis: true },
     {
       title: '관리',
@@ -151,7 +152,7 @@ export default function UnitLineageTreePage() {
         </div>
       </div>
 
-      {/* 등록/수정 모달 */}
+      {/* 등록/수정 모달 - CSV 입력값 전체 반영 (R1 규칙) */}
       <Modal
         title={editTarget ? '계승관계 수정' : '계승관계 등록'}
         open={formOpen}
@@ -164,6 +165,7 @@ export default function UnitLineageTreePage() {
         okText={editTarget ? '수정' : '등록'}
         confirmLoading={saveMutation.isPending}
         destroyOnClose
+        width={650}
       >
         <Form
           form={form}
@@ -185,8 +187,31 @@ export default function UnitLineageTreePage() {
           <Form.Item name="establishDate" label="창설일자" rules={[{ required: true, message: '창설일자를 입력하세요' }]}>
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
+          <Form.Item name="relatedBasis" label="관련근거">
+            <Input />
+          </Form.Item>
+          <Form.Item name="mission" label="임무 및 기능">
+            <TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="address" label="소재지 주소">
+            <Input />
+          </Form.Item>
+          <Form.Item name="buildingStatus" label="건물현황">
+            <Input />
+          </Form.Item>
+          <Form.Item name="landScale" label="대지규모">
+            <Input />
+          </Form.Item>
           <Form.Item name="relatedOrg" label="관련기관">
             <Input />
+          </Form.Item>
+          <Form.Item name="remarks" label="기타 참고사항">
+            <TextArea rows={2} />
+          </Form.Item>
+          <Form.Item label="부대본관 사진(첨부파일)">
+            <Upload beforeUpload={() => false} maxCount={1} accept="image/*">
+              <Button icon={<UploadOutlined />}>사진 선택</Button>
+            </Upload>
           </Form.Item>
         </Form>
       </Modal>

@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 
 // 타입 정의
 export type InspProgressStatus = 'notStarted' | 'inProgress' | 'completed' | 'received'
@@ -26,7 +28,18 @@ export interface InspectionTask extends Record<string, unknown> {
   planName: string
   targetUnit: string
   managingDept: string
+  /** 담당검열관 군번 */
+  inspectorServiceNumber: string
+  /** 담당검열관 계급 */
+  inspectorRank: string
+  /** 담당검열관 성명 */
+  inspectorName: string
+  /** 공개여부 */
+  isPublic: boolean
   inspField: string
+  /** 처분종류 */
+  dispositionType: string
+  /** 주요내용 */
   taskContent: string
   dueDate: string
   progressStatus: InspProgressStatus
@@ -46,8 +59,10 @@ export interface InspActionHistory extends Record<string, unknown> {
   content: string
 }
 
-const UNITS = ['1사단', '2사단', '해병대사령부', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const INSP_FIELDS = ['전투준비태세', '교육훈련', '군수', '인사', '정보화']
+const DISPOSITION_TYPES = ['시정', '주의', '경고', '개선', '보완']
+const RANKS = ['대위', '소령', '중령', '대령', '상사', '중사']
 const PROGRESS_STATUSES: InspProgressStatus[] = ['notStarted', 'inProgress', 'completed', 'received']
 const APPROVAL_STATUSES: ApprovalStatus[] = ['pending', 'inReview', 'approved', 'rejected']
 
@@ -99,7 +114,12 @@ let tasks: InspectionTask[] = Array.from({ length: 30 }, (_, i) => {
     planName: plans[planIndex].planName,
     targetUnit: UNITS[i % UNITS.length],
     managingDept: faker.helpers.arrayElement(['작전처', '군수처', '인사처', '정보처', '교육처']),
+    inspectorServiceNumber: randomServiceNumber(),
+    inspectorRank: faker.helpers.arrayElement(RANKS),
+    inspectorName: faker.person.lastName() + faker.person.firstName(),
+    isPublic: faker.datatype.boolean(),
     inspField: INSP_FIELDS[i % INSP_FIELDS.length],
+    dispositionType: faker.helpers.arrayElement(DISPOSITION_TYPES),
     taskContent: faker.lorem.sentences(2),
     dueDate: faker.date.future({ years: 1 }).toISOString().split('T')[0],
     progressStatus,
@@ -233,15 +253,19 @@ export const sys17Handlers = [
     const inspYear = url.searchParams.get('inspYear') || ''
     const targetUnit = url.searchParams.get('targetUnit') || ''
     const taskName = url.searchParams.get('taskName') || ''
+    const taskNo = url.searchParams.get('taskNo') || ''
     const progressStatus = url.searchParams.get('progressStatus') || ''
     const inspField = url.searchParams.get('inspField') || ''
+    const managingDept = url.searchParams.get('managingDept') || ''
 
     let filtered = [...tasks]
     if (inspYear) filtered = filtered.filter((t) => plans.find((p) => p.id === t.planId)?.inspYear === inspYear)
     if (targetUnit) filtered = filtered.filter((t) => t.targetUnit === targetUnit)
     if (taskName) filtered = filtered.filter((t) => t.taskName.includes(taskName))
+    if (taskNo) filtered = filtered.filter((t) => t.taskNo.includes(taskNo))
     if (progressStatus) filtered = filtered.filter((t) => t.progressStatus === progressStatus)
     if (inspField) filtered = filtered.filter((t) => t.inspField === inspField)
+    if (managingDept) filtered = filtered.filter((t) => t.managingDept === managingDept)
 
     const result: ApiResult<PageResponse<InspectionTask>> = {
       success: true,
@@ -266,13 +290,18 @@ export const sys17Handlers = [
     const plan = plans.find((p) => p.id === body.planId)
     const newTask: InspectionTask = {
       id: `task-${Date.now()}`,
-      taskNo: `TASK-${String(tasks.length + 1).padStart(3, '0')}`,
+      taskNo: body.taskNo || `TASK-${String(tasks.length + 1).padStart(3, '0')}`,
       taskName: body.taskName || '',
       planId: body.planId || '',
       planName: plan?.planName || '',
       targetUnit: body.targetUnit || '',
       managingDept: body.managingDept || '',
+      inspectorServiceNumber: (body.inspectorServiceNumber as string) || '',
+      inspectorRank: (body.inspectorRank as string) || '',
+      inspectorName: (body.inspectorName as string) || '',
+      isPublic: (body.isPublic as boolean) ?? true,
       inspField: body.inspField || '',
+      dispositionType: (body.dispositionType as string) || '',
       taskContent: body.taskContent || '',
       dueDate: body.dueDate || '',
       progressStatus: 'notStarted',
@@ -337,13 +366,22 @@ export const sys17Handlers = [
     return HttpResponse.json(result)
   }),
 
-  // 접수대기 목록
+  // 접수대기 목록 (검색조건: 연도, 대상부대, 검열분야, 조치부대, 과제명)
   http.get('/api/sys17/approval/pending', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
+    const inspYear = url.searchParams.get('inspYear') || ''
+    const targetUnit = url.searchParams.get('targetUnit') || ''
+    const inspField = url.searchParams.get('inspField') || ''
+    const taskName = url.searchParams.get('taskName') || ''
 
-    const pending = tasks.filter((t) => t.approvalStatus === 'pending' || t.approvalStatus === 'inReview')
+    let pending = tasks.filter((t) => t.approvalStatus === 'pending' || t.approvalStatus === 'inReview')
+    if (inspYear) pending = pending.filter((t) => plans.find((p) => p.id === t.planId)?.inspYear === inspYear)
+    if (targetUnit) pending = pending.filter((t) => t.targetUnit === targetUnit)
+    if (inspField) pending = pending.filter((t) => t.inspField === inspField)
+    if (taskName) pending = pending.filter((t) => t.taskName.includes(taskName))
+
     const result: ApiResult<PageResponse<InspectionTask>> = {
       success: true,
       data: paginate(pending, page, size),

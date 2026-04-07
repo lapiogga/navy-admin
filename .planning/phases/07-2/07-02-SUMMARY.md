@@ -87,3 +87,9 @@ None - 계획대로 실행됨.
 커밋 확인:
 - 50b5728: FOUND (Task 1)
 - 3ab79e9: FOUND (Task 2)
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS15 보안일일결산체계 비밀/매체관리 페이지에 req_spec 기반 6대 규칙 적용. SearchForm 추가, militaryPersonColumn 적용 (보안담당자/점검자), DataTable navy-bordered-table CSS 적용.

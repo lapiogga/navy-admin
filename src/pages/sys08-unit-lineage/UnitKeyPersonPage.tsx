@@ -1,14 +1,19 @@
 import { useState, useRef } from 'react'
-import { Modal, Button, Form, Input, Select, DatePicker, message, Space, Timeline } from 'antd'
+import { Modal, Button, Form, Input, Select, DatePicker, Switch, message, Space, Timeline } from 'antd'
 import { PlusOutlined, EditOutlined, DeleteOutlined, HistoryOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { UnitKeyPerson, UnitKeyPersonHistory } from '@/shared/api/mocks/handlers/sys08-unit-lineage'
 import dayjs from 'dayjs'
+
+const { TextArea } = Input
 
 const CATEGORY_OPTIONS = [
   { label: '지휘관', value: '지휘관' },
@@ -32,6 +37,31 @@ const RANK_OPTIONS = [
   { label: '중사', value: '중사' },
 ]
 
+const BRANCH_OPTIONS = [
+  { label: '보병', value: '보병' },
+  { label: '포병', value: '포병' },
+  { label: '기갑', value: '기갑' },
+  { label: '공병', value: '공병' },
+  { label: '통신', value: '통신' },
+  { label: '병참', value: '병참' },
+  { label: '수송', value: '수송' },
+  { label: '정보통신', value: '정보통신' },
+]
+
+const COMMISSION_OPTIONS = [
+  { label: '학사', value: '학사' },
+  { label: '학군', value: '학군' },
+  { label: '3사', value: '3사' },
+  { label: '부사관', value: '부사관' },
+  { label: '간부후보생', value: '간부후보생' },
+]
+
+// 검색 필드 정의
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '성명', type: 'text', placeholder: '성명 검색' },
+  { name: 'category', label: '구분', type: 'select', options: CATEGORY_OPTIONS },
+]
+
 async function fetchKeyPersons(params: PageRequest & Record<string, unknown>): Promise<PageResponse<UnitKeyPerson>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<UnitKeyPerson>>>('/sys08/key-persons', { params })
   return (res as ApiResult<PageResponse<UnitKeyPerson>>).data ?? (res as unknown as PageResponse<UnitKeyPerson>)
@@ -47,6 +77,7 @@ export default function UnitKeyPersonPage() {
   const [editTarget, setEditTarget] = useState<UnitKeyPerson | undefined>()
   const [deleteTarget, setDeleteTarget] = useState<UnitKeyPerson | undefined>()
   const [historyTarget, setHistoryTarget] = useState<UnitKeyPerson | undefined>()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [form] = Form.useForm()
   const actionRef = useRef<ActionType>()
   const queryClient = useQueryClient()
@@ -87,12 +118,19 @@ export default function UnitKeyPersonPage() {
   })
 
   const columns: ProColumns<UnitKeyPerson>[] = [
-    { title: '구분', dataIndex: 'category', width: 120 },
-    { title: '성명', dataIndex: 'name', width: 120 },
-    { title: '계급', dataIndex: 'rank', width: 100 },
-    { title: '임기시작', dataIndex: 'termStart', width: 120 },
-    { title: '임기종료', dataIndex: 'termEnd', width: 120 },
-    { title: '비고', dataIndex: 'remarks', ellipsis: true },
+    { title: '구분', dataIndex: 'category', width: 100 },
+    { title: '계승번호', dataIndex: 'lineageNo', width: 100 },
+    { title: '역대', dataIndex: 'generation', width: 60 },
+    // 군번/계급/성명 컬럼 (R6 규칙)
+    militaryPersonColumn<UnitKeyPerson>('군번/계급/성명', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'name',
+    }),
+    { title: '병과', dataIndex: 'branch', width: 80 },
+    { title: '보직일자', dataIndex: 'termStart', width: 110 },
+    { title: '면직일자', dataIndex: 'termEnd', width: 110 },
+    { title: '직무대리', dataIndex: 'isActingDuty', width: 80, render: (_, r) => r.isActingDuty ? '예' : '-' },
     {
       title: '관리',
       width: 160,
@@ -129,8 +167,21 @@ export default function UnitKeyPersonPage() {
     },
   ]
 
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }
+
   return (
     <PageContainer title="주요직위자 관리">
+      {/* 검색영역 (R2 규칙) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <div style={{ marginBottom: 16 }}>
         <Button
           type="primary"
@@ -147,13 +198,13 @@ export default function UnitKeyPersonPage() {
 
       <DataTable<UnitKeyPerson>
         columns={columns}
-        request={fetchKeyPersons}
+        request={(params) => fetchKeyPersons({ ...params, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle="주요직위자 목록"
       />
 
-      {/* 등록/수정 모달 */}
+      {/* 등록/수정 모달 - CSV 입력값 전체 반영 (R1 규칙) */}
       <Modal
         title={editTarget ? '주요직위자 수정' : '주요직위자 등록'}
         open={formOpen}
@@ -166,6 +217,7 @@ export default function UnitKeyPersonPage() {
         okText={editTarget ? '수정' : '등록'}
         confirmLoading={saveMutation.isPending}
         destroyOnClose
+        width={700}
       >
         <Form
           form={form}
@@ -179,20 +231,50 @@ export default function UnitKeyPersonPage() {
             saveMutation.mutate(payload)
           }}
         >
-          <Form.Item name="category" label="구분" rules={[{ required: true, message: '구분을 선택하세요' }]}>
+          <Form.Item name="category" label="주요직위자 구분" rules={[{ required: true, message: '구분을 선택하세요' }]}>
             <Select options={CATEGORY_OPTIONS} />
           </Form.Item>
-          <Form.Item name="name" label="성명" rules={[{ required: true, message: '성명을 입력하세요' }]}>
+          <Form.Item name="lineageNo" label="계승번호">
+            <Input />
+          </Form.Item>
+          <Form.Item name="generation" label="역대">
+            <Input />
+          </Form.Item>
+          <Form.Item name="serviceNumber" label="군번" rules={[{ required: true, message: '군번을 입력하세요' }]}>
+            <Input placeholder="예: 12-345678" />
+          </Form.Item>
+          <Form.Item name="name" label="성명(한글)" rules={[{ required: true, message: '성명을 입력하세요' }]}>
+            <Input />
+          </Form.Item>
+          <Form.Item name="nameHanja" label="성명(한자)">
             <Input />
           </Form.Item>
           <Form.Item name="rank" label="계급" rules={[{ required: true, message: '계급을 선택하세요' }]}>
             <Select options={RANK_OPTIONS} />
           </Form.Item>
-          <Form.Item name="termStart" label="임기시작" rules={[{ required: true, message: '임기시작을 입력하세요' }]}>
+          <Form.Item name="position" label="직책">
+            <Input />
+          </Form.Item>
+          <Form.Item name="branch" label="병과">
+            <Select options={BRANCH_OPTIONS} allowClear />
+          </Form.Item>
+          <Form.Item name="commissionType" label="임관구분">
+            <Select options={COMMISSION_OPTIONS} allowClear />
+          </Form.Item>
+          <Form.Item name="termStart" label="보직일자" rules={[{ required: true, message: '보직일자를 입력하세요' }]}>
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
-          <Form.Item name="termEnd" label="임기종료">
+          <Form.Item name="termEnd" label="면직일자">
             <DatePicker style={{ width: '100%' }} />
+          </Form.Item>
+          <Form.Item name="isActingDuty" label="직무대리 여부" valuePropName="checked">
+            <Switch checkedChildren="예" unCheckedChildren="아니오" />
+          </Form.Item>
+          <Form.Item name="motto" label="지휘관 표어">
+            <Input />
+          </Form.Item>
+          <Form.Item name="policy" label="지휘관 방침">
+            <TextArea rows={2} />
           </Form.Item>
           <Form.Item name="remarks" label="비고">
             <Input />
@@ -215,7 +297,7 @@ export default function UnitKeyPersonPage() {
             items={historyData?.map((h) => ({
               children: (
                 <div>
-                  <strong>{h.name}</strong> ({h.rank} / {h.category})
+                  <strong>{h.serviceNumber}</strong> / {h.rank} / {h.name} ({h.category})
                   <br />
                   임기: {h.termStart} ~ {h.termEnd}
                   <br />

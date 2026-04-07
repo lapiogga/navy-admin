@@ -1,11 +1,14 @@
-import { useState } from 'react'
-import { Modal, Button, message, Select } from 'antd'
+import { useState, useCallback } from 'react'
+import { Modal, Button, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { CombatReview } from '@/shared/api/mocks/handlers/sys09'
@@ -54,6 +57,23 @@ const MILITARY_TYPE_OPTIONS = [
   { label: '공군', value: '공군' },
 ]
 
+const COMBAT_CATEGORY_OPTIONS = [
+  { label: '전투상이', value: '전투상이' },
+  { label: '공무상이', value: '공무상이' },
+  { label: '교육훈련상이', value: '교육훈련상이' },
+  { label: '직무수행상이', value: '직무수행상이' },
+]
+
+// CSV 검색조건: 군구분, 군번, 성명, 주민번호(생년월일), 계급, 소속
+const searchFields: SearchField[] = [
+  { name: 'militaryType', label: '군구분', type: 'select', options: MILITARY_TYPE_OPTIONS },
+  { name: 'serviceNumber', label: '군번', type: 'text', placeholder: '군번 입력' },
+  { name: 'name', label: '성명', type: 'text', placeholder: '성명 입력' },
+  { name: 'residentNumber', label: '주민번호', type: 'text', placeholder: '생년월일 6자리' },
+  { name: 'rank', label: '계급', type: 'select', options: RANK_OPTIONS },
+  { name: 'unit', label: '소속', type: 'select', options: UNIT_OPTIONS },
+]
+
 type FormValues = {
   reviewRound: string
   reviewDate: string
@@ -63,9 +83,11 @@ type FormValues = {
   enlistDate: string
   rank: string
   unit: string
+  diseaseName: string
   incidentType: string
   incidentDate: string
   incidentCause: string
+  combatCategory: string
   result: string
   resultDetail: string
   remarks: string
@@ -119,6 +141,15 @@ export default function ReviewPage() {
     },
   })
 
+  // 검색 처리
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }, [])
+
+  const handleSearchReset = useCallback(() => {
+    setSearchParams({})
+  }, [])
+
   const columns: ProColumns<CombatReview>[] = [
     {
       title: '심사차수',
@@ -132,11 +163,13 @@ export default function ReviewPage() {
       width: 120,
       sorter: true,
     },
+    // R6: 군번/계급/성명 동시 표시
     {
-      title: '성명',
-      dataIndex: 'name',
-      width: 100,
-      sorter: true,
+      ...militaryPersonColumn<CombatReview>('대상자', {
+        serviceNumber: 'serviceNumber',
+        rank: 'rank',
+        name: 'name',
+      }),
       render: (_, record) => (
         <a
           onClick={() => {
@@ -144,26 +177,26 @@ export default function ReviewPage() {
             setModalOpen(true)
           }}
         >
-          {record.name}
+          {`${record.serviceNumber} / ${record.rank} / ${record.name}`}
         </a>
       ),
-    },
-    {
-      title: '군번',
-      dataIndex: 'serviceNumber',
-      width: 120,
-      sorter: true,
-    },
-    {
-      title: '계급',
-      dataIndex: 'rank',
-      width: 80,
-      sorter: true,
     },
     {
       title: '소속',
       dataIndex: 'unit',
       width: 150,
+      sorter: true,
+    },
+    {
+      title: '병명',
+      dataIndex: 'diseaseName',
+      width: 150,
+      sorter: true,
+    },
+    {
+      title: '전공상 분류',
+      dataIndex: 'combatCategory',
+      width: 120,
       sorter: true,
     },
     {
@@ -204,6 +237,7 @@ export default function ReviewPage() {
     },
   ]
 
+  // CSV 입력값: 심사차수, 심사일자, 성명, 군번, 주민번호, 입대일자, 소속, 병명, 소속부대 심사결과, 전공상 분류
   const formFields = [
     { name: 'reviewRound', label: '심사차수', type: 'text' as const, required: true, placeholder: '예: 제1차' },
     { name: 'reviewDate', label: '심사일자', type: 'date' as const, required: true },
@@ -213,10 +247,12 @@ export default function ReviewPage() {
     { name: 'enlistDate', label: '입대일자', type: 'date' as const, required: true },
     { name: 'rank', label: '계급', type: 'select' as const, required: true, options: RANK_OPTIONS },
     { name: 'unit', label: '소속', type: 'select' as const, required: true, options: UNIT_OPTIONS },
+    { name: 'diseaseName', label: '병명', type: 'text' as const },
     { name: 'incidentType', label: '사고유형', type: 'select' as const, required: true, options: INCIDENT_TYPE_OPTIONS },
     { name: 'incidentDate', label: '사고일자', type: 'date' as const, required: true },
     { name: 'incidentCause', label: '사고원인', type: 'textarea' as const, required: true },
-    { name: 'result', label: '심사결과', type: 'select' as const, required: true, options: RESULT_OPTIONS },
+    { name: 'combatCategory', label: '전공상 분류', type: 'select' as const, options: COMBAT_CATEGORY_OPTIONS },
+    { name: 'result', label: '소속부대 심사결과', type: 'select' as const, required: true, options: RESULT_OPTIONS },
     { name: 'resultDetail', label: '결과 상세', type: 'textarea' as const },
     { name: 'remarks', label: '비고', type: 'textarea' as const },
   ]
@@ -231,29 +267,8 @@ export default function ReviewPage() {
 
   return (
     <PageContainer title="전공사상심사 관리">
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <Select
-          placeholder="군구분"
-          allowClear
-          style={{ width: 120 }}
-          options={MILITARY_TYPE_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, militaryType: val }))}
-        />
-        <Select
-          placeholder="계급"
-          allowClear
-          style={{ width: 120 }}
-          options={RANK_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, rank: val }))}
-        />
-        <Select
-          placeholder="소속"
-          allowClear
-          style={{ width: 160 }}
-          options={UNIT_OPTIONS}
-          onChange={(val) => setSearchParams((prev) => ({ ...prev, unit: val }))}
-        />
-      </div>
+      {/* R2: CSV 검색조건 반영 SearchForm */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<CombatReview>
         queryKey="sys09/reviews"
         requestFn={(params) => fetchReviews({ ...params, ...searchParams })}

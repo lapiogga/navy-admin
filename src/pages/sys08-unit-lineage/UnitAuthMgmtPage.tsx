@@ -6,6 +6,8 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useRef } from 'react'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
@@ -19,7 +21,19 @@ const STATUS_COLOR_MAP: Record<string, string> = {
   반려: 'red',
 }
 
-async function fetchAuthRequests(params: PageRequest): Promise<PageResponse<UnitAuthRequest>> {
+// 검색 필드 정의 (R2 규칙)
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '검색어', type: 'text', placeholder: '관리부대/요청권한 검색' },
+  {
+    name: 'status', label: '상태', type: 'select', options: [
+      { label: '신청', value: '신청' },
+      { label: '승인', value: '승인' },
+      { label: '반려', value: '반려' },
+    ],
+  },
+]
+
+async function fetchAuthRequests(params: PageRequest & Record<string, unknown>): Promise<PageResponse<UnitAuthRequest>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<UnitAuthRequest>>>('/sys08/auth-mgmt', { params })
   return (res as ApiResult<PageResponse<UnitAuthRequest>>).data ?? (res as unknown as PageResponse<UnitAuthRequest>)
 }
@@ -27,6 +41,7 @@ async function fetchAuthRequests(params: PageRequest): Promise<PageResponse<Unit
 export default function UnitAuthMgmtPage() {
   const [rejectTarget, setRejectTarget] = useState<UnitAuthRequest | undefined>()
   const [rejectReason, setRejectReason] = useState('')
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const actionRef = useRef<ActionType>()
   const queryClient = useQueryClient()
 
@@ -59,6 +74,7 @@ export default function UnitAuthMgmtPage() {
   const columns: ProColumns<UnitAuthRequest>[] = [
     { title: '관리부대', dataIndex: 'requestUnit', width: 150 },
     { title: '요청권한', dataIndex: 'requestRole', width: 130 },
+    { title: '군 전화번호', dataIndex: 'milPhone', width: 120 },
     { title: '사유', dataIndex: 'reason', ellipsis: true },
     {
       title: '상태',
@@ -101,11 +117,24 @@ export default function UnitAuthMgmtPage() {
     },
   ]
 
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }
+
   return (
     <PageContainer title="권한관리">
+      {/* 검색영역 (R2 규칙) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<UnitAuthRequest>
         columns={columns}
-        request={fetchAuthRequests}
+        request={(params) => fetchAuthRequests({ ...params, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle="권한신청 목록"

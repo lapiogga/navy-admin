@@ -127,3 +127,9 @@ board.test.ts 8개 테스트 포함 전체 테스트 통과.
 - [x] `navy-admin/src/pages/common/board/BoardUnitPage.tsx` — FOUND
 - [x] Commit d9c2fec — FOUND
 - [x] Commit caa1536 — FOUND
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 04 (공통게시판) 화면은 직접 수정 대상 아님. CrudForm에 `file` 타입(ProFormUploadButton)이 추가되어 게시판 첨부파일 필드에 활용 가능. DataTable/SearchForm CSS 자동 적용.

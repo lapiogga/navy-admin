@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 
 // 타입 정의
 export type SecurityLevel = 'secret' | 'confidential' | 'normal'
@@ -25,6 +27,20 @@ export interface MilDocument extends Record<string, unknown> {
   attachFile: string
   remarks: string
   storageLocation: string
+  // CSV 입력값 추가 필드
+  managementNumber: string       // 관리번호
+  storagePosition: string        // 보관위치
+  docDate: string                // 문서일자
+  transferDept: string           // 이관부서
+  issueDept: string              // 발행부서
+  docSpec: string                // 문서규격
+  docFormat: string              // 문서형태
+  notice: string                 // 예고문
+  changeReason: string           // 문서상태 변경근거
+  usageFormat: string            // 활용형태
+  transferNumber: string         // 이관번호
+  transferYear: string           // 이관년도
+  retentionCategory: string      // 보존기간 구분
 }
 
 export interface MilDocUsage extends Record<string, unknown> {
@@ -35,10 +51,12 @@ export interface MilDocUsage extends Record<string, unknown> {
   securityLevel: SecurityLevel
   userName: string
   militaryId: string
+  serviceNumber: string          // 군번 (militaryPersonColumn용)
   rank: string
   position: string
   unit: string
-  phone: string
+  phone: string                  // 휴대전화
+  milPhone: string               // 군전화
   usagePurpose: string
   usageDate: string
   returnDueDate: string
@@ -58,9 +76,16 @@ export interface HaegidanDoc extends Record<string, unknown> {
   securityLevel: SecurityLevel
   publishYear: string
   storageLocation: string
+  cabinetLocation: string        // 캐비넷 보관위치
   pages: number
   registeredAt: string
   remarks: string
+  // 관리자 정보 (CSV: 관리자 군번, 성명, 계급, 직책)
+  managerServiceNumber: string
+  managerName: string
+  managerRank: string
+  managerTitle: string
+  manageDept: string             // 관리부서
 }
 
 export interface EvaluationItem extends Record<string, unknown> {
@@ -74,14 +99,19 @@ export interface EvaluationItem extends Record<string, unknown> {
   newRetentionDate?: string
 }
 
-const STORAGE_TYPES = ['금고보관', '서가보관', '전산보관']
+const STORAGE_TYPES = ['이관비밀', '존안비밀', '군사자료']
 const DOC_TYPES = ['훈령', '예규', '지시', '일반문서', '보고서']
 const STORAGE_LOCATIONS = ['본부 비밀취급소', '1사단 보관소', '2사단 보관소', '교육훈련단']
+const STORAGE_POSITIONS = ['A-01', 'A-02', 'B-01', 'B-02', 'C-01']
 const DEPARTMENTS = ['작전처', '정보처', '인사처', '군수처', '기획처']
-const UNITS = ['해병대사령부', '1사단', '2사단', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '원사', '상사']
 const POSITIONS = ['참모장', '처장', '과장', '팀장', '실무자']
 const DATA_TYPES = ['전술교범', '기술교범', '훈련교재', '연구자료', '참고자료']
+const DOC_SPECS = ['A4', 'B4', 'A3', 'B5', '기타']
+const DOC_FORMATS = ['원본', '사본', '전자문서', '마이크로필름']
+const USAGE_FORMATS = ['대출', '열람', '지출']
+const RETENTION_CATEGORIES = ['10년 이하', '10년 초과']
 
 // 오늘 기준 과거 2년 내 날짜
 function pastDate(years = 2): string {
@@ -99,6 +129,7 @@ function retentionExpireDate(isExpired = false): string {
 // Mock 데이터: 군사자료 30건
 let milDocuments: MilDocument[] = Array.from({ length: 30 }, (_, i) => {
   const expired = i < 8 // 8건은 보존기간 만료
+  const transferYr = String(2020 + (i % 5))
   return {
     id: `doc-${i + 1}`,
     securityLevel: (['secret', 'confidential', 'normal'] as SecurityLevel[])[i % 3],
@@ -116,6 +147,20 @@ let milDocuments: MilDocument[] = Array.from({ length: 30 }, (_, i) => {
     attachFile: `attachment_${i + 1}.pdf`,
     remarks: faker.lorem.sentence(),
     storageLocation: STORAGE_LOCATIONS[i % STORAGE_LOCATIONS.length],
+    // CSV 추가 필드
+    managementNumber: `MGT-${transferYr}-${String(i + 1).padStart(3, '0')}`,
+    storagePosition: STORAGE_POSITIONS[i % STORAGE_POSITIONS.length],
+    docDate: pastDate(2),
+    transferDept: DEPARTMENTS[i % DEPARTMENTS.length],
+    issueDept: DEPARTMENTS[(i + 1) % DEPARTMENTS.length],
+    docSpec: DOC_SPECS[i % DOC_SPECS.length],
+    docFormat: DOC_FORMATS[i % DOC_FORMATS.length],
+    notice: i % 4 === 0 ? faker.lorem.sentence() : '',
+    changeReason: i % 5 === 0 ? faker.lorem.sentence() : '',
+    usageFormat: USAGE_FORMATS[i % USAGE_FORMATS.length],
+    transferNumber: `TRF-${transferYr}-${String(i + 1).padStart(3, '0')}`,
+    transferYear: transferYr,
+    retentionCategory: RETENTION_CATEGORIES[i % RETENTION_CATEGORIES.length],
   }
 })
 
@@ -131,11 +176,13 @@ let milUsages: MilDocUsage[] = Array.from({ length: 20 }, (_, i) => {
     docTitle: doc.title,
     securityLevel: doc.securityLevel,
     userName: faker.person.fullName(),
-    militaryId: faker.string.numeric(8),
+    militaryId: randomServiceNumber(),
+    serviceNumber: randomServiceNumber(),
     rank: RANKS[i % RANKS.length],
     position: POSITIONS[i % POSITIONS.length],
     unit: UNITS[i % UNITS.length],
     phone: `010-${faker.string.numeric(4)}-${faker.string.numeric(4)}`,
+    milPhone: `042-${faker.string.numeric(3)}-${faker.string.numeric(4)}`,
     usagePurpose: faker.lorem.sentence(),
     usageDate: pastDate(),
     returnDueDate: faker.date.future({ years: 0.1 }).toISOString().split('T')[0],
@@ -157,9 +204,16 @@ let haegidanDocs: HaegidanDoc[] = Array.from({ length: 20 }, (_, i) => ({
   securityLevel: (['secret', 'confidential', 'normal'] as SecurityLevel[])[i % 3],
   publishYear: String(2020 + (i % 5)),
   storageLocation: STORAGE_LOCATIONS[i % STORAGE_LOCATIONS.length],
+  cabinetLocation: `캐비넷-${String.fromCharCode(65 + (i % 5))}-${(i % 3) + 1}`,
   pages: faker.number.int({ min: 20, max: 300 }),
   registeredAt: pastDate(),
   remarks: faker.lorem.sentence(),
+  // 관리자 정보
+  managerServiceNumber: randomServiceNumber(),
+  managerName: faker.person.fullName(),
+  managerRank: RANKS[i % RANKS.length],
+  managerTitle: POSITIONS[i % POSITIONS.length],
+  manageDept: DEPARTMENTS[i % DEPARTMENTS.length],
 }))
 
 // 변경이력 Mock
@@ -195,11 +249,29 @@ export const sys07Handlers = [
     const securityLevel = url.searchParams.get('securityLevel')
     const keyword = url.searchParams.get('keyword')
     const status = url.searchParams.get('status')
+    const storageType = url.searchParams.get('storageType')
+    const docType = url.searchParams.get('docType')
+    const retentionCategory = url.searchParams.get('retentionCategory')
+    const transferYear = url.searchParams.get('transferYear')
+    const transferNumber = url.searchParams.get('transferNumber')
+    const issueDept = url.searchParams.get('issueDept')
+    const transferDept = url.searchParams.get('transferDept')
+    const docNumber = url.searchParams.get('docNumber')
+    const storageLocation = url.searchParams.get('storageLocation')
 
     let filtered = milDocuments
     if (securityLevel) filtered = filtered.filter((d) => d.securityLevel === securityLevel)
     if (keyword) filtered = filtered.filter((d) => d.title.includes(keyword) || d.author.includes(keyword))
     if (status) filtered = filtered.filter((d) => d.status === status)
+    if (storageType) filtered = filtered.filter((d) => d.storageType === storageType)
+    if (docType) filtered = filtered.filter((d) => d.docType === docType)
+    if (retentionCategory) filtered = filtered.filter((d) => d.retentionCategory === retentionCategory)
+    if (transferYear) filtered = filtered.filter((d) => d.transferYear === transferYear)
+    if (transferNumber) filtered = filtered.filter((d) => d.transferNumber.includes(transferNumber))
+    if (issueDept) filtered = filtered.filter((d) => d.issueDept === issueDept)
+    if (transferDept) filtered = filtered.filter((d) => d.transferDept === transferDept)
+    if (docNumber) filtered = filtered.filter((d) => d.docNumber.includes(docNumber))
+    if (storageLocation) filtered = filtered.filter((d) => d.storageLocation === storageLocation)
 
     const result: ApiResult<PageResponse<MilDocument>> = {
       code: 'SUCCESS',
@@ -357,6 +429,7 @@ export const sys07Handlers = [
   // 활용 신청
   http.post('/api/sys07/usages', async ({ request }) => {
     const body = (await request.json()) as Partial<MilDocUsage>
+    const svcNum = (body.serviceNumber as string) ?? (body.militaryId as string) ?? ''
     const newUsage: MilDocUsage = {
       id: `usage-${Date.now()}`,
       usageType: (body.usageType as UsageType) ?? 'view',
@@ -364,11 +437,13 @@ export const sys07Handlers = [
       docTitle: (body.docTitle as string) ?? '',
       securityLevel: (body.securityLevel as SecurityLevel) ?? 'normal',
       userName: (body.userName as string) ?? '',
-      militaryId: (body.militaryId as string) ?? '',
+      militaryId: svcNum,
+      serviceNumber: svcNum,
       rank: (body.rank as string) ?? '',
       position: (body.position as string) ?? '',
       unit: (body.unit as string) ?? '',
       phone: (body.phone as string) ?? '',
+      milPhone: (body.milPhone as string) ?? '',
       usagePurpose: (body.usagePurpose as string) ?? '',
       usageDate: new Date().toISOString().split('T')[0],
       returnDueDate: (body.returnDueDate as string) ?? '',
@@ -493,10 +568,14 @@ export const sys07Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const department = url.searchParams.get('department')
     const keyword = url.searchParams.get('keyword')
+    const managerPosition = url.searchParams.get('managerPosition')
+    const fileFolder = url.searchParams.get('fileFolder')
 
     let filtered = haegidanDocs
     if (department) filtered = filtered.filter((d) => d.department === department)
     if (keyword) filtered = filtered.filter((d) => d.title.includes(keyword))
+    if (managerPosition) filtered = filtered.filter((d) => d.managerPosition.includes(managerPosition))
+    if (fileFolder) filtered = filtered.filter((d) => d.fileFolder.includes(fileFolder))
 
     const result: ApiResult<PageResponse<HaegidanDoc>> = {
       code: 'SUCCESS',
@@ -525,9 +604,15 @@ export const sys07Handlers = [
       securityLevel: (body.securityLevel as SecurityLevel) ?? 'normal',
       publishYear: (body.publishYear as string) ?? String(new Date().getFullYear()),
       storageLocation: (body.storageLocation as string) ?? '',
+      cabinetLocation: (body.cabinetLocation as string) ?? '',
       pages: (body.pages as number) ?? 0,
       registeredAt: new Date().toISOString().split('T')[0],
       remarks: (body.remarks as string) ?? '',
+      managerServiceNumber: (body.managerServiceNumber as string) ?? '',
+      managerName: (body.managerName as string) ?? '',
+      managerRank: (body.managerRank as string) ?? '',
+      managerTitle: (body.managerTitle as string) ?? '',
+      manageDept: (body.manageDept as string) ?? '',
     }
     haegidanDocs = [...haegidanDocs, newDoc]
     return HttpResponse.json({ code: 'SUCCESS', message: '등록 성공', data: newDoc })

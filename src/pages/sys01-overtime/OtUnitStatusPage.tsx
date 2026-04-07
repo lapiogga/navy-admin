@@ -5,9 +5,23 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
 import { Column, Bar } from '@ant-design/charts'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtUnitStatus, OtAbsence } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 부대 근무현황 검색 필드 */
+const unitStatusSearchFields: SearchField[] = [
+  { name: 'unitName', label: '부대(서)', type: 'select', options: [
+    { label: '전체', value: '' },
+    { label: '1함대', value: '1함대' },
+    { label: '2함대', value: '2함대' },
+    { label: '3함대', value: '3함대' },
+    { label: '해군사령부', value: '해군사령부' },
+  ]},
+  { name: 'month', label: '기간', type: 'date' },
+]
 
 const UNIT_OPTIONS = [
   { label: '전체', value: '' },
@@ -54,9 +68,8 @@ function UnitStatusTab() {
 
   return (
     <div>
-      <div style={{ marginBottom: 12, display: 'flex', gap: 8 }}>
-        <Select options={UNIT_OPTIONS} defaultValue="" style={{ width: 160 }} placeholder="부대(서) 선택" />
-        <Button type="primary">조회</Button>
+      <SearchForm fields={unitStatusSearchFields} onSearch={(values) => console.log('검색:', values)} />
+      <div style={{ marginBottom: 12, textAlign: 'right' }}>
         <Button icon={<DownloadOutlined />} onClick={() => void message.success('엑셀 저장이 완료되었습니다.')}>
           엑셀저장
         </Button>

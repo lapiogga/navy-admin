@@ -12,6 +12,9 @@ import type { UploadFile } from 'antd/es/upload'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
 const { Text, Title } = Typography
@@ -22,6 +25,8 @@ interface Suggestion extends Record<string, unknown> {
   title: string
   content: string
   authorName: string
+  serviceNumber: string
+  rank: string
   authorUnit: string
   authorPosition?: string
   authorPhone?: string
@@ -79,15 +84,47 @@ const CRUD_FIELDS = [
 const MOCK_USER = {
   authorUnit: '해병대사령부',
   authorName: '홍길동',
-  authorPosition: '대위',
+  serviceNumber: 'M-20260001',
+  rank: '대위',
+  authorPosition: '과장',
   authorPhone: '010-1234-5678',
 }
 
-async function fetchSuggestions(params: PageRequest & { keyword?: string }): Promise<PageResponse<Suggestion>> {
+// CSV 스펙: 진행상태 옵션
+const STATUS_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '등록', value: 'registered' },
+  { label: '접수', value: 'received' },
+  { label: '진행', value: 'processing' },
+  { label: '완료', value: 'completed' },
+  { label: '반려', value: 'rejected' },
+]
+
+// CSV 스펙: 조치유형 옵션 (정책반영, 업무추진, 기추진, 업무참고)
+const ACTION_TYPE_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '정책반영', value: '정책반영' },
+  { label: '업무추진', value: '업무추진' },
+  { label: '기추진', value: '기추진' },
+  { label: '업무참고', value: '업무참고' },
+]
+
+// 검색 파라미터 확장: 제목, 작성자, 진행상태, 조치유형
+interface SuggestionSearchParams extends PageRequest {
+  keyword?: string
+  status?: string
+  actionType?: string
+  author?: string
+}
+
+async function fetchSuggestions(params: SuggestionSearchParams): Promise<PageResponse<Suggestion>> {
   const qs = new URLSearchParams({
     page: String(params.page),
     size: String(params.size),
     ...(params.keyword ? { keyword: params.keyword } : {}),
+    ...(params.status ? { status: params.status } : {}),
+    ...(params.actionType ? { actionType: params.actionType } : {}),
+    ...(params.author ? { author: params.author } : {}),
   })
   const res = await fetch(`/api/sys14/suggestions?${qs}`)
   const json: ApiResult<PageResponse<Suggestion>> = await res.json()
@@ -145,10 +182,11 @@ export default function SuggestionListPage() {
   const [selectedId, setSelectedId] = useState<string | null>(null)
   const [editTarget, setEditTarget] = useState<Suggestion | null>(null)
 
-  // G19: 상태 관리
+  // 상태 관리
   const [newStatus, setNewStatus] = useState<string>('registered')
   const [actionType, setActionType] = useState<string | undefined>(undefined)
   const [actionDateVal, setActionDateVal] = useState<Dayjs | null>(null)
+  const [assignedDeptVal, setAssignedDeptVal] = useState('')
 
   // G20: 반려사유 모달
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
@@ -165,8 +203,8 @@ export default function SuggestionListPage() {
   // G26: 엑셀 출력 로딩
   const [excelLoading, setExcelLoading] = useState(false)
 
-  // 검색 키워드
-  const [keyword, setKeyword] = useState('')
+  // 검색 파라미터
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const actionRef = useRef<ActionType>(null)
 
   const queryClient = useQueryClient()
@@ -269,6 +307,7 @@ export default function SuggestionListPage() {
       queryClient.invalidateQueries({ queryKey: ['sys14'] })
       setActionType(undefined)
       setActionDateVal(null)
+      setAssignedDeptVal('')
       setRejectReason('')
     },
   })
@@ -315,18 +354,19 @@ export default function SuggestionListPage() {
     },
   })
 
-  // G20: 상태 변경 핸들러 - 반려 시 모달로 사유 입력
+  // 상태 변경 핸들러 - 반려 시 모달로 사유 입력
   function handleStatusChange() {
-    // 반려 선택 시 반려사유 모달 표시
-    if (actionType === '반려') {
+    // 반려 상태 선택 시 반려사유 모달 표시
+    if (newStatus === 'rejected') {
       setRejectModalOpen(true)
       return
     }
-    const body: { status: string; actionType?: string; actionDate?: string } = {
+    const body: { status: string; actionType?: string; actionDate?: string; assignedDept?: string } = {
       status: newStatus,
     }
     if (actionType) body.actionType = actionType
     if (actionDateVal) body.actionDate = actionDateVal.format('YYYY-MM-DD')
+    if (assignedDeptVal) body.assignedDept = assignedDeptVal
     statusMutation.mutate(body)
   }
 
@@ -338,8 +378,6 @@ export default function SuggestionListPage() {
     }
     statusMutation.mutate({
       status: 'rejected',
-      actionType: '반려',
-      actionDate: actionDateVal ? actionDateVal.format('YYYY-MM-DD') : undefined,
       rejectReason,
     })
     setRejectModalOpen(false)
@@ -360,10 +398,18 @@ export default function SuggestionListPage() {
     setEditCommentText(item.content)
   }
 
-  // G17-G19: 컬럼 정의 (확장)
+  // R2: 검색 필드 정의 (제목, 작성자, 진행상태, 조치유형)
+  const searchFields: SearchField[] = [
+    { name: 'title', label: '제목', type: 'text' },
+    { name: 'author', label: '작성자', type: 'text' },
+    { name: 'status', label: '진행상태', type: 'select', options: STATUS_OPTIONS },
+    { name: 'actionType', label: '조치유형', type: 'select', options: ACTION_TYPE_OPTIONS },
+  ]
+
+  // CSV 스펙: 순번, 제목, 제언자, 작성일, 진행상태, 담당부서, 조치일, 조치유형
   const columns: ProColumns<Suggestion>[] = [
     {
-      // G18: 연도별 순번 형식
+      // 연도별 순번 형식 (ex: 2026-1, 2026-2)
       title: '순번',
       width: 100,
       render: (_, record, index) => {
@@ -372,11 +418,14 @@ export default function SuggestionListPage() {
       },
     },
     { title: '제목', dataIndex: 'title', ellipsis: true },
-    { title: '작성자', dataIndex: 'authorName', width: 100 },
-    { title: '소속', dataIndex: 'authorUnit', width: 100 },
+    // R6: 제언자 컬럼 - 군번/계급/성명
+    militaryPersonColumn<Suggestion>('제언자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     { title: '작성일', dataIndex: 'createdAt', width: 110 },
     {
-      // G19: 4단계 진행상태
       title: '진행상태',
       dataIndex: 'status',
       width: 100,
@@ -388,35 +437,38 @@ export default function SuggestionListPage() {
         />
       ),
     },
-    // G17: 담당부서, 조치일, 조치유형 컬럼 추가
     { title: '담당부서', dataIndex: 'assignedDept', width: 100 },
     { title: '조치일', dataIndex: 'actionDate', width: 110 },
     { title: '조치유형', dataIndex: 'actionType', width: 100 },
-    { title: '추천', dataIndex: 'recommendCount', width: 70 },
   ]
 
   return (
     <PageContainer title="제언확인">
-      {/* 검색 영역 */}
-      <Space style={{ marginBottom: 16 }}>
-        <Input.Search
-          placeholder="제목, 내용, 작성자 검색"
-          allowClear
-          enterButton="검색"
-          style={{ width: 320 }}
-          onSearch={(value) => {
-            setKeyword(value)
-            actionRef.current?.reload()
-          }}
-        />
-      </Space>
+      {/* R2: 검색영역 - 제목, 작성자, 진행상태, 조치유형 */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
 
       <DataTable<Suggestion>
         columns={columns}
         rowKey="id"
         actionRef={actionRef}
         request={async (params) => {
-          const result = await fetchSuggestions({ ...params, keyword })
+          const result = await fetchSuggestions({
+            ...params,
+            keyword: searchParams.title as string,
+            author: searchParams.author as string,
+            status: searchParams.status as string,
+            actionType: searchParams.actionType as string,
+          })
           return result
         }}
         headerTitle="제언 목록"
@@ -567,6 +619,9 @@ export default function SuggestionListPage() {
                 />
               </Descriptions.Item>
               <Descriptions.Item label="작성일">{detail.createdAt}</Descriptions.Item>
+              <Descriptions.Item label="담당부서">{detail.assignedDept || '-'}</Descriptions.Item>
+              <Descriptions.Item label="조치유형">{detail.actionType || '-'}</Descriptions.Item>
+              <Descriptions.Item label="조치일">{detail.actionDate || '-'}</Descriptions.Item>
               <Descriptions.Item label="내용" span={2}>
                 <Text>{detail.content}</Text>
               </Descriptions.Item>
@@ -612,6 +667,7 @@ export default function SuggestionListPage() {
             <Space direction="vertical" style={{ width: '100%' }}>
               <Text strong>상태 관리</Text>
               <Space wrap>
+                {/* CSV 스펙: 진행상태 (등록, 접수, 진행, 완료, 반려) */}
                 <Select
                   value={newStatus}
                   onChange={setNewStatus}
@@ -621,9 +677,10 @@ export default function SuggestionListPage() {
                     { label: '접수', value: 'received' },
                     { label: '진행', value: 'processing' },
                     { label: '완료', value: 'completed' },
+                    { label: '반려', value: 'rejected' },
                   ]}
                 />
-                {/* G19: 조치유형 선택 시 조치일 DatePicker 연동 */}
+                {/* CSV 스펙: 조치유형 (정책반영, 업무추진, 기추진, 업무참고) */}
                 <Select
                   value={actionType}
                   onChange={setActionType}
@@ -631,19 +688,27 @@ export default function SuggestionListPage() {
                   allowClear
                   style={{ width: 120 }}
                   options={[
-                    { label: '시정', value: '시정' },
-                    { label: '개선', value: '개선' },
-                    { label: '검토완료', value: '검토완료' },
-                    { label: '반려', value: '반려' },
+                    { label: '정책반영', value: '정책반영' },
+                    { label: '업무추진', value: '업무추진' },
+                    { label: '기추진', value: '기추진' },
+                    { label: '업무참고', value: '업무참고' },
                   ]}
                 />
-                {actionType && actionType !== '반려' && (
+                {/* 조치유형 선택 시 조치일 DatePicker 연동 */}
+                {actionType && (
                   <DatePicker
                     value={actionDateVal}
                     onChange={setActionDateVal}
                     placeholder="조치일"
                   />
                 )}
+                {/* 담당부서 입력 */}
+                <Input
+                  value={assignedDeptVal}
+                  onChange={(e) => setAssignedDeptVal(e.target.value)}
+                  placeholder="담당부서"
+                  style={{ width: 120 }}
+                />
                 <Button type="primary" onClick={handleStatusChange}>변경</Button>
               </Space>
             </Space>

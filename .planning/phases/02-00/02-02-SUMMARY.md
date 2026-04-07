@@ -85,3 +85,9 @@ None — 플랜에 정의된 코드를 정확히 구현했다.
 - [x] `navy-admin/src/features/auth/hooks/useSessionCheck.test.ts` — 존재, 14 tests PASS
 - [x] commit b120f8f — feat(02-02): useSessionCheck Idle 이중 타이머 리팩토링
 - [x] commit e96f63c — feat(02-02): RequireAuth SessionWarningModal 연동
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 02 (세션관리/SessionWarningModal) 화면은 직접 수정 대상 아님. 세션 관리 로직 및 RequireAuth 컴포넌트는 GAP 수정 영향 없음.

@@ -19,9 +19,38 @@ const SECURITY_LEVEL_OPTIONS = [
 ]
 
 const STORAGE_TYPE_OPTIONS = [
-  { label: '금고보관', value: '금고보관' },
-  { label: '서가보관', value: '서가보관' },
-  { label: '전산보관', value: '전산보관' },
+  { label: '이관비밀', value: '이관비밀' },
+  { label: '존안비밀', value: '존안비밀' },
+  { label: '군사자료', value: '군사자료' },
+]
+
+const DOC_SPEC_OPTIONS = [
+  { label: 'A4', value: 'A4' },
+  { label: 'B4', value: 'B4' },
+  { label: 'A3', value: 'A3' },
+  { label: 'B5', value: 'B5' },
+  { label: '기타', value: '기타' },
+]
+
+const DOC_FORMAT_OPTIONS = [
+  { label: '원본', value: '원본' },
+  { label: '사본', value: '사본' },
+  { label: '전자문서', value: '전자문서' },
+  { label: '마이크로필름', value: '마이크로필름' },
+]
+
+const USAGE_FORMAT_OPTIONS = [
+  { label: '대출', value: '대출' },
+  { label: '열람', value: '열람' },
+  { label: '지출', value: '지출' },
+]
+
+const DEPARTMENT_OPTIONS = [
+  { label: '작전처', value: '작전처' },
+  { label: '정보처', value: '정보처' },
+  { label: '인사처', value: '인사처' },
+  { label: '군수처', value: '군수처' },
+  { label: '기획처', value: '기획처' },
 ]
 
 const DOC_TYPE_OPTIONS = [
@@ -78,6 +107,7 @@ export default function MilDataFormPage({ initialValues, mode = 'create', onSucc
     const payload = {
       ...values,
       transferDate: values.transferDate ? dayjs(values.transferDate as string).format('YYYY-MM-DD') : undefined,
+      docDate: values.docDate ? dayjs(values.docDate as string).format('YYYY-MM-DD') : undefined,
       retentionExpireDate: values.retentionExpireDate
         ? dayjs(values.retentionExpireDate as string).format('YYYY-MM-DD')
         : undefined,
@@ -103,6 +133,7 @@ export default function MilDataFormPage({ initialValues, mode = 'create', onSucc
           ? {
               ...initialValues,
               transferDate: initialValues.transferDate ? dayjs(initialValues.transferDate) : undefined,
+              docDate: initialValues.docDate ? dayjs(initialValues.docDate as string) : undefined,
               retentionExpireDate: initialValues.retentionExpireDate
                 ? dayjs(initialValues.retentionExpireDate)
                 : undefined,
@@ -111,13 +142,16 @@ export default function MilDataFormPage({ initialValues, mode = 'create', onSucc
       }
       onFinish={handleFinish}
     >
+      {/* CSV 입력값: 비밀등급, 보관장소, 관리번호, 문서구분, 이관일자, 문서제목,
+          문서상태 변경근거, 문서일자, 보관위치, 이관부서, 발행부서, 보존기간,
+          문서매수, 문서규격, 문서형태, 문서번호, 예고문, 활용형태, 보존기간만료 */}
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
         <Form.Item name="securityLevel" label="비밀등급" rules={[{ required: true, message: '비밀등급을 선택하세요' }]}>
           <Select options={SECURITY_LEVEL_OPTIONS} placeholder="비밀등급 선택" />
         </Form.Item>
 
-        <Form.Item name="storageType" label="보관형태" rules={[{ required: true, message: '보관형태를 선택하세요' }]}>
-          <Select options={STORAGE_TYPE_OPTIONS} placeholder="보관형태 선택" />
+        <Form.Item name="storageLocation" label="보관장소">
+          <Select options={STORAGE_LOCATION_OPTIONS} placeholder="보관장소 선택" />
         </Form.Item>
 
         <Form.Item name="docNumber" label="관리번호" rules={[{ required: true, message: '관리번호를 입력하세요' }]}>
@@ -132,29 +166,61 @@ export default function MilDataFormPage({ initialValues, mode = 'create', onSucc
           <DatePicker style={{ width: '100%' }} placeholder="이관일자 선택" />
         </Form.Item>
 
-        <Form.Item name="author" label="작성자" rules={[{ required: true, message: '작성자를 입력하세요' }]}>
-          <Input placeholder="작성자 입력" />
+        <Form.Item name="docDate" label="문서일자">
+          <DatePicker style={{ width: '100%' }} placeholder="문서일자 선택" />
+        </Form.Item>
+
+        <Form.Item name="storageType" label="보관형태" rules={[{ required: true, message: '보관형태를 선택하세요' }]}>
+          <Select options={STORAGE_TYPE_OPTIONS} placeholder="보관형태 선택" />
+        </Form.Item>
+
+        <Form.Item name="storagePosition" label="보관위치">
+          <Input placeholder="보관위치 입력 (예: A-01)" />
+        </Form.Item>
+
+        <Form.Item name="transferDept" label="이관부서">
+          <Select options={DEPARTMENT_OPTIONS} placeholder="이관부서 선택" />
+        </Form.Item>
+
+        <Form.Item name="issueDept" label="발행부서">
+          <Select options={DEPARTMENT_OPTIONS} placeholder="발행부서 선택" />
         </Form.Item>
 
         <Form.Item name="retentionPeriod" label="보존기간" rules={[{ required: true, message: '보존기간을 선택하세요' }]}>
           <Select options={RETENTION_PERIOD_OPTIONS} placeholder="보존기간 선택" />
         </Form.Item>
 
-        <Form.Item name="retentionExpireDate" label="보존만료일">
+        <Form.Item name="retentionExpireDate" label="보존기간만료일">
           <DatePicker style={{ width: '100%' }} placeholder="보존만료일 선택" />
         </Form.Item>
 
-        <Form.Item name="pages" label="쪽수">
-          <InputNumber min={1} style={{ width: '100%' }} placeholder="쪽수 입력" />
+        <Form.Item name="pages" label="문서매수">
+          <InputNumber min={1} style={{ width: '100%' }} placeholder="매수 입력" />
         </Form.Item>
 
-        <Form.Item name="storageLocation" label="보관장소">
-          <Select options={STORAGE_LOCATION_OPTIONS} placeholder="보관장소 선택" />
+        <Form.Item name="docSpec" label="문서규격">
+          <Select options={DOC_SPEC_OPTIONS} placeholder="문서규격 선택" />
+        </Form.Item>
+
+        <Form.Item name="docFormat" label="문서형태">
+          <Select options={DOC_FORMAT_OPTIONS} placeholder="문서형태 선택" />
+        </Form.Item>
+
+        <Form.Item name="usageFormat" label="활용형태">
+          <Select options={USAGE_FORMAT_OPTIONS} placeholder="활용형태 선택" />
         </Form.Item>
       </div>
 
-      <Form.Item name="title" label="자료명" rules={[{ required: true, message: '자료명을 입력하세요' }]}>
-        <Input placeholder="자료명 입력" />
+      <Form.Item name="title" label="문서제목" rules={[{ required: true, message: '문서제목을 입력하세요' }]}>
+        <Input placeholder="문서제목 입력" />
+      </Form.Item>
+
+      <Form.Item name="notice" label="예고문">
+        <Input.TextArea rows={2} placeholder="예고문 입력" />
+      </Form.Item>
+
+      <Form.Item name="changeReason" label="문서상태 변경근거">
+        <Input.TextArea rows={2} placeholder="변경근거 입력" />
       </Form.Item>
 
       <Form.Item name="attachFile" label="첨부파일">

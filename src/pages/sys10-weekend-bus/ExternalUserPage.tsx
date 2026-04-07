@@ -2,6 +2,8 @@ import { useRef, useState } from 'react'
 import { Button, Modal, Form, Input, message } from 'antd'
 import type { ActionType, ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
@@ -37,6 +39,27 @@ export function ExternalUserPage() {
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null)
   const [rejectForm] = Form.useForm()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // 검색 필드 정의 (CSV: 군구분, 부대명, 군번, 계급, 성명, 직책, 전화번호, 메일주소, 등록일)
+  const searchFields: SearchField[] = [
+    {
+      name: 'militaryBranch',
+      label: '군 구분',
+      type: 'select',
+      options: [
+        { label: '육군', value: '육군' },
+        { label: '공군', value: '공군' },
+        { label: '해군', value: '해군' },
+        { label: '해병대', value: '해병대' },
+      ],
+    },
+    { name: 'unitName', label: '부대명', type: 'text', placeholder: '부대명 입력' },
+    { name: 'militaryId', label: '군번', type: 'text', placeholder: '군번 입력' },
+    { name: 'name', label: '성명', type: 'text', placeholder: '성명 입력' },
+    { name: 'position', label: '직책', type: 'text', placeholder: '직책 입력' },
+    { name: 'dateRange', label: '등록일', type: 'dateRange' },
+  ]
 
   const columns: ProColumns<ExternalUser>[] = [
     { title: '군 구분', dataIndex: 'militaryBranch', width: 80 },
@@ -92,9 +115,16 @@ export function ExternalUserPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/sys10/external-users', {
-      params: { page: params.page, size: params.size },
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      ...Object.fromEntries(
+        Object.entries(searchParams)
+          .filter(([, v]) => v != null && v !== '')
+          .map(([k, v]) => [k, String(v)])
+      ),
     })
+    const res = await apiClient.get(`/sys10/external-users?${qs.toString()}`)
     return res.data
   }
 
@@ -132,6 +162,19 @@ export function ExternalUserPage() {
 
   return (
     <>
+      {/* 검색영역 (R2: CSV 검색조건 - 군구분, 부대명, 군번, 성명, 직책, 등록일) */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
+
       <DataTable<ExternalUser>
         headerTitle="타군 사용자 관리"
         columns={columns}

@@ -4,6 +4,9 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn, formatMilitaryPerson } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { IndividualResultEval, EvalGrade } from '@/shared/api/mocks/handlers/sys03-performance'
@@ -24,15 +27,21 @@ const GRADE_COLOR: Record<EvalGrade, string> = {
   D: 'red',
 }
 
-async function fetchIndividualEvals(params: PageRequest): Promise<PageResponse<IndividualResultEval>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '성명/부대(서)', type: 'text', placeholder: '성명 또는 부대(서) 검색' },
+]
+
+async function fetchIndividualEvals(params: PageRequest & { keyword?: string }): Promise<PageResponse<IndividualResultEval>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<IndividualResultEval>>>('/sys03/individual-evals', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<IndividualResultEval>>).data ?? (res as unknown as PageResponse<IndividualResultEval>)
 }
 
 export default function PerfIndividualResultEvalPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [evalOpen, setEvalOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<IndividualResultEval | null>(null)
   const [form] = Form.useForm()
@@ -53,8 +62,7 @@ export default function PerfIndividualResultEvalPage() {
 
   const columns: ProColumns<IndividualResultEval>[] = [
     { title: '번호', dataIndex: 'index', valueType: 'index', width: 60 },
-    { title: '성명', dataIndex: 'name', width: 120 },
-    { title: '계급', dataIndex: 'rank', width: 100 },
+    militaryPersonColumn<IndividualResultEval>('대상자', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'name' }),
     { title: '부대(서)', dataIndex: 'deptName' },
     {
       title: '평가상태',
@@ -98,12 +106,13 @@ export default function PerfIndividualResultEvalPage() {
 
   return (
     <PageContainer title="개인 업무실적 평가">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<IndividualResultEval>
         rowKey="id"
         columns={columns}
         headerTitle="개인 업무실적 평가 목록"
         actionRef={actionRef}
-        request={(params) => fetchIndividualEvals(params)}
+        request={(params) => fetchIndividualEvals({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
       />
 
       <Modal
@@ -121,8 +130,7 @@ export default function PerfIndividualResultEvalPage() {
         {selectedItem && (
           <>
             <Descriptions column={2} bordered style={{ marginBottom: 16 }}>
-              <Descriptions.Item label="성명">{selectedItem.name}</Descriptions.Item>
-              <Descriptions.Item label="계급">{selectedItem.rank}</Descriptions.Item>
+              <Descriptions.Item label="대상자" span={2}>{formatMilitaryPerson({ serviceNumber: selectedItem.serviceNumber, rank: selectedItem.rank, name: selectedItem.name })}</Descriptions.Item>
               <Descriptions.Item label="부대(서)" span={2}>{selectedItem.deptName}</Descriptions.Item>
             </Descriptions>
             <Form form={form} layout="vertical" onFinish={(values) => evalMutation.mutate(values)}>

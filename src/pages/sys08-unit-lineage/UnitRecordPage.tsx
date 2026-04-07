@@ -5,12 +5,20 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { UnitRecord } from '@/shared/api/mocks/handlers/sys08-unit-lineage'
 import dayjs from 'dayjs'
 
 const { TextArea } = Input
+
+// 검색 필드 정의 (R2 규칙)
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '부대명', type: 'text', placeholder: '부대명 검색' },
+  { name: 'unitCode', label: '부대코드', type: 'text', placeholder: '부대코드 검색' },
+]
 
 async function fetchUnitRecords(params: PageRequest & Record<string, unknown>): Promise<PageResponse<UnitRecord>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<UnitRecord>>>('/sys08/unit-records', { params })
@@ -21,7 +29,7 @@ export default function UnitRecordPage() {
   const [formOpen, setFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<UnitRecord | undefined>()
   const [deleteTarget, setDeleteTarget] = useState<UnitRecord | undefined>()
-  const [searchKeyword, setSearchKeyword] = useState('')
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [form] = Form.useForm()
   const actionRef = useRef<ActionType>()
   const queryClient = useQueryClient()
@@ -93,22 +101,22 @@ export default function UnitRecordPage() {
     },
   ]
 
-  const handleSearch = () => {
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
     actionRef.current?.reload()
   }
 
   return (
     <PageContainer title="부대기록부">
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8 }}>
-        <Input
-          placeholder="부대명 검색"
-          value={searchKeyword}
-          onChange={(e) => setSearchKeyword(e.target.value)}
-          onPressEnter={handleSearch}
-          style={{ width: 240 }}
-          allowClear
-        />
-        <Button onClick={handleSearch}>검색</Button>
+      {/* 검색영역 (R2 규칙) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
+      <div style={{ marginBottom: 16 }}>
         <Button
           type="primary"
           icon={<PlusOutlined />}
@@ -124,7 +132,7 @@ export default function UnitRecordPage() {
 
       <DataTable<UnitRecord>
         columns={columns}
-        request={(params) => fetchUnitRecords({ ...params, keyword: searchKeyword })}
+        request={(params) => fetchUnitRecords({ ...params, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle="부대기록부 목록"

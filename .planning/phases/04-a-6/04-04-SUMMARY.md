@@ -154,3 +154,12 @@ Test Files  1 passed (1)
 - FOUND: navy-admin/src/__tests__/sys02/survey.test.ts
 - FOUND commit: 5137654 (Task 2 - 7페이지 + 라우트)
 - Tests: 49/49 PASSED
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS02 설문종합관리체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CrudForm에 대상필드 4개, 첨부파일 3종 추가
+- **R2**: 목록 화면 상단에 SearchForm 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용

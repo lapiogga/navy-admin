@@ -1,18 +1,26 @@
 import { useState } from 'react'
-import { Modal, Button, Input, Popconfirm, Tag, Space, Tabs, message } from 'antd'
+import { Modal, Button, Input, Popconfirm, Tag, Space, Tabs, Select, DatePicker, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
+import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
 interface Suggestion extends Record<string, unknown> {
   id: string
   title: string
   authorName: string
+  serviceNumber: string
+  rank: string
   authorUnit: string
+  assignedDept: string
+  actionDate?: string
+  actionType?: string
+  rejectReason?: string
   status: 'registered' | 'received' | 'processing' | 'completed' | 'rejected'
   isPrivate: boolean
   recommendCount: number
@@ -206,6 +214,15 @@ export default function SuggestionAdminPage() {
   const [answerTarget, setAnswerTarget] = useState<Suggestion | null>(null)
   const [answerText, setAnswerText] = useState('')
 
+  // 상태변경 모달
+  const [statusOpen, setStatusOpen] = useState(false)
+  const [statusTarget, setStatusTarget] = useState<Suggestion | null>(null)
+  const [newStatus, setNewStatus] = useState<string>('registered')
+  const [actionTypeVal, setActionTypeVal] = useState<string | undefined>(undefined)
+  const [actionDateVal, setActionDateVal] = useState<Dayjs | null>(null)
+  const [assignedDeptVal, setAssignedDeptVal] = useState('')
+  const [rejectReason, setRejectReason] = useState('')
+
   const queryClient = useQueryClient()
 
   const privateMutation = useMutation({
@@ -215,6 +232,29 @@ export default function SuggestionAdminPage() {
     },
     onSuccess: () => {
       message.success('비공개 처리되었습니다')
+      queryClient.invalidateQueries({ queryKey: ['sys14'] })
+    },
+  })
+
+  // 상태변경 mutation (진행상태, 조치유형, 조치일, 담당부서, 반려사유)
+  const statusMutation = useMutation({
+    mutationFn: async (body: { status: string; actionType?: string; actionDate?: string; assignedDept?: string; rejectReason?: string }) => {
+      const res = await fetch(`/api/sys14/suggestions/${statusTarget?.id}/status`, {
+        method: 'PATCH',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(body),
+      })
+      return res.json()
+    },
+    onSuccess: () => {
+      message.success('상태가 변경되었습니다')
+      setStatusOpen(false)
+      setStatusTarget(null)
+      setNewStatus('registered')
+      setActionTypeVal(undefined)
+      setActionDateVal(null)
+      setAssignedDeptVal('')
+      setRejectReason('')
       queryClient.invalidateQueries({ queryKey: ['sys14'] })
     },
   })
@@ -240,9 +280,14 @@ export default function SuggestionAdminPage() {
   const columns: ProColumns<Suggestion>[] = [
     { title: '번호', dataIndex: 'id', width: 80 },
     { title: '제목', dataIndex: 'title', ellipsis: true },
-    { title: '작성자', dataIndex: 'authorName', width: 100 },
+    // R6: 제언자 컬럼 - 군번/계급/성명
+    militaryPersonColumn<Suggestion>('제언자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     {
-      title: '상태',
+      title: '진행상태',
       dataIndex: 'status',
       width: 100,
       render: (_, record) => (
@@ -253,6 +298,8 @@ export default function SuggestionAdminPage() {
         />
       ),
     },
+    { title: '담당부서', dataIndex: 'assignedDept', width: 100 },
+    { title: '조치유형', dataIndex: 'actionType', width: 100 },
     {
       title: '비공개',
       dataIndex: 'isPrivate',
@@ -260,15 +307,25 @@ export default function SuggestionAdminPage() {
       render: (_, record) =>
         record.isPrivate ? <Tag color="red">비공개</Tag> : <Tag color="default">공개</Tag>,
     },
-    { title: '추천', dataIndex: 'recommendCount', width: 70 },
-    { title: '신고', dataIndex: 'reportCount', width: 70 },
     { title: '작성일', dataIndex: 'createdAt', width: 110 },
     {
       title: '액션',
       key: 'action',
-      width: 160,
+      width: 220,
       render: (_, record) => (
         <Space>
+          <Button
+            size="small"
+            onClick={() => {
+              setStatusTarget(record)
+              setNewStatus(record.status)
+              setActionTypeVal(record.actionType)
+              setAssignedDeptVal(record.assignedDept || '')
+              setStatusOpen(true)
+            }}
+          >
+            상태변경
+          </Button>
           {!record.isPrivate && (
             <Popconfirm
               title="비공개 처리하시겠습니까?"
@@ -319,6 +376,97 @@ export default function SuggestionAdminPage() {
   return (
     <PageContainer title="관리자">
       <Tabs items={tabItems} />
+
+      {/* 상태변경 모달 (진행상태, 조치유형, 조치일, 담당부서, 반려사유) */}
+      <Modal
+        title="상태 변경"
+        open={statusOpen}
+        onCancel={() => { setStatusOpen(false); setStatusTarget(null) }}
+        onOk={() => {
+          if (!statusTarget) return
+          // 반려 시 반려사유 필수
+          if (newStatus === 'rejected' && !rejectReason.trim()) {
+            message.warning('반려사유를 입력하세요')
+            return
+          }
+          const body: { status: string; actionType?: string; actionDate?: string; assignedDept?: string; rejectReason?: string } = {
+            status: newStatus,
+          }
+          if (actionTypeVal) body.actionType = actionTypeVal
+          if (actionDateVal) body.actionDate = actionDateVal.format('YYYY-MM-DD')
+          if (assignedDeptVal) body.assignedDept = assignedDeptVal
+          if (newStatus === 'rejected' && rejectReason) body.rejectReason = rejectReason
+          statusMutation.mutate(body)
+        }}
+        okText="변경"
+        cancelText="취소"
+        destroyOnClose
+        width={500}
+      >
+        <Space direction="vertical" style={{ width: '100%' }} size="middle">
+          <div>
+            <div style={{ marginBottom: 4, fontWeight: 500 }}>진행상태</div>
+            <Select
+              value={newStatus}
+              onChange={setNewStatus}
+              style={{ width: '100%' }}
+              options={[
+                { label: '등록', value: 'registered' },
+                { label: '접수', value: 'received' },
+                { label: '진행', value: 'processing' },
+                { label: '완료', value: 'completed' },
+                { label: '반려', value: 'rejected' },
+              ]}
+            />
+          </div>
+          <div>
+            <div style={{ marginBottom: 4, fontWeight: 500 }}>조치유형</div>
+            <Select
+              value={actionTypeVal}
+              onChange={setActionTypeVal}
+              placeholder="선택"
+              allowClear
+              style={{ width: '100%' }}
+              options={[
+                { label: '정책반영', value: '정책반영' },
+                { label: '업무추진', value: '업무추진' },
+                { label: '기추진', value: '기추진' },
+                { label: '업무참고', value: '업무참고' },
+              ]}
+            />
+          </div>
+          {actionTypeVal && (
+            <div>
+              <div style={{ marginBottom: 4, fontWeight: 500 }}>조치일</div>
+              <DatePicker
+                value={actionDateVal}
+                onChange={setActionDateVal}
+                style={{ width: '100%' }}
+                placeholder="조치일 선택"
+              />
+            </div>
+          )}
+          <div>
+            <div style={{ marginBottom: 4, fontWeight: 500 }}>담당부서</div>
+            <Input
+              value={assignedDeptVal}
+              onChange={(e) => setAssignedDeptVal(e.target.value)}
+              placeholder="담당부서 입력"
+            />
+          </div>
+          {newStatus === 'rejected' && (
+            <div>
+              <div style={{ marginBottom: 4, fontWeight: 500 }}>반려사유</div>
+              <Input.TextArea
+                value={rejectReason}
+                onChange={(e) => setRejectReason(e.target.value)}
+                rows={3}
+                placeholder="반려사유를 입력하세요 (필수)"
+              />
+            </div>
+          )}
+        </Space>
+      </Modal>
 
       {/* 답변 등록 모달 */}
       <Modal

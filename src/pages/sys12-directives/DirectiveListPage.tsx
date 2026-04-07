@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useCallback } from 'react'
 import { Modal, Button, Divider, message, Timeline } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
@@ -6,7 +6,10 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { CrudFormField } from '@/shared/ui/CrudForm/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { Directive, ActionItem, ActionHistory } from '@/shared/api/mocks/handlers/sys12'
@@ -32,12 +35,6 @@ const STATUS_OPTIONS = [
   { label: '지연', value: 'delayed' },
 ]
 
-const DIRECTOR_OPTIONS = [
-  { label: '사령관', value: '사령관' },
-  { label: '참모장', value: '참모장' },
-  { label: '부사령관', value: '부사령관' },
-]
-
 const UNIT_OPTIONS = [
   { label: '1사단', value: '1사단' },
   { label: '2사단', value: '2사단' },
@@ -46,12 +43,18 @@ const UNIT_OPTIONS = [
   { label: '상륙기동단', value: '상륙기동단' },
 ]
 
-const CATEGORY_OPTIONS = [
-  { label: '작전', value: '작전' },
-  { label: '교육', value: '교육' },
-  { label: '군수', value: '군수' },
-  { label: '인사', value: '인사' },
-  { label: '정보화', value: '정보화' },
+const DIRECTIVE_TYPE_OPTIONS = [
+  { label: '문서', value: '문서' },
+  { label: '구두', value: '구두' },
+]
+
+// 검색 필드 정의 (CSV 검색조건: 지시일, 지시자, 수명부대, 진행상황, 지시내용)
+const searchFields: SearchField[] = [
+  { name: 'directiveDateRange', label: '지시일', type: 'dateRange' },
+  { name: 'director', label: '지시자', type: 'text', placeholder: '지시자명 검색' },
+  { name: 'targetUnit', label: '수명부대', type: 'select', options: UNIT_OPTIONS },
+  { name: 'progressStatus', label: '진행상황', type: 'select', options: STATUS_OPTIONS },
+  { name: 'keyword', label: '지시내용', type: 'text', placeholder: '지시내용 검색' },
 ]
 
 // API 함수
@@ -63,6 +66,9 @@ async function fetchDirectives(params: PageRequest & Record<string, unknown>): P
       progressStatus: params.progressStatus || '',
       director: params.director || '',
       keyword: params.keyword || '',
+      targetUnit: params.targetUnit || '',
+      directiveDateFrom: params.directiveDateFrom || '',
+      directiveDateTo: params.directiveDateTo || '',
     },
   })
   const data = (res as ApiResult<PageResponse<Directive>>).data ?? (res as unknown as PageResponse<Directive>)
@@ -75,14 +81,25 @@ async function fetchDirectiveHistory(id: string): Promise<ActionHistory[]> {
   return data
 }
 
-// CrudForm 필드 정의
+// CrudForm 필드 정의 (CSV 입력값: 지시자, 지시일자, 수명부대, 추진상태, 지시내용, 지시사항종류(문서/구두))
 const directiveFormFields: CrudFormField[] = [
   {
-    name: 'director',
-    label: '지시자',
-    type: 'select',
+    name: 'directorServiceNumber',
+    label: '지시자 군번',
+    type: 'text',
     required: true,
-    options: DIRECTOR_OPTIONS,
+  },
+  {
+    name: 'directorRank',
+    label: '지시자 계급',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'directorName',
+    label: '지시자 성명',
+    type: 'text',
+    required: true,
   },
   {
     name: 'directiveDate',
@@ -111,19 +128,31 @@ const directiveFormFields: CrudFormField[] = [
     required: true,
   },
   {
-    name: 'category',
+    name: 'directiveType',
     label: '지시사항 종류',
     type: 'select',
     required: true,
-    options: CATEGORY_OPTIONS,
+    options: DIRECTIVE_TYPE_OPTIONS,
   },
 ]
 
-// 조치사항 등록 폼 필드
+// 조치사항 등록 폼 필드 (CSV 입력값: 업무담당자, 추진상태, 추진계획, 추진내용, 첨부파일)
 const actionFormFields: CrudFormField[] = [
   {
-    name: 'assignee',
-    label: '업무담당자',
+    name: 'assigneeServiceNumber',
+    label: '담당자 군번',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'assigneeRank',
+    label: '담당자 계급',
+    type: 'text',
+    required: true,
+  },
+  {
+    name: 'assigneeName',
+    label: '담당자 성명',
     type: 'text',
     required: true,
   },
@@ -149,6 +178,11 @@ const actionFormFields: CrudFormField[] = [
     label: '추진내용',
     type: 'textarea',
   },
+  {
+    name: 'attachments',
+    label: '첨부파일',
+    type: 'file',
+  },
 ]
 
 export default function DirectiveListPage() {
@@ -159,6 +193,26 @@ export default function DirectiveListPage() {
   const [actionFormOpen, setActionFormOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Directive | null>(null)
   const [selectedDirective, setSelectedDirective] = useState<Directive | null>(null)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // 검색 핸들러
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    const params: Record<string, unknown> = { ...values }
+    // dateRange를 from/to로 분리
+    if (values.directiveDateRange && Array.isArray(values.directiveDateRange)) {
+      const [from, to] = values.directiveDateRange as [{ format: (f: string) => string }, { format: (f: string) => string }]
+      params.directiveDateFrom = from?.format('YYYY-MM-DD') || ''
+      params.directiveDateTo = to?.format('YYYY-MM-DD') || ''
+      delete params.directiveDateRange
+    }
+    setSearchParams(params)
+    actionRef.current?.reload()
+  }, [])
+
+  const handleSearchReset = useCallback(() => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }, [])
 
   // 지시사항 이행 이력 조회
   const { data: history = [] } = useQuery({
@@ -225,15 +279,15 @@ export default function DirectiveListPage() {
     {
       title: '관리번호',
       dataIndex: 'directiveNo',
-      width: 100,
+      width: 120,
       sorter: true,
     },
-    {
-      title: '지시자',
-      dataIndex: 'director',
-      width: 100,
-      sorter: true,
-    },
+    // 지시자: 군번/계급/성명 표시
+    militaryPersonColumn<Directive>('지시자', {
+      serviceNumber: 'directorServiceNumber',
+      rank: 'directorRank',
+      name: 'directorName',
+    }),
     {
       title: '지시일자',
       dataIndex: 'directiveDate',
@@ -266,9 +320,9 @@ export default function DirectiveListPage() {
       ),
     },
     {
-      title: '종류',
-      dataIndex: 'category',
-      width: 100,
+      title: '종류(문서/구두)',
+      dataIndex: 'directiveType',
+      width: 120,
       sorter: true,
     },
     {
@@ -312,10 +366,13 @@ export default function DirectiveListPage() {
 
   return (
     <PageContainer title="지시사항 목록">
+      {/* 검색영역 (CSV 검색조건: 지시일, 지시자, 수명부대, 진행상황, 지시내용) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<Directive>
         rowKey="id"
         columns={columns}
-        request={(params) => fetchDirectives(params as PageRequest & Record<string, unknown>)}
+        request={(params) => fetchDirectives({ ...params, ...searchParams } as PageRequest & Record<string, unknown>)}
         actionRef={actionRef}
         toolBarRender={() => [
           <Button
@@ -384,13 +441,13 @@ export default function DirectiveListPage() {
               <dt>관리번호</dt>
               <dd>{selectedDirective.directiveNo}</dd>
               <dt>지시자</dt>
-              <dd>{selectedDirective.director}</dd>
+              <dd>{selectedDirective.directorServiceNumber} / {selectedDirective.directorRank} / {selectedDirective.directorName}</dd>
               <dt>지시일자</dt>
               <dd>{selectedDirective.directiveDate}</dd>
               <dt>수명부대</dt>
               <dd>{selectedDirective.targetUnit}</dd>
-              <dt>종류</dt>
-              <dd>{selectedDirective.category}</dd>
+              <dt>종류(문서/구두)</dt>
+              <dd>{selectedDirective.directiveType}</dd>
               <dt>추진상태</dt>
               <dd>
                 <StatusBadge

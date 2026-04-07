@@ -115,9 +115,6 @@ export function SubsystemHomePage({
         >
           {title}
         </Title>
-        <Text style={{ color: 'rgba(255,255,255,0.7)', marginTop: 8, fontSize: 14 }}>
-          해병대 행정포탈 시스템
-        </Text>
       </div>
 
       {/* 중단영역: 대시보드 (optional) */}

@@ -9,9 +9,11 @@ import {
   Typography,
   InputNumber,
   Descriptions,
+  Upload,
+  Table,
   message,
 } from 'antd'
-import { PlusOutlined, MinusCircleOutlined } from '@ant-design/icons'
+import { PlusOutlined, MinusCircleOutlined, UploadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
@@ -39,6 +41,27 @@ const STEP_ITEMS = [
   { title: '시간배분' },
   { title: '역량/자격요건' },
   { title: '완료/제출' },
+]
+
+// 결재자 옵션 (1차/2차 결재자 지정용)
+const APPROVER_OPTIONS = [
+  { label: '김부서장 (중령)', value: 'user-a1' },
+  { label: '이참모 (대령)', value: 'user-a2' },
+  { label: '박대위 (대위)', value: 'user-a3' },
+  { label: '최소령 (소령)', value: 'user-a4' },
+]
+
+// 초과근무 실적 Mock 데이터 (연동 데이터)
+const OVERTIME_MOCK_DATA = [
+  { key: '1', month: '2024-01', hours: 12, description: '작전 지원' },
+  { key: '2', month: '2024-02', hours: 8, description: '행정 업무' },
+  { key: '3', month: '2024-03', hours: 15, description: '훈련 지원' },
+]
+
+const OVERTIME_COLUMNS = [
+  { title: '월', dataIndex: 'month', key: 'month' },
+  { title: '시간', dataIndex: 'hours', key: 'hours' },
+  { title: '내용', dataIndex: 'description', key: 'description' },
 ]
 
 // 표준업무시간 조회
@@ -192,6 +215,40 @@ export default function JobDescFormPage({ type, id, onClose }: JobDescFormPagePr
             <Form.Item name="phone" label="전화번호">
               <Input placeholder="010-0000-0000" />
             </Form.Item>
+
+            {/* 1차/2차 결재자 지정 (CSV 행 16) */}
+            <Form.Item name="firstApproverId" label="1차 결재자" rules={[{ required: true, message: '1차 결재자를 선택하세요' }]}>
+              <Select placeholder="1차 결재자 선택" options={APPROVER_OPTIONS} />
+            </Form.Item>
+            <Form.Item name="secondApproverId" label="2차 결재자" rules={[{ required: true, message: '2차 결재자를 선택하세요' }]}>
+              <Select placeholder="2차 결재자 선택" options={APPROVER_OPTIONS} />
+            </Form.Item>
+
+            {/* 개인직무내용 엑셀 업로드 (CSV 행 16: 엑셀 작성 및 파일 업로드) */}
+            <Form.Item name="excelFile" label="개인직무내용 엑셀 가져오기">
+              <Upload accept=".xlsx,.xls" maxCount={1} beforeUpload={() => { message.success('엑셀 파일이 업로드되었습니다 (Mock)'); return false }}>
+                <Button icon={<UploadOutlined />}>엑셀 파일 선택</Button>
+              </Upload>
+            </Form.Item>
+
+            {/* 전자결재 생산/발송 실적 엑셀 업로드 */}
+            <Form.Item name="approvalRecordFile" label="전자결재 생산/발송 실적 엑셀">
+              <Upload accept=".xlsx,.xls" maxCount={1} beforeUpload={() => { message.success('전자결재 실적 파일이 업로드되었습니다 (Mock)'); return false }}>
+                <Button icon={<UploadOutlined />}>엑셀 파일 선택</Button>
+              </Upload>
+            </Form.Item>
+
+            {/* 초과근무 실적 (연동 데이터, CSV 행 16) */}
+            <div style={{ marginBottom: 16 }}>
+              <Typography.Text strong>초과근무 실적 (연동 데이터)</Typography.Text>
+              <Table
+                columns={OVERTIME_COLUMNS}
+                dataSource={OVERTIME_MOCK_DATA}
+                pagination={false}
+                size="small"
+                style={{ marginTop: 8 }}
+              />
+            </div>
 
             {/* 대리작성 모드 (부서관리자 권한): 작성자 선택 */}
             {type === 'department' && (
@@ -385,10 +442,10 @@ export default function JobDescFormPage({ type, id, onClose }: JobDescFormPagePr
 
             <Descriptions title="결재선 확인" layout="vertical" column={2} bordered>
               <Descriptions.Item label="1차 결재자">
-                <Text>김부서장 (중령)</Text>
+                <Text>{APPROVER_OPTIONS.find((o) => o.value === form.getFieldValue('firstApproverId'))?.label ?? '-'}</Text>
               </Descriptions.Item>
               <Descriptions.Item label="2차 결재자">
-                <Text>이참모 (대령)</Text>
+                <Text>{APPROVER_OPTIONS.find((o) => o.value === form.getFieldValue('secondApproverId'))?.label ?? '-'}</Text>
               </Descriptions.Item>
             </Descriptions>
           </div>

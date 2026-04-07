@@ -115,3 +115,9 @@ requirements:
 - navy-admin/src/pages/sys07-mil-data/HaegidanListPage.tsx: FOUND
 - 커밋 306f0ac: FOUND
 - 커밋 9762511: FOUND
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS07 군사자료관리체계에 req_spec 기반 6대 규칙 적용. 검색조건이 5개에서 14개로 확대되고 (자료분류, 보안등급, 자료상태, 등록기간, 발간일자 등), CSV 입력값 17개 필드가 CrudForm에 반영되었다. 신청자/등록자 컬럼에 militaryPersonColumn(군번/계급/성명) 헬퍼 적용. DataTable에 navy-bordered-table CSS 적용으로 군청색 라인 통일.

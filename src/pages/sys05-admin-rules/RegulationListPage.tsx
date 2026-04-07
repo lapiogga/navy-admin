@@ -6,6 +6,9 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { CrudFormField } from '@/shared/ui/CrudForm/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse } from '@/shared/api/types'
 import { useFavorites } from './useFavorites'
 
@@ -19,7 +22,27 @@ interface Regulation extends Record<string, unknown> {
   content: string
   fileUrl?: string
   fileName?: string
+  serviceNumber?: string
+  rank?: string
+  authorName?: string
 }
+
+// 검색 필드 정의 (R2) - CSV '검색기능 추가' 반영
+const SEARCH_FIELDS: SearchField[] = [
+  { name: 'title', label: '규정명', type: 'text' },
+  { name: 'docNumber', label: '문서번호', type: 'text' },
+  {
+    name: 'category',
+    label: '분류',
+    type: 'select',
+    options: [
+      { label: '법령', value: '법령' },
+      { label: '훈령', value: '훈령' },
+      { label: '예규', value: '예규' },
+      { label: '고시', value: '고시' },
+    ],
+  },
+]
 
 // 조직도 트리 데이터 (G09) - 부/실/단 구조
 const ORG_TREE_DATA = [
@@ -106,12 +129,19 @@ const REGULATION_FIELDS: CrudFormField[] = [
 async function fetchRegulations(
   params: PageRequest,
   department?: string,
+  searchParams?: Record<string, unknown>,
 ): Promise<PageResponse<Regulation>> {
   const url = new URL('/api/sys05/regulations', window.location.origin)
   url.searchParams.set('page', String(params.page))
   url.searchParams.set('size', String(params.size))
   if (department) {
     url.searchParams.set('department', department)
+  }
+  // 검색 파라미터 전달
+  if (searchParams) {
+    Object.entries(searchParams).forEach(([key, value]) => {
+      if (value) url.searchParams.set(key, String(value))
+    })
   }
   const res = await fetch(url.toString())
   const json = (await res.json()) as { success: boolean; data: PageResponse<Regulation> }
@@ -135,8 +165,20 @@ export default function RegulationListPage() {
   const [editTarget, setEditTarget] = useState<Regulation | null>(null)
   const [selectedDept, setSelectedDept] = useState<string | undefined>(undefined)
   const [loading, setLoading] = useState(false)
+  const [searchValues, setSearchValues] = useState<Record<string, unknown>>({})
   const actionRef = useRef<ActionType>(null)
   const { toggle, isFavorite } = useFavorites('sys05-regulation-favorites')
+
+  // 검색 핸들러 (R2)
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchValues(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchValues({})
+    actionRef.current?.reload()
+  }
 
   // 조직도 선택 핸들러 (G09) - 그룹 노드 선택 시 전체 조회
   const GROUP_KEYS = ['hq', 'dept-group', 'office-group', 'unit-group']
@@ -202,6 +244,11 @@ export default function RegulationListPage() {
     { title: '분류', dataIndex: 'category', width: 100 },
     { title: '소관부서', dataIndex: 'department', width: 120 },
     { title: '시행일', dataIndex: 'effectiveDate', width: 120 },
+    militaryPersonColumn<Regulation>('등록자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     {
       title: '즐겨찾기',
       dataIndex: 'id',
@@ -273,9 +320,11 @@ export default function RegulationListPage() {
           </Card>
         </Col>
         <Col span={18}>
+          {/* 검색영역 (R2) */}
+          <SearchForm fields={SEARCH_FIELDS} onSearch={handleSearch} onReset={handleSearchReset} />
           <DataTable<Regulation>
             columns={columns}
-            request={(params) => fetchRegulations(params, selectedDept)}
+            request={(params) => fetchRegulations(params, selectedDept, searchValues)}
             rowKey="id"
             headerTitle="현행규정 목록"
             actionRef={actionRef}
@@ -317,6 +366,9 @@ export default function RegulationListPage() {
             <Descriptions.Item label="소관부서">{selected.department}</Descriptions.Item>
             <Descriptions.Item label="시행일">{selected.effectiveDate}</Descriptions.Item>
             <Descriptions.Item label="내용">{selected.content}</Descriptions.Item>
+            <Descriptions.Item label="등록자">
+              {[selected.serviceNumber, selected.rank, selected.authorName].filter(Boolean).join(' / ')}
+            </Descriptions.Item>
             <Descriptions.Item label="첨부파일">
               {selected.fileUrl ? (
                 <a href={selected.fileUrl} target="_blank" rel="noopener noreferrer">

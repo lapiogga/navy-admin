@@ -124,4 +124,8 @@ metrics:
 
 없음 - 모든 페이지가 MSW Mock 데이터 기반으로 정상 동작
 
+## GAP 수정 반영 (2026-04-07)
+
+SYS08 부대계보관리체계에 req_spec 기반 6대 규칙 적용. SearchForm 추가, CSV 17개 필드 CrudForm 반영, militaryPersonColumn(군번/계급/성명) 적용, 연혁부호/비밀여부 필드 반영. DataTable에 navy-bordered-table CSS 적용으로 군청색 라인 통일.
+
 ## Self-Check: PASSED

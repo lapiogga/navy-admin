@@ -32,6 +32,7 @@ const CATEGORY_COLOR: Record<string, string> = {
   기타: 'default',
 }
 
+// R1: CSV 입력값 - 제목, 지식유형(카테고리), 출처(생산/카피), 키워드(다수), 내용, 첨부파일
 const CRUD_FIELDS = [
   {
     name: 'title',
@@ -58,11 +59,24 @@ const CRUD_FIELDS = [
     ],
   },
   {
+    name: 'keywords',
+    label: '키워드',
+    type: 'text' as const,
+    required: false,
+    placeholder: '키워드를 쉼표(,)로 구분하여 입력 (다수 입력 가능)',
+  },
+  {
     name: 'content',
     label: '내용',
     type: 'textarea' as const,
     required: true,
     placeholder: '지식 내용을 입력하세요',
+  },
+  {
+    name: 'attachments',
+    label: '첨부파일',
+    type: 'file' as const,
+    required: false,
   },
 ]
 

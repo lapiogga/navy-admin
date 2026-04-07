@@ -1,12 +1,15 @@
 import { useState, useRef } from 'react'
-import { Tabs, Calendar, Modal, Form, Select, Button, message, Steps, Input } from 'antd'
+import { Tabs, Calendar, Modal, Form, Select, Button, message, Steps, Input, Alert } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Dayjs } from 'dayjs'
 import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
@@ -16,8 +19,12 @@ interface DutySchedule extends Record<string, unknown> {
   id: string
   date: string
   officerName: string
+  serviceNumber: string
   rank: string
   department: string
+  approverName: string
+  approverServiceNumber: string
+  approverRank: string
   status: 'draft' | 'submitted' | 'approved'
 }
 
@@ -138,12 +145,20 @@ function DutyScheduleModal({ open, selectedDate, record, onClose, onSuccess }: D
       <Form
         form={form}
         layout="vertical"
-        initialValues={record ? { officerName: record.officerName, rank: record.rank, department: record.department } : undefined}
+        initialValues={record ? {
+          officerName: record.officerName,
+          serviceNumber: record.serviceNumber,
+          rank: record.rank,
+          department: record.department,
+          approverName: record.approverName,
+          approverServiceNumber: record.approverServiceNumber,
+          approverRank: record.approverRank,
+        } : undefined}
       >
-        <Form.Item name="officerName" label="당직관 성명" rules={[{ required: true }]}>
-          <Input />
+        <Form.Item name="serviceNumber" label="당직관 군번" rules={[{ required: true }]}>
+          <Input placeholder="군번을 입력하세요" />
         </Form.Item>
-        <Form.Item name="rank" label="계급" rules={[{ required: true }]}>
+        <Form.Item name="rank" label="당직관 계급" rules={[{ required: true }]}>
           <Select options={[
             { value: '중위', label: '중위' },
             { value: '대위', label: '대위' },
@@ -151,13 +166,36 @@ function DutyScheduleModal({ open, selectedDate, record, onClose, onSuccess }: D
             { value: '중령', label: '중령' },
           ]} />
         </Form.Item>
+        <Form.Item name="officerName" label="당직관 성명" rules={[{ required: true }]}>
+          <Input />
+        </Form.Item>
         <Form.Item name="department" label="부대(서)" rules={[{ required: true }]}>
           <Select options={[
             { value: '1함대', label: '1함대' },
             { value: '2함대', label: '2함대' },
             { value: '3함대', label: '3함대' },
             { value: '해군사령부', label: '해군사령부' },
+            { value: '해병대사령부', label: '해병대사령부' },
           ]} />
+        </Form.Item>
+        <Alert
+          message="결재자는 부서별 기본 지정되며, 변경이 필요한 경우 아래에서 수정하세요."
+          type="info"
+          showIcon
+          style={{ marginBottom: 12 }}
+        />
+        <Form.Item name="approverServiceNumber" label="결재자 군번">
+          <Input placeholder="기본 결재자 자동 지정 (변경 시 입력)" />
+        </Form.Item>
+        <Form.Item name="approverRank" label="결재자 계급">
+          <Select allowClear placeholder="기본 결재자 자동 지정" options={[
+            { value: '소령', label: '소령' },
+            { value: '중령', label: '중령' },
+            { value: '대령', label: '대령' },
+          ]} />
+        </Form.Item>
+        <Form.Item name="approverName" label="결재자 성명">
+          <Input placeholder="기본 결재자 자동 지정 (변경 시 입력)" />
         </Form.Item>
       </Form>
     </Modal>
@@ -204,11 +242,28 @@ function DutyCalendarTab() {
     }
   }
 
+  // 검색 필드 (CSV line 47: 검색기능 추가)
+  const scheduleSearchFields: SearchField[] = [
+    { name: 'keyword', label: '당직관', type: 'text', placeholder: '성명 검색' },
+    { name: 'department', label: '부대(서)', type: 'select', options: [
+      { label: '1함대', value: '1함대' },
+      { label: '2함대', value: '2함대' },
+      { label: '3함대', value: '3함대' },
+      { label: '해군사령부', value: '해군사령부' },
+      { label: '해병대사령부', value: '해병대사령부' },
+    ] },
+    { name: 'status', label: '상태', type: 'select', options: [
+      { label: '작성중', value: 'draft' },
+      { label: '결재대기', value: 'submitted' },
+      { label: '승인', value: 'approved' },
+    ] },
+  ]
+
   const scheduleColumns: ProColumns<DutySchedule>[] = [
     { title: '날짜', dataIndex: 'date', width: 120 },
-    { title: '당직관', dataIndex: 'officerName', width: 100 },
-    { title: '계급', dataIndex: 'rank', width: 80 },
+    militaryPersonColumn<DutySchedule>('당직관', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'officerName' }),
     { title: '부대(서)', dataIndex: 'department' },
+    militaryPersonColumn<DutySchedule>('결재자', { serviceNumber: 'approverServiceNumber', rank: 'approverRank', name: 'approverName' }),
     {
       title: '상태',
       dataIndex: 'status',
@@ -221,6 +276,12 @@ function DutyCalendarTab() {
 
   return (
     <div>
+      {/* 검색 영역 */}
+      <SearchForm
+        fields={scheduleSearchFields}
+        onSearch={() => actionRef.current?.reload()}
+        onReset={() => actionRef.current?.reload()}
+      />
       <Calendar
         cellRender={cellRender}
         onSelect={handleSelect}

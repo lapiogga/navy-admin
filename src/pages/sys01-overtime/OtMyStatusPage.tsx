@@ -1,10 +1,22 @@
 import { Tabs } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
+import type { ProColumns } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
 import { Column } from '@ant-design/charts'
+import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
-import type { ApiResult } from '@/shared/api/types'
+import type { ApiResult, PageResponse } from '@/shared/api/types'
 import type { OtMyStatus } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 검색 필드 정의 */
+const myStatusSearchFields: SearchField[] = [
+  { name: 'year', label: '연도', type: 'select', options: [
+    { label: '2026', value: '2026' },
+    { label: '2025', value: '2025' },
+  ]},
+]
 
 async function fetchMyStatus(): Promise<OtMyStatus[]> {
   const res = await apiClient.get<never, ApiResult<OtMyStatus[]>>('/sys01/my-status')
@@ -31,29 +43,34 @@ function AnnualChart({ data }: { data: OtMyStatus[] }) {
     },
     style: { fill: '#1890ff' },
   }
+
+  const statusColumns: ProColumns<OtMyStatus>[] = [
+    { title: '월', dataIndex: 'month', width: 80 },
+    { title: '초과근무시간(h)', dataIndex: 'hours', width: 140, render: (_, r) => typeof r.hours === 'number' ? r.hours.toFixed(1) : r.hours },
+    { title: '승인건수', dataIndex: 'approvedCount', width: 100 },
+  ]
+
+  /** 인라인 데이터를 PageResponse로 변환 */
+  const fetchInline = async (): Promise<PageResponse<OtMyStatus>> => ({
+    content: data,
+    totalElements: data.length,
+    totalPages: 1,
+    size: data.length,
+    number: 0,
+  })
+
   return (
     <div>
       <h3 style={{ marginBottom: 16 }}>연간 초과근무 현황</h3>
       <Column {...config} />
       <div style={{ marginTop: 16 }}>
-        <table style={{ width: '100%', borderCollapse: 'collapse', fontSize: 13 }}>
-          <thead>
-            <tr style={{ background: '#f5f5f5' }}>
-              <th style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>월</th>
-              <th style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>초과근무시간(h)</th>
-              <th style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>승인건수</th>
-            </tr>
-          </thead>
-          <tbody>
-            {data.map(row => (
-              <tr key={row.month}>
-                <td style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>{row.month}</td>
-                <td style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>{typeof row.hours === 'number' ? row.hours.toFixed(1) : row.hours}</td>
-                <td style={{ padding: '6px 12px', border: '1px solid #ddd', textAlign: 'center' }}>{row.approvedCount}</td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+        <DataTable<OtMyStatus>
+          columns={statusColumns}
+          request={fetchInline}
+          rowKey="month"
+          headerTitle="월별 상세"
+          search={false}
+        />
       </div>
     </div>
   )
@@ -109,6 +126,7 @@ export default function OtMyStatusPage() {
 
   return (
     <PageContainer title="나의 근무현황">
+      <SearchForm fields={myStatusSearchFields} onSearch={(values) => console.log('검색:', values)} />
       <Tabs defaultActiveKey="annual" items={tabItems} />
     </PageContainer>
   )

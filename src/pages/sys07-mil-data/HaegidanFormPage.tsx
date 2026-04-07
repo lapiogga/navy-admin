@@ -115,8 +115,16 @@ export default function HaegidanFormPage({ initialValues, mode = 'create', onSuc
           <Select options={YEAR_OPTIONS} placeholder="발행년도 선택" />
         </Form.Item>
 
-        <Form.Item name="storageLocation" label="보관장소">
-          <Select options={STORAGE_LOCATION_OPTIONS} placeholder="보관장소 선택" />
+        <Form.Item name="storageLocation" label="보관위치(파일철)">
+          <Select options={STORAGE_LOCATION_OPTIONS} placeholder="보관위치 선택" />
+        </Form.Item>
+
+        <Form.Item name="cabinetLocation" label="보관위치(캐비넷)">
+          <Input placeholder="캐비넷 위치 입력" />
+        </Form.Item>
+
+        <Form.Item name="manageDept" label="관리부서">
+          <Select options={DEPARTMENT_OPTIONS} placeholder="관리부서 선택" />
         </Form.Item>
 
         <Form.Item name="pages" label="쪽수">
@@ -127,6 +135,25 @@ export default function HaegidanFormPage({ initialValues, mode = 'create', onSuc
       <Form.Item name="title" label="자료명" rules={[{ required: true, message: '자료명을 입력하세요' }]}>
         <Input placeholder="자료명 입력" />
       </Form.Item>
+
+      {/* CSV: 관리자(군번, 성명, 계급, 직책) */}
+      <div style={{ border: '1px solid #d9d9d9', borderRadius: 4, padding: 16, marginBottom: 16 }}>
+        <h4 style={{ marginTop: 0, marginBottom: 12 }}>관리자 정보</h4>
+        <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: '0 16px' }}>
+          <Form.Item name="managerServiceNumber" label="관리자 군번">
+            <Input placeholder="군번 입력" />
+          </Form.Item>
+          <Form.Item name="managerName" label="관리자 성명">
+            <Input placeholder="성명 입력" />
+          </Form.Item>
+          <Form.Item name="managerRank" label="관리자 계급">
+            <Input placeholder="계급 입력" />
+          </Form.Item>
+          <Form.Item name="managerTitle" label="관리자 직책">
+            <Input placeholder="직책 입력" />
+          </Form.Item>
+        </div>
+      </div>
 
       <Form.Item name="attachFile" label="첨부파일">
         <Upload beforeUpload={() => false} maxCount={1}>

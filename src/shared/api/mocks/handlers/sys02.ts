@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 
 // 타입 정의
 export type SurveyStatus = 'draft' | 'submitted' | 'approved' | 'rejected' | 'active' | 'closed'
@@ -22,10 +24,21 @@ export interface Survey extends Record<string, unknown> {
   isPublicResult: boolean
   isAnonymous: boolean
   authorName: string
+  authorServiceNumber?: string
+  authorRank?: string
   createdAt: string
   submittedAt?: string
   categoryId?: string
   templateId?: string
+  // 대상 필터 필드 (CSV 입력값 반영)
+  targetRank?: string[]
+  targetUnit?: string[]
+  targetPosition?: string[]
+  targetGender?: string
+  // 첨부파일 필드
+  referenceFile?: string
+  surveyFile?: string
+  securityReviewFile?: string
 }
 
 export interface SurveyQuestion extends Record<string, unknown> {
@@ -42,6 +55,8 @@ export interface SurveyResponse extends Record<string, unknown> {
   id: string
   surveyId: string
   questionId: string
+  serviceNumber: string
+  rank: string
   respondentName: string
   answer: string | string[]
   ratingValue?: number
@@ -69,6 +84,7 @@ export interface SurveyTemplate extends Record<string, unknown> {
 export interface SurveyTarget extends Record<string, unknown> {
   id: string
   surveyId: string
+  serviceNumber: string
   targetName: string
   targetUnit: string
   targetRank: string
@@ -76,7 +92,7 @@ export interface SurveyTarget extends Record<string, unknown> {
   respondedAt?: string
 }
 
-const UNITS = ['1사단', '2사단', '3사단', '해병대사령부', '교육훈련단']
+const UNITS = [...MARINE_UNITS]
 const RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '준위', '원사', '상사', '중사', '하사']
 const STATUSES: SurveyStatus[] = ['draft', 'submitted', 'approved', 'rejected', 'active', 'closed']
 const QUESTION_TYPES: QuestionType[] = ['radio', 'checkbox', 'textarea', 'rate']
@@ -149,6 +165,8 @@ let surveys: Survey[] = Array.from({ length: 20 }, (_, i) => {
     isPublicResult: i % 3 !== 2,
     isAnonymous: i % 2 === 0,
     authorName: faker.person.lastName() + faker.person.firstName(),
+    authorServiceNumber: randomServiceNumber(),
+    authorRank: RANKS[i % RANKS.length],
     createdAt: faker.date.recent({ days: 60 }).toISOString().split('T')[0],
     submittedAt: ['submitted', 'approved', 'rejected', 'active', 'closed'].includes(status)
       ? faker.date.recent({ days: 30 }).toISOString().split('T')[0]
@@ -234,6 +252,8 @@ let responses: SurveyResponse[] = Array.from({ length: 60 }, (_, i) => ({
   id: `resp-${i + 1}`,
   surveyId: `survey-${(i % 20) + 1}`,
   questionId: `q-survey-${(i % 20) + 1}-${(i % 4) + 1}`,
+  serviceNumber: randomServiceNumber(),
+  rank: RANKS[i % RANKS.length],
   respondentName: faker.person.lastName() + faker.person.firstName(),
   answer: i % 4 === 2 ? TEXT_ANSWERS[i % TEXT_ANSWERS.length] : ANSWER_TEXTS[i % ANSWER_TEXTS.length],
   ratingValue: i % 4 === 3 ? faker.number.int({ min: 1, max: 5 }) : undefined,
@@ -243,6 +263,7 @@ let responses: SurveyResponse[] = Array.from({ length: 60 }, (_, i) => ({
 let targets: SurveyTarget[] = Array.from({ length: 80 }, (_, i) => ({
   id: `target-${i + 1}`,
   surveyId: `survey-${(i % 20) + 1}`,
+  serviceNumber: randomServiceNumber(),
   targetName: faker.person.lastName() + faker.person.firstName(),
   targetUnit: UNITS[i % UNITS.length],
   targetRank: RANKS[i % RANKS.length],

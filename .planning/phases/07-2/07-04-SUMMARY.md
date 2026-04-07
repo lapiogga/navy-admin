@@ -158,3 +158,9 @@ Commits verified:
 - 5013474: FOUND (Task 2)
 
 Tests: 1092/1092 PASSED
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS15 보안일일결산체계 보안일일결산/결재 페이지에 req_spec 기반 6대 규칙 적용. SearchForm 추가, militaryPersonColumn 적용, 미실시자/부재자 사유 필수 입력 규칙 UI 로직 구현, DataTable navy-bordered-table CSS 적용.

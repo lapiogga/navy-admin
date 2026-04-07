@@ -8,6 +8,9 @@ import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtRequest } from '@/shared/api/mocks/handlers/sys01-overtime'
@@ -40,10 +43,34 @@ async function fetchRequests(params: PageRequest): Promise<PageResponse<OtReques
   return data
 }
 
+const DUTY_POST_OPTIONS = [
+  { label: '제1당직실', value: '제1당직실' },
+  { label: '제2당직실', value: '제2당직실' },
+  { label: '제3당직실', value: '제3당직실' },
+  { label: '본부 당직실', value: '본부 당직실' },
+  { label: '지휘통제실', value: '지휘통제실' },
+  { label: '통신당직실', value: '통신당직실' },
+  { label: '함정당직실', value: '함정당직실' },
+]
+
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'requestType', label: '신청서 종류', type: 'select', options: REQUEST_TYPE_OPTIONS },
+  { name: 'workDate', label: '근무일', type: 'date' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '작성중', value: 'draft' },
+    { label: '결재대기', value: 'pending' },
+    { label: '승인', value: 'approved' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
+
 interface FormValues {
   requestType: string
   workDate: Dayjs
   timeRange: [Dayjs, Dayjs]
+  applicantIp: string
+  dutyPost: string
   reason: string
 }
 
@@ -71,6 +98,8 @@ function OtRequestForm({ open, editRecord, onClose, onSuccess }: OtRequestFormPr
         startTime,
         endTime,
         totalHours: hours,
+        applicantIp: values.applicantIp,
+        dutyPost: values.dutyPost,
         reason: values.reason,
       }
       if (editRecord) {
@@ -126,6 +155,12 @@ function OtRequestForm({ open, editRecord, onClose, onSuccess }: OtRequestFormPr
         <Form.Item label="총 근무시간">
           <Input value={`${totalHours} 시간`} readOnly style={{ background: '#f5f5f5' }} />
         </Form.Item>
+        <Form.Item name="applicantIp" label="신청자 IP">
+          <Input placeholder="예: 192.168.1.1" />
+        </Form.Item>
+        <Form.Item name="dutyPost" label="당직개소" rules={[{ required: true }]}>
+          <Select options={DUTY_POST_OPTIONS} placeholder="당직개소 선택" />
+        </Form.Item>
         <Form.Item name="reason" label="근무사유" rules={[{ required: true }]}>
           <TextArea rows={3} placeholder="근무사유를 입력하세요" />
         </Form.Item>
@@ -160,8 +195,9 @@ export default function OtRequestPage() {
     { title: '시작시간', dataIndex: 'startTime', width: 90 },
     { title: '종료시간', dataIndex: 'endTime', width: 90 },
     { title: '총근무시간(h)', dataIndex: 'totalHours', width: 110 },
+    { title: '당직개소', dataIndex: 'dutyPost', width: 120 },
     { title: '근무사유', dataIndex: 'reason', ellipsis: true },
-    { title: '신청자', dataIndex: 'applicantName', width: 90 },
+    militaryPersonColumn<OtRequest>('신청자', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'applicantName' }),
     { title: '부대(서)', dataIndex: 'applicantUnit', width: 100 },
     {
       title: '상태',
@@ -204,6 +240,7 @@ export default function OtRequestPage() {
 
   return (
     <PageContainer title="신청서 작성">
+      <SearchForm fields={searchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <DataTable<OtRequest>
         columns={columns}
         request={fetchRequests}

@@ -6,6 +6,7 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { MilDocUsage } from '@/shared/api/mocks/handlers/sys07'
@@ -155,9 +156,12 @@ export default function MilDataUsagePage() {
       ),
     },
     { title: '비밀등급', dataIndex: 'securityLevel', width: 90, render: (_, r) => securityLevelTag(r.securityLevel) },
-    { title: '성명', dataIndex: 'userName', width: 100 },
-    { title: '군번', dataIndex: 'militaryId', width: 100 },
-    { title: '계급', dataIndex: 'rank', width: 80 },
+    // R6: 대출자/열람자/지출자 군번/계급/성명 통합 컬럼
+    militaryPersonColumn<MilDocUsage>('대출/열람자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'userName',
+    }),
     { title: '직위', dataIndex: 'position', width: 100 },
     { title: '부대(서)', dataIndex: 'unit', width: 120 },
     { title: '활용일', dataIndex: 'usageDate', width: 110 },
@@ -246,7 +250,9 @@ export default function MilDataUsagePage() {
               <div><b>군번:</b> {selectedUsage.militaryId}</div>
               <div><b>계급:</b> {selectedUsage.rank}</div>
               <div><b>직위:</b> {selectedUsage.position}</div>
-              <div><b>부대(서):</b> {selectedUsage.unit}</div>
+              <div><b>소속:</b> {selectedUsage.unit}</div>
+              <div><b>군전화:</b> {selectedUsage.milPhone ?? '-'}</div>
+              <div><b>휴대전화:</b> {selectedUsage.phone ?? '-'}</div>
               <div><b>활용일:</b> {selectedUsage.usageDate}</div>
               <div><b>반납예정일:</b> {selectedUsage.returnDueDate}</div>
               {selectedUsage.returnDate && <div><b>반납일:</b> {selectedUsage.returnDate}</div>}
@@ -285,7 +291,7 @@ export default function MilDataUsagePage() {
                 onChange={(v) => setApplySecurityLevel(v)}
               />
             </Form.Item>
-            <Form.Item name="militaryId" label="군번" rules={[{ required: true, message: '군번을 입력하세요' }]}>
+            <Form.Item name="serviceNumber" label="군번" rules={[{ required: true, message: '군번을 입력하세요' }]}>
               <Input placeholder="군번 입력" />
             </Form.Item>
             <Form.Item name="userName" label="성명" rules={[{ required: true, message: '성명을 입력하세요' }]}>
@@ -297,11 +303,14 @@ export default function MilDataUsagePage() {
             <Form.Item name="position" label="직위">
               <Input placeholder="직위 입력" />
             </Form.Item>
-            <Form.Item name="unit" label="부대(서)">
-              <Input placeholder="부대(서) 입력" />
+            <Form.Item name="unit" label="소속">
+              <Input placeholder="소속 입력" />
             </Form.Item>
-            <Form.Item name="phone" label="연락처">
-              <Input placeholder="연락처 입력" />
+            <Form.Item name="milPhone" label="군전화">
+              <Input placeholder="군전화 입력" />
+            </Form.Item>
+            <Form.Item name="phone" label="휴대전화">
+              <Input placeholder="휴대전화 입력" />
             </Form.Item>
             <Form.Item name="returnDueDate" label="반납예정일">
               <DatePicker style={{ width: '100%' }} />

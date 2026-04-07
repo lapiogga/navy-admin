@@ -63,3 +63,27 @@ created: 2026-04-06
 | TBD | 07-04 | 2 | SEC-01~09 | unit+file | pending |
 | TBD | 07-05 | 3 | PERF-07~17 | unit+file | pending |
 | TBD | 07-06 | 3 | SEC-10~28 | unit+file | pending |
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+req_spec 기반 전체 서브시스템 GAP 분석 후 Phase 7 소속 SYS03/SYS15에 6대 규칙(R1~R6) 적용 완료.
+
+### 검증 항목 추가
+
+| 항목 | 대상 | 검증 방법 | 상태 |
+|------|------|----------|------|
+| R1 입력값 반영 | SYS03/SYS15 CrudForm | 필드 수 확인 | 적용완료 |
+| R2 SearchForm | SYS03 15개 페이지, SYS15 | UI 렌더링 확인 | 적용완료 |
+| R3 미실시자/부재자 사유 | SYS15 보안일일결산 | 필수 입력 규칙 동작 | 적용완료 |
+| R5 DataTable CSS | 전체 | navy-bordered-table 클래스 | 적용완료 |
+| R6 militaryPersonColumn | SYS03 4페이지, SYS15 | 군번/계급/성명 3항목 표시 | 적용완료 |
+
+### 공통 컴포넌트 수정 사항
+
+- `DataTable.tsx`: navy-bordered-table CSS 클래스 적용
+- `index.css`: 글로벌 CSS (테이블 라인, 검색영역 컨테이너)
+- `SearchForm.tsx`: search-form-container wrapper 추가
+- `CrudForm.tsx`: file/dateRange 타입 필드 추가
+- `military.ts`: formatMilitaryPerson(), militaryPersonColumn() 헬퍼 신규 생성

@@ -102,3 +102,12 @@ LocalStorage 즐겨찾기 훅 + DataTable+Modal 패턴으로 현행규정/예규
 없음. 모든 페이지가 MSW 핸들러와 연결된 실제 데이터로 렌더링됩니다.
 
 ## Self-Check: PASSED
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS05 행정규칙포탈체계에 req_spec 기반 GAP 수정 적용:
+- **R2**: 목록 화면 상단에 SearchForm 3개 조건 (규정명/문서번호/분류) 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 관련 인물 컬럼에 militaryPersonColumn() 헬퍼 적용 (군번/계급/성명)

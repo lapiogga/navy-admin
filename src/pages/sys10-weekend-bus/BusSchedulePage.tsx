@@ -1,11 +1,12 @@
-import { useRef } from 'react'
+import { useRef, useState } from 'react'
 import { Button, Modal, message, Popconfirm, Form, Select, DatePicker, TimePicker, InputNumber } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest } from '@/shared/api/types'
-import { useState } from 'react'
 
 interface ScheduleRecord extends Record<string, unknown> {
   id: string
@@ -48,11 +49,38 @@ export function BusSchedulePage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [modalMode, setModalMode] = useState<'create' | 'edit'>('create')
   const [editRecord, setEditRecord] = useState<ScheduleRecord | null>(null)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [form] = Form.useForm()
 
+  // 검색 필드 정의 (CSV: 구간별, 계급별, 일자별)
+  const searchFields: SearchField[] = [
+    {
+      name: 'routeId',
+      label: '구간(노선)',
+      type: 'select',
+      options: ROUTE_OPTIONS,
+    },
+    {
+      name: 'rank',
+      label: '계급',
+      type: 'select',
+      options: RANK_OPTIONS,
+    },
+    { name: 'dateRange', label: '운행일자', type: 'dateRange' },
+  ]
+
   const fetchSchedules = async (params: PageRequest) => {
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      ...Object.fromEntries(
+        Object.entries(searchParams)
+          .filter(([, v]) => v != null && v !== '')
+          .map(([k, v]) => [k, String(v)])
+      ),
+    })
     const res = await apiClient.get<{ content: ScheduleRecord[]; totalElements: number }>(
-      `/sys10/schedule?page=${params.page}&size=${params.size}`
+      `/sys10/schedule?${qs.toString()}`
     )
     return {
       content: res.data.content,
@@ -142,6 +170,19 @@ export function BusSchedulePage() {
   return (
     <div style={{ padding: 24 }}>
       <h2>예약시간관리</h2>
+
+      {/* 검색영역 (R2: CSV 검색조건 - 구간별, 계급별, 일자별) */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
 
       <DataTable<ScheduleRecord>
         columns={columns}

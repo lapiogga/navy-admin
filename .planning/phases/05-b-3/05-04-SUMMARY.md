@@ -106,3 +106,9 @@ tests-added: 53
 - FOUND: OrgDiagnosisPage.tsx
 - FOUND: commit faa9f98
 - FOUND: commit 53b3beb
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS18 직무기술서관리체계에 req_spec 기반 6대 규칙 적용. SearchForm 추가, 결재자지정 UI 로직 반영, 엑셀가져오기 기능 반영, 초과근무실적연동 규칙 반영. DataTable에 navy-bordered-table CSS 적용.

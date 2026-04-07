@@ -19,5 +19,5 @@ export function StatusBadge({ status, colorMap, labelMap }: StatusBadgeProps) {
   const mergedColors = { ...DEFAULT_COLOR_MAP, ...colorMap }
   const label = labelMap?.[status] ?? status
   const color = mergedColors[status] ?? 'default'
-  return <Tag color={color}>{label}</Tag>
+  return <Tag color={color} bordered={false}>{label}</Tag>
 }

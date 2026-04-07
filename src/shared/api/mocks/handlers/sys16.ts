@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // 타입 정의
 type ReservationStatus = 'pending' | 'approved' | 'rejected'
@@ -32,6 +33,13 @@ interface Reservation {
   status: ReservationStatus
   createdAt: string
   processedAt?: string
+  // CSV 스펙 반영 추가 필드
+  meetingName: string
+  meetingGrade: string
+  hostDepartment: string
+  reserverServiceNumber: string
+  reserverRank: string
+  reserverName: string
 }
 
 // Mock 데이터 생성
@@ -68,14 +76,20 @@ const meetingRooms: MeetingRoom[] = Array.from({ length: 5 }, (_, i) => ({
 }))
 
 const STATUSES: ReservationStatus[] = ['pending', 'approved', 'rejected']
+const MEETING_GRADES = ['일반', '비밀', '대외비']
+const HOST_DEPARTMENTS = ['작전과', '인사과', '군수과', '정보통신과']
+const RANKS = ['대위', '소령', '중령', '대령']
+
 const reservations: Reservation[] = Array.from({ length: 25 }, (_, i) => {
   const room = meetingRooms[i % meetingRooms.length]
   const status = STATUSES[i % 3]
+  const reserverLastName = faker.person.lastName()
+  const reserverFirstName = faker.person.firstName()
   return {
     id: `res-${i + 1}`,
     roomId: room.id,
     roomName: room.name,
-    applicant: faker.person.lastName() + faker.person.firstName(),
+    applicant: reserverLastName + reserverFirstName,
     unit: `제${faker.number.int({ min: 1, max: 9 })}대대`,
     managingUnit: faker.helpers.arrayElement(MANAGING_UNITS),
     purpose: faker.lorem.sentence(),
@@ -87,6 +101,13 @@ const reservations: Reservation[] = Array.from({ length: 25 }, (_, i) => {
     status,
     createdAt: faker.date.recent({ days: 30 }).toISOString().split('T')[0],
     processedAt: status !== 'pending' ? faker.date.recent({ days: 7 }).toISOString().split('T')[0] : undefined,
+    // CSV 스펙 반영 필드
+    meetingName: faker.lorem.sentence(),
+    meetingGrade: faker.helpers.arrayElement(MEETING_GRADES),
+    hostDepartment: faker.helpers.arrayElement(HOST_DEPARTMENTS),
+    reserverServiceNumber: randomServiceNumber(),
+    reserverRank: faker.helpers.arrayElement(RANKS),
+    reserverName: reserverLastName + reserverFirstName,
   }
 })
 
@@ -112,7 +133,7 @@ export const sys16Handlers = [
       id: `res-${Date.now()}`,
       roomId: room.id,
       roomName: room.name,
-      applicant: '홍길동',
+      applicant: body.reserverName || '홍길동',
       unit: '제1대대',
       managingUnit: body.managingUnit || '',
       purpose: body.purpose || '',
@@ -123,6 +144,12 @@ export const sys16Handlers = [
       attendees: body.attendees || '',
       status: 'pending',
       createdAt: new Date().toISOString().split('T')[0],
+      meetingName: body.meetingName || '',
+      meetingGrade: body.meetingGrade || '일반',
+      hostDepartment: body.hostDepartment || '',
+      reserverServiceNumber: body.reserverServiceNumber || '',
+      reserverRank: body.reserverRank || '',
+      reserverName: body.reserverName || '홍길동',
     }
     reservations.push(newReservation)
     return HttpResponse.json({ success: true, data: newReservation })
@@ -137,13 +164,18 @@ export const sys16Handlers = [
     return HttpResponse.json({ success: true, data: paginate(myReservations, page, size) })
   }),
 
-  // 전체 예약 목록 (관리자)
+  // 전체 예약 목록 (회의현황)
   http.get('/api/sys16/reservations/status', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
     const unitFilter = url.searchParams.get('managingUnit')
-    const filtered = unitFilter ? reservations.filter((r) => r.managingUnit === unitFilter) : reservations
+    const roomFilter = url.searchParams.get('roomId')
+    const dateFilter = url.searchParams.get('meetingDate')
+    let filtered = reservations
+    if (unitFilter) filtered = filtered.filter((r) => r.managingUnit === unitFilter)
+    if (roomFilter) filtered = filtered.filter((r) => r.roomId === roomFilter)
+    if (dateFilter) filtered = filtered.filter((r) => r.date === dateFilter)
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
 

@@ -4,19 +4,27 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { TaskResult } from '@/shared/api/mocks/handlers/sys03-performance'
 
-async function fetchPendingResults(params: PageRequest): Promise<PageResponse<TaskResult>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '과제명/부대(서)', type: 'text', placeholder: '과제명 또는 부대(서) 검색' },
+]
+
+async function fetchPendingResults(params: PageRequest & { keyword?: string }): Promise<PageResponse<TaskResult>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<TaskResult>>>('/sys03/task-results', {
-    params: { current: params.page + 1, pageSize: params.size, status: 'pending' },
+    params: { current: params.page + 1, pageSize: params.size, status: 'pending', keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<TaskResult>>).data ?? (res as unknown as PageResponse<TaskResult>)
 }
 
 export default function PerfTaskResultApprovalPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [detailOpen, setDetailOpen] = useState(false)
   const [rejectOpen, setRejectOpen] = useState(false)
   const [selectedItem, setSelectedItem] = useState<TaskResult | null>(null)
@@ -85,12 +93,13 @@ export default function PerfTaskResultApprovalPage() {
 
   return (
     <PageContainer title="과제실적 승인">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<TaskResult>
         rowKey="id"
         columns={columns}
         headerTitle="결재대기 업무실적 목록"
         actionRef={actionRef}
-        request={(params) => fetchPendingResults(params)}
+        request={(params) => fetchPendingResults({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
       />
 
       {/* 상세 Modal */}

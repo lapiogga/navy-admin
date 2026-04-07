@@ -5,18 +5,33 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
 interface PersonalDeptApproval extends Record<string, unknown> {
   id: string
   applicantName: string
+  applicantRank: string
+  serviceNumber: string
   fromDept: string
   toDept: string
   reason: string
   status: string
   createdAt: string
 }
+
+/** 검색 필드 정의 */
+const personalDeptSearchFields: SearchField[] = [
+  { name: 'applicantName', label: '신청자', type: 'text', placeholder: '성명 검색' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '승인대기', value: 'pending' },
+    { label: '승인', value: 'approved' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 const STATUS_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 'green', rejected: 'red' }
 const STATUS_LABEL_MAP: Record<string, string> = { pending: '승인대기', approved: '승인', rejected: '반려' }
@@ -61,7 +76,7 @@ export default function OtPersonalDeptApprovalPage() {
   }
 
   const columns: ProColumns<PersonalDeptApproval>[] = [
-    { title: '신청자', dataIndex: 'applicantName', width: 100 },
+    militaryPersonColumn<PersonalDeptApproval>('신청자', { serviceNumber: 'serviceNumber', rank: 'applicantRank', name: 'applicantName' }),
     { title: '이동 전 부서', dataIndex: 'fromDept', width: 130 },
     { title: '이동 후 부서', dataIndex: 'toDept', width: 130 },
     { title: '사유', dataIndex: 'reason', ellipsis: true },
@@ -102,6 +117,7 @@ export default function OtPersonalDeptApprovalPage() {
 
   return (
     <PageContainer title="개인별 부서 이동 승인">
+      <SearchForm fields={personalDeptSearchFields} onSearch={(values) => { console.log('검색:', values); actionRef.current?.reload() }} />
       <DataTable<PersonalDeptApproval>
         columns={columns}
         request={fetchApprovals}

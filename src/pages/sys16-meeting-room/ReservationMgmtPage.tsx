@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import axios from 'axios'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 
 interface Reservation extends Record<string, unknown> {
@@ -21,6 +22,9 @@ interface Reservation extends Record<string, unknown> {
   status: 'pending' | 'approved' | 'rejected'
   createdAt: string
   processedAt?: string
+  reserverServiceNumber: string
+  reserverRank: string
+  reserverName: string
 }
 
 const STATUS_COLOR_MAP = { pending: 'orange', approved: 'green', rejected: 'red' }
@@ -93,8 +97,11 @@ export default function ReservationMgmtPage() {
 
   const columns: ProColumns<Reservation>[] = [
     { title: '번호', dataIndex: 'id', width: 80, render: (_, __, index) => index + 1 },
-    { title: '신청자', dataIndex: 'applicant', width: 100 },
-    { title: '소속', dataIndex: 'unit', width: 100 },
+    militaryPersonColumn<Reservation>('신청자', {
+      serviceNumber: 'reserverServiceNumber',
+      rank: 'reserverRank',
+      name: 'reserverName',
+    }),
     { title: '회의실', dataIndex: 'roomName', width: 120 },
     { title: '예약일', dataIndex: 'date', width: 110 },
     {

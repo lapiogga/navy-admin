@@ -108,3 +108,14 @@ sys05 페이지(RegulationListPage, PrecedentHQPage, DirectiveListPage)가 `/api
 - [x] 커밋 3fcd914 존재 확인
 - [x] 커밋 e4b60d6 존재 확인
 - [x] 테스트 16/16 통과 확인
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS06 해병대규정관리체계에 req_spec 기반 GAP 수정 적용:
+- **SYS05 독립**: SYS05 행정규칙포탈에서 분리, 전용 4페이지 신규 생성
+- **R1**: 전용 API 핸들러(/api/sys06/) 신규 생성
+- **R2**: 목록 화면 상단에 SearchForm 추가
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: militaryPersonColumn() 헬퍼 적용

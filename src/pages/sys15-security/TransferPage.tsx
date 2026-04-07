@@ -4,6 +4,8 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
@@ -326,8 +328,30 @@ function InboundTab() {
     },
   ]
 
+  // 검색 필드 (CSV line 36: 비밀/매체 인계/인수 결재대기 검색기능 추가)
+  const inboundSearchFields: SearchField[] = [
+    { name: 'keyword', label: '인계자', type: 'text', placeholder: '성명 검색' },
+    { name: 'fromDept', label: '인계 부대(서)', type: 'select', options: [
+      { label: '1함대', value: '1함대' },
+      { label: '2함대', value: '2함대' },
+      { label: '3함대', value: '3함대' },
+      { label: '해군사령부', value: '해군사령부' },
+      { label: '해병대사령부', value: '해병대사령부' },
+    ] },
+    { name: 'status', label: '상태', type: 'select', options: [
+      { label: '인계대기', value: 'pending' },
+      { label: '인수완료', value: 'approved' },
+      { label: '반송', value: 'rejected' },
+    ] },
+  ]
+
   return (
     <div>
+      <SearchForm
+        fields={inboundSearchFields}
+        onSearch={() => actionRef.current?.reload()}
+        onReset={() => actionRef.current?.reload()}
+      />
       <h4 style={{ marginBottom: 8 }}>인수 대기 목록</h4>
       <DataTable<TransferRecord>
         columns={pendingColumns}

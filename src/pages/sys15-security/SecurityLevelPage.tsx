@@ -6,7 +6,10 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { Column, Pie, Line } from '@ant-design/charts'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
@@ -199,9 +202,22 @@ function SecurityLevelEvalTab({ evalType }: { evalType: '수시' | '정기' }) {
     },
   })
 
+  // 검색 필드 (CSV line 52: 검색기능 추가)
+  const evalSearchFields: SearchField[] = [
+    { name: 'keyword', label: '대상자', type: 'text', placeholder: '성명 검색' },
+    { name: 'department', label: '부대(서)', type: 'select', options: [
+      { label: '1함대', value: '1함대' },
+      { label: '2함대', value: '2함대' },
+      { label: '3함대', value: '3함대' },
+      { label: '해군사령부', value: '해군사령부' },
+      { label: '교육사령부', value: '교육사령부' },
+    ] },
+    { name: 'dateRange', label: '평가기간', type: 'dateRange' },
+  ]
+
   const columns: ProColumns<SecurityLevelRecord>[] = [
     { title: '평가일자', dataIndex: 'evalDate', width: 120 },
-    { title: '대상자', dataIndex: 'targetName', width: 100 },
+    militaryPersonColumn<SecurityLevelRecord>('대상자', { serviceNumber: 'targetServiceNumber', rank: 'targetRank', name: 'targetName' }),
     { title: '부대(서)', dataIndex: 'department', width: 120 },
     {
       title: '점수',
@@ -217,7 +233,7 @@ function SecurityLevelEvalTab({ evalType }: { evalType: '수시' | '정기' }) {
         <StatusBadge status={String(val)} colorMap={GRADE_COLOR_MAP} labelMap={GRADE_LABEL_MAP} />
       ),
     },
-    { title: '평가자', dataIndex: 'evaluator', width: 100 },
+    militaryPersonColumn<SecurityLevelRecord>('평가자', { serviceNumber: 'evaluatorServiceNumber', rank: 'evaluatorRank', name: 'evaluator' }),
     {
       title: '상태',
       dataIndex: 'status',
@@ -247,6 +263,11 @@ function SecurityLevelEvalTab({ evalType }: { evalType: '수시' | '정기' }) {
 
   return (
     <div>
+      <SearchForm
+        fields={evalSearchFields}
+        onSearch={() => actionRef.current?.reload()}
+        onReset={() => actionRef.current?.reload()}
+      />
       <div style={{ marginBottom: 16 }}>
         <Button type="primary" onClick={() => { setEditRecord(null); setModalOpen(true) }}>
           평가 입력

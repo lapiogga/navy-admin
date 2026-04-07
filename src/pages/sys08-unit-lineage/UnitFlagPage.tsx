@@ -10,6 +10,8 @@ import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { UnitFlag } from '@/shared/api/mocks/handlers/sys08-unit-lineage'
 import dayjs from 'dayjs'
 
+const { TextArea } = Input
+
 const FLAG_TYPE_OPTIONS = [
   { label: '부대기', value: '부대기' },
   { label: '부대마크', value: '부대마크' },
@@ -68,7 +70,7 @@ export default function UnitFlagPage() {
       setPreviewImage(base64)
       form.setFieldValue('imageBase64', base64)
     }
-    return false // 자동 업로드 방지 (Pitfall 3 대응)
+    return false // 자동 업로드 방지
   }
 
   const columns: ProColumns<UnitFlag>[] = [
@@ -88,6 +90,7 @@ export default function UnitFlagPage() {
     { title: '부대명', dataIndex: 'unitName', width: 150 },
     { title: '구분', dataIndex: 'flagType', width: 100 },
     { title: '개정일자', dataIndex: 'revisionDate', width: 120 },
+    { title: '제작자(고안자)', dataIndex: 'creator', width: 120 },
     { title: '비고', dataIndex: 'remarks', ellipsis: true },
     {
       title: '관리',
@@ -143,7 +146,7 @@ export default function UnitFlagPage() {
         headerTitle="부대기/부대마크 목록"
       />
 
-      {/* 등록/수정 모달 */}
+      {/* 등록/수정 모달 - CSV 입력값 전체 반영 (R1 규칙) */}
       <Modal
         title={editTarget ? '부대기/부대마크 수정' : '부대기/부대마크 등록'}
         open={formOpen}
@@ -174,16 +177,25 @@ export default function UnitFlagPage() {
           <Form.Item name="unitName" label="부대명" rules={[{ required: true, message: '부대명을 입력하세요' }]}>
             <Input disabled={!!editTarget} />
           </Form.Item>
-          <Form.Item name="flagType" label="구분" rules={[{ required: true, message: '구분을 선택하세요' }]}>
+          <Form.Item name="flagType" label="구분(부대기/부대마크)" rules={[{ required: true, message: '구분을 선택하세요' }]}>
             <Select options={FLAG_TYPE_OPTIONS} />
           </Form.Item>
           <Form.Item name="revisionDate" label="개정일자">
             <DatePicker style={{ width: '100%' }} />
           </Form.Item>
+          <Form.Item name="creator" label="제작자(고안자)">
+            <Input />
+          </Form.Item>
+          <Form.Item name="meaning" label="의미">
+            <TextArea rows={3} />
+          </Form.Item>
+          <Form.Item name="motivation" label="제정동기">
+            <TextArea rows={3} />
+          </Form.Item>
           <Form.Item name="remarks" label="비고">
             <Input />
           </Form.Item>
-          <Form.Item label="이미지 업로드">
+          <Form.Item label="이미지(첨부파일)">
             <Upload.Dragger
               beforeUpload={handleBeforeUpload}
               accept="image/*"

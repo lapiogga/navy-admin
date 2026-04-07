@@ -1,5 +1,6 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // 타입 정의
 export interface Regulation {
@@ -12,7 +13,12 @@ export interface Regulation {
   content: string
   fileUrl?: string
   fileName?: string
+  serviceNumber?: string
+  rank?: string
+  authorName?: string
 }
+
+const RANKS = ['이병','일병','상병','병장','하사','중사','상사','원사','준위','소위','중위','대위','소령','중령','대령']
 
 const DEPARTMENTS = ['기획부', '인사부', '작전부', '군수부', '정보부', '감찰실', '법무실', '공보실']
 const CATEGORIES = ['법령', '훈령', '예규', '고시']
@@ -41,6 +47,9 @@ const regulations: Regulation[] = Array.from({ length: 15 }, (_, i) => ({
   content: faker.lorem.paragraphs(2),
   fileUrl: `/files/regulation-${i + 1}.pdf`,
   fileName: `규정_제${i + 1}호.pdf`,
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  authorName: faker.person.fullName(),
 }))
 
 // 해군본부 예규 Mock 데이터 (12건)
@@ -53,6 +62,9 @@ const precedentsHQ: Regulation[] = Array.from({ length: 12 }, (_, i) => ({
   effectiveDate: faker.date.recent({ days: 365 }).toISOString().split('T')[0],
   content: faker.lorem.paragraphs(2),
   fileUrl: `/files/precedent-hq-${i + 1}.pdf`,
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  authorName: faker.person.fullName(),
 }))
 
 // 예하부대 예규 Mock 데이터 (10건)
@@ -65,6 +77,9 @@ const precedentsUnit: Regulation[] = Array.from({ length: 10 }, (_, i) => ({
   effectiveDate: faker.date.recent({ days: 365 }).toISOString().split('T')[0],
   content: faker.lorem.paragraphs(2),
   fileUrl: `/files/precedent-unit-${i + 1}.pdf`,
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  authorName: faker.person.fullName(),
 }))
 
 // 지시문서 Mock 데이터 (8건)
@@ -77,16 +92,22 @@ const directives: Regulation[] = Array.from({ length: 8 }, (_, i) => ({
   effectiveDate: faker.date.recent({ days: 365 }).toISOString().split('T')[0],
   content: faker.lorem.paragraphs(2),
   fileUrl: `/files/directive-${i + 1}.pdf`,
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
+  authorName: faker.person.fullName(),
 }))
 
 export const sys05Handlers = [
-  // 현행규정 목록 (keyword + department 필터 + 페이지네이션)
+  // 현행규정 목록 (검색조건: 규정명, 문서번호, 분류, 소관부서 + 페이지네이션)
   http.get('/api/sys05/regulations', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
     const keyword = url.searchParams.get('keyword') || ''
     const department = url.searchParams.get('department') || ''
+    const titleSearch = url.searchParams.get('title') || ''
+    const docNumberSearch = url.searchParams.get('docNumber') || ''
+    const categorySearch = url.searchParams.get('category') || ''
 
     let filtered = [...regulations]
     if (keyword) {
@@ -99,6 +120,16 @@ export const sys05Handlers = [
     }
     if (department) {
       filtered = filtered.filter((item) => item.department === department)
+    }
+    // 검색 파라미터 필터링 (R2)
+    if (titleSearch) {
+      filtered = filtered.filter((item) => item.title.includes(titleSearch))
+    }
+    if (docNumberSearch) {
+      filtered = filtered.filter((item) => item.docNumber.includes(docNumberSearch))
+    }
+    if (categorySearch) {
+      filtered = filtered.filter((item) => item.category === categorySearch)
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
@@ -144,18 +175,27 @@ export const sys05Handlers = [
     return HttpResponse.json({ success: true })
   }),
 
-  // 해군본부 예규 목록
+  // 해군본부 예규 목록 (검색조건: 예규명, 문서번호)
   http.get('/api/sys05/precedents/hq', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
     const keyword = url.searchParams.get('keyword') || ''
+    const titleSearch = url.searchParams.get('title') || ''
+    const docNumberSearch = url.searchParams.get('docNumber') || ''
 
     let filtered = [...precedentsHQ]
     if (keyword) {
       filtered = filtered.filter(
         (item) => item.title.includes(keyword) || item.docNumber.includes(keyword),
       )
+    }
+    // 검색 파라미터 필터링 (R2)
+    if (titleSearch) {
+      filtered = filtered.filter((item) => item.title.includes(titleSearch))
+    }
+    if (docNumberSearch) {
+      filtered = filtered.filter((item) => item.docNumber.includes(docNumberSearch))
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),
@@ -223,18 +263,27 @@ export const sys05Handlers = [
     return HttpResponse.json({ success: true, data: item })
   }),
 
-  // 지시문서 목록
+  // 지시문서 목록 (검색조건: 지시명, 문서번호)
   http.get('/api/sys05/directives', ({ request }) => {
     const url = new URL(request.url)
     const page = parseInt(url.searchParams.get('page') || '0')
     const size = parseInt(url.searchParams.get('size') || '10')
     const keyword = url.searchParams.get('keyword') || ''
+    const titleSearch = url.searchParams.get('title') || ''
+    const docNumberSearch = url.searchParams.get('docNumber') || ''
 
     let filtered = [...directives]
     if (keyword) {
       filtered = filtered.filter(
         (item) => item.title.includes(keyword) || item.docNumber.includes(keyword),
       )
+    }
+    // 검색 파라미터 필터링 (R2)
+    if (titleSearch) {
+      filtered = filtered.filter((item) => item.title.includes(titleSearch))
+    }
+    if (docNumberSearch) {
+      filtered = filtered.filter((item) => item.docNumber.includes(docNumberSearch))
     }
     return HttpResponse.json({ success: true, data: paginate(filtered, page, size) })
   }),

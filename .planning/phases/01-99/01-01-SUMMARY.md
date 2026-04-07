@@ -115,3 +115,9 @@ requirements: [COM-07, COM-08]
 
 - Task 1: 0ee3ba3
 - Task 2: 9fe13a2
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 01 (코드관리) 화면은 직접 수정 대상 아님. 공통 컴포넌트(DataTable, SearchForm) 강화에 의해 코드관리 목록 화면에 군청색 보더 및 검색 영역 고정이 자동 적용됨.

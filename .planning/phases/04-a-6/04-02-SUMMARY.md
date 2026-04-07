@@ -133,3 +133,14 @@ Duration: ~4s
 ## Self-Check: PASSED
 
 모든 파일이 존재하고 커밋에 포함되었으며 44개 테스트가 통과함.
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS17 검열결과관리체계에 req_spec 기반 GAP 수정 적용:
+- **R1**: CSV 11개 입력항목 전부 CrudForm 필드에 반영
+- **R2**: 목록 화면 상단에 SearchForm 추가
+- **R3**: 공개여부/처분종류 필드 UI 로직 반영
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 검열관 컬럼에 militaryPersonColumn() 헬퍼 적용 (군번/계급/성명)

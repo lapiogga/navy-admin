@@ -4,13 +4,20 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { MainTask, Policy } from '@/shared/api/mocks/handlers/sys03-performance'
 
-async function fetchMainTasks(params: PageRequest): Promise<PageResponse<MainTask>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '과제명/지휘방침', type: 'text', placeholder: '과제명 또는 지휘방침 검색' },
+]
+
+async function fetchMainTasks(params: PageRequest & { keyword?: string }): Promise<PageResponse<MainTask>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<MainTask>>>('/sys03/main-tasks', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<MainTask>>).data ?? (res as unknown as PageResponse<MainTask>)
 }
@@ -25,6 +32,7 @@ async function fetchAllPolicies(): Promise<Policy[]> {
 
 export default function PerfMainTaskPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<MainTask | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<MainTask | null>(null)
@@ -96,12 +104,13 @@ export default function PerfMainTaskPage() {
 
   return (
     <PageContainer title="추진중점과제 관리">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<MainTask>
         rowKey="id"
         columns={columns}
         headerTitle="추진중점과제 목록"
         actionRef={actionRef}
-        request={(params) => fetchMainTasks(params)}
+        request={(params) => fetchMainTasks({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="add"

@@ -23,6 +23,7 @@ import {
 } from '@ant-design/icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ApiResult } from '@/shared/api/types'
+import { formatMilitaryPerson } from '@/shared/lib/military'
 import type { Knowledge, KnowledgeComment } from '@/shared/api/mocks/handlers/sys13'
 
 const { Title, Text, Paragraph } = Typography
@@ -163,7 +164,13 @@ export default function KnowledgeDetailPage({ knowledge, onClose }: KnowledgeDet
 
       {/* 메타 정보 */}
       <Descriptions size="small" bordered column={2} style={{ marginBottom: 16 }}>
-        <Descriptions.Item label="작성자">{knowledge.authorName}</Descriptions.Item>
+        <Descriptions.Item label="작성자">
+          {formatMilitaryPerson({
+            serviceNumber: knowledge.serviceNumber,
+            rank: knowledge.rank,
+            name: knowledge.authorName,
+          })}
+        </Descriptions.Item>
         <Descriptions.Item label="소속">{knowledge.authorUnit}</Descriptions.Item>
         <Descriptions.Item label="등록일">{knowledge.createdAt}</Descriptions.Item>
         <Descriptions.Item label="출처">{knowledge.source}</Descriptions.Item>

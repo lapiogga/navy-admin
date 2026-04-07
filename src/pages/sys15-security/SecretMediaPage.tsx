@@ -7,7 +7,10 @@ import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { SecretItem, MediaItem, EquipmentItem } from '@/shared/api/mocks/handlers/sys15-security'
@@ -102,7 +105,7 @@ const commonColumns: ProColumns<ItemType>[] = [
     width: 80,
     render: (_, r) => <StatusBadge status={r.classification as string} colorMap={{ '1급': 'red', '2급': 'orange', '3급': 'gold', 'II급': 'blue', 'III급': 'cyan' }} />,
   },
-  { title: '등록자', dataIndex: 'registrant', width: 90 },
+  militaryPersonColumn<ItemType>('등록자', { serviceNumber: 'registrantServiceNumber', rank: 'registrantRank', name: 'registrant' }),
   { title: '부대(서)', dataIndex: 'department', width: 120 },
   { title: '등록일자', dataIndex: 'registeredAt', width: 110 },
   {
@@ -211,21 +214,44 @@ function FormModal({ open, mode, type, initialValues, onOk, onCancel, loading }:
         </Form.Item>
 
         {type === 'secret' && (
-          <Form.Item name="noticeDue" label="예고일자">
-            <Input type="date" />
-          </Form.Item>
+          <>
+            <Form.Item name="changeType" label="증감" rules={[{ required: true, message: '증감을 선택하세요' }]}>
+              <Select options={[
+                { label: '증가', value: '증가' },
+                { label: '감소', value: '감소' },
+              ]} />
+            </Form.Item>
+            <Form.Item name="changeStatus" label="증감현황" rules={[{ required: true, message: '증감현황을 입력하세요' }]}>
+              <Input placeholder="예: 신규등록, 인계, 폐기 등" />
+            </Form.Item>
+            <Form.Item name="quantity" label="수량" rules={[{ required: true, message: '수량을 입력하세요' }]}>
+              <Input type="number" min={1} />
+            </Form.Item>
+            <Form.Item name="remark" label="비고">
+              <Input.TextArea rows={2} placeholder="비고사항을 입력하세요" />
+            </Form.Item>
+            <Form.Item name="noticeDue" label="예고일자">
+              <Input type="date" />
+            </Form.Item>
+          </>
         )}
 
         {type === 'media' && (
           <>
-            <Form.Item name="mediaType" label="매체유형" rules={[{ required: true, message: '매체유형을 선택하세요' }]}>
+            <Form.Item name="mediaType" label="매체구분" rules={[{ required: true, message: '매체구분을 선택하세요' }]}>
               <Select options={MEDIA_TYPE_OPTIONS} />
+            </Form.Item>
+            <Form.Item name="changeQuantity" label="증감수량" rules={[{ required: true, message: '증감수량을 입력하세요' }]}>
+              <Input type="number" placeholder="양수: 증가, 음수: 감소" />
             </Form.Item>
             <Form.Item name="serialNo" label="시리얼번호">
               <Input />
             </Form.Item>
             <Form.Item name="capacity" label="용량">
               <Input />
+            </Form.Item>
+            <Form.Item name="remark" label="비고">
+              <Input.TextArea rows={2} placeholder="비고사항을 입력하세요" />
             </Form.Item>
           </>
         )}
@@ -235,11 +261,17 @@ function FormModal({ open, mode, type, initialValues, onOk, onCancel, loading }:
             <Form.Item name="equipmentType" label="장비유형" rules={[{ required: true, message: '장비유형을 선택하세요' }]}>
               <Select options={EQUIPMENT_TYPE_OPTIONS} />
             </Form.Item>
+            <Form.Item name="changeQuantity" label="증감수량" rules={[{ required: true, message: '증감수량을 입력하세요' }]}>
+              <Input type="number" placeholder="양수: 증가, 음수: 감소" />
+            </Form.Item>
             <Form.Item name="modelName" label="모델명">
               <Input />
             </Form.Item>
             <Form.Item name="installLocation" label="설치위치">
               <Input />
+            </Form.Item>
+            <Form.Item name="remark" label="비고">
+              <Input.TextArea rows={2} placeholder="비고사항을 입력하세요" />
             </Form.Item>
           </>
         )}
@@ -309,8 +341,16 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
   const [printItems, setPrintItems] = useState<ItemType[]>([])
   const [activeTab, setActiveTab] = useState('list')
 
-  // 검색 폼 상태
-  const [searchForm] = Form.useForm()
+  // 검색 조건 상태
+  const [searchValues, setSearchValues] = useState<Record<string, unknown>>({})
+
+  // 검색 필드 정의
+  const searchFields: SearchField[] = [
+    { name: 'dateRange', label: '기간', type: 'dateRange' },
+    { name: 'department', label: '부대(서)', type: 'select', options: UNIT_OPTIONS },
+    { name: 'status', label: '상태', type: 'select', options: STATUS_OPTIONS },
+    { name: 'keyword', label: '키워드', type: 'text', placeholder: '명칭/관리번호 검색' },
+  ]
 
   // 이력 조회 탭용 dateRange
   const [historyRange, setHistoryRange] = useState<[string, string] | null>(null)
@@ -423,29 +463,12 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
 
   const listTab = (
     <>
-      {/* 검색 폼 */}
-      <Form
-        form={searchForm}
-        layout="inline"
-        style={{ marginBottom: 12, padding: 12, background: '#fafafa', borderRadius: 4 }}
-      >
-        <Form.Item name="dateRange" label="기간">
-          <DatePicker.RangePicker style={{ width: 220 }} />
-        </Form.Item>
-        <Form.Item name="department" label="부대(서)">
-          <Select options={UNIT_OPTIONS} placeholder="전체" allowClear style={{ width: 130 }} />
-        </Form.Item>
-        <Form.Item name="status" label="상태">
-          <Select options={STATUS_OPTIONS} placeholder="전체" allowClear style={{ width: 110 }} />
-        </Form.Item>
-        <Form.Item name="keyword" label="키워드">
-          <Input placeholder="명칭/관리번호 검색" style={{ width: 160 }} />
-        </Form.Item>
-        <Form.Item>
-          <Button type="primary" onClick={() => actionRef.current?.reload()}>검색</Button>
-          <Button onClick={() => { searchForm.resetFields(); actionRef.current?.reload() }} style={{ marginLeft: 8 }}>초기화</Button>
-        </Form.Item>
-      </Form>
+      {/* 검색 영역 */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => { setSearchValues(values); actionRef.current?.reload() }}
+        onReset={() => { setSearchValues({}); actionRef.current?.reload() }}
+      />
 
       {/* 일괄등록 */}
       <Space style={{ marginBottom: 12 }}>

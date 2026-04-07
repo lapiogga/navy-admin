@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useCallback } from 'react'
 import { message, Modal, Input } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -6,15 +6,21 @@ import { Popconfirm, Button } from 'antd'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { CertApplication } from '@/shared/api/mocks/handlers/sys04'
 
-// 인증서 신청 목록 조회 (전체)
-async function fetchCertificates(params: PageRequest): Promise<PageResponse<CertApplication>> {
+// 인증서 신청 목록 조회 (검색 필터 포함)
+async function fetchCertificates(
+  params: PageRequest,
+  filters?: Record<string, unknown>,
+): Promise<PageResponse<CertApplication>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<CertApplication>>>(
     '/sys04/certificates',
-    { params: { page: params.page, size: params.size } },
+    { params: { page: params.page, size: params.size, ...filters } },
   )
   const data = (res as ApiResult<PageResponse<CertApplication>>).data ?? (res as unknown as PageResponse<CertApplication>)
   return data
@@ -26,11 +32,49 @@ const STATUS_LABEL_MAP: Record<string, string> = { pending: '대기', approved: 
 const NDSCA_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 'green', rejected: 'red' }
 const NDSCA_LABEL_MAP: Record<string, string> = { pending: '처리중', approved: '승인', rejected: '반려' }
 
+const CERT_TYPE_OPTIONS = [
+  { label: '재직증명서', value: '재직증명서' },
+  { label: '경력증명서', value: '경력증명서' },
+  { label: '복무증명서', value: '복무증명서' },
+]
+
+const REQUEST_TYPE_OPTIONS = [
+  { label: '신규발급', value: '신규발급' },
+  { label: '재발급', value: '재발급' },
+  { label: '갱신', value: '갱신' },
+]
+
+const APPROVAL_STATUS_OPTIONS = [
+  { label: '전체', value: '' },
+  { label: '대기', value: 'pending' },
+  { label: '승인', value: 'approved' },
+  { label: '반려', value: 'rejected' },
+]
+
+// 검색 필드 정의
+const approvalSearchFields: SearchField[] = [
+  { name: 'certType', label: '인증서구분', type: 'select', options: CERT_TYPE_OPTIONS },
+  { name: 'requestType', label: '신청구분', type: 'select', options: REQUEST_TYPE_OPTIONS },
+  { name: 'status', label: '진행상태', type: 'select', options: APPROVAL_STATUS_OPTIONS },
+]
+
 export default function CertificateApprovalPage() {
   const queryClient = useQueryClient()
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
   const [rejectTargetId, setRejectTargetId] = useState<string | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [searchFilters, setSearchFilters] = useState<Record<string, unknown>>({})
+
+  // 검색 핸들러
+  const handleSearch = useCallback((values: Record<string, unknown>) => {
+    setSearchFilters(values)
+    queryClient.invalidateQueries({ queryKey: ['sys04-approval'] })
+  }, [queryClient])
+
+  const handleSearchReset = useCallback(() => {
+    setSearchFilters({})
+    queryClient.invalidateQueries({ queryKey: ['sys04-approval'] })
+  }, [queryClient])
 
   // 승인 mutation
   const approveMutation = useMutation({
@@ -85,23 +129,18 @@ export default function CertificateApprovalPage() {
 
   const columns: ProColumns<CertApplication>[] = [
     {
-      title: '번호',
+      title: '순번',
       dataIndex: 'id',
-      width: 80,
+      width: 60,
       render: (_, __, index) => index + 1,
     },
     {
-      title: '신청자',
-      dataIndex: 'applicantName',
-      width: 100,
-    },
-    {
-      title: '소속',
+      title: '소속부서',
       dataIndex: 'applicantUnit',
       width: 120,
     },
     {
-      title: '인증서종류',
+      title: '인증서구분',
       dataIndex: 'certType',
       width: 120,
     },
@@ -110,32 +149,20 @@ export default function CertificateApprovalPage() {
       dataIndex: 'requestType',
       width: 100,
     },
+    militaryPersonColumn<CertApplication>('신청자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'applicantName',
+    }),
     {
-      title: '신청목적',
-      dataIndex: 'purpose',
-      ellipsis: true,
-    },
-    {
-      title: '상태',
-      dataIndex: 'status',
-      width: 80,
-      render: (_, record) => (
-        <StatusBadge
-          status={record.status}
-          colorMap={STATUS_COLOR_MAP}
-          labelMap={STATUS_LABEL_MAP}
-        />
-      ),
-    },
-    {
-      title: '신청일',
+      title: '신청일시',
       dataIndex: 'appliedAt',
       width: 110,
     },
     {
       title: '국방전자서명인증센터',
       dataIndex: 'ndscaStatus',
-      width: 120,
+      width: 150,
       render: (_, record) => (
         <StatusBadge
           status={record.ndscaStatus || 'pending'}
@@ -145,7 +172,24 @@ export default function CertificateApprovalPage() {
       ),
     },
     {
-      title: '처리일',
+      title: '진행상태(최종)',
+      dataIndex: 'status',
+      width: 100,
+      render: (_, record) => (
+        <StatusBadge
+          status={record.status}
+          colorMap={STATUS_COLOR_MAP}
+          labelMap={STATUS_LABEL_MAP}
+        />
+      ),
+    },
+    militaryPersonColumn<CertApplication>('승인자', {
+      serviceNumber: 'approverServiceNumber',
+      rank: 'approverRank',
+      name: 'approverName',
+    }),
+    {
+      title: '처리일시',
       dataIndex: 'processedAt',
       width: 110,
       render: (_, record) => record.processedAt ?? '-',
@@ -191,12 +235,14 @@ export default function CertificateApprovalPage() {
 
   return (
     <PageContainer title="인증서 승인/관리">
+      <SearchForm fields={approvalSearchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<CertApplication>
         rowKey="id"
         columns={columns}
         request={(params) => {
           queryClient.setQueryData(['sys04-approval-params'], params)
-          return fetchCertificates(params)
+          return fetchCertificates(params, searchFilters)
         }}
         headerTitle="승인 대기 목록"
       />

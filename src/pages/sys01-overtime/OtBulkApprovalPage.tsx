@@ -6,9 +6,21 @@ import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtBulkRequest } from '@/shared/api/mocks/handlers/sys01-overtime'
+
+/** 검색 필드 정의 */
+const bulkApprovalSearchFields: SearchField[] = [
+  { name: 'workDate', label: '근무일', type: 'date' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '결재대기', value: 'pending' },
+    { label: '승인', value: 'approved' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 const { TextArea } = Input
 
@@ -105,6 +117,7 @@ export default function OtBulkApprovalPage() {
 
   return (
     <PageContainer title="일괄처리 승인">
+      <SearchForm fields={bulkApprovalSearchFields} onSearch={(values) => console.log('검색:', values)} />
       <DataTable<OtBulkRequest>
         columns={columns}
         request={fetchBulkApprovals}

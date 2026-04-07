@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Button, Dropdown, Modal, Form, Input, DatePicker, Select, message } from 'antd'
-import { DownOutlined } from '@ant-design/icons'
+import { Button, Dropdown, Modal, Form, Input, DatePicker, Select, Upload, message } from 'antd'
+import { DownOutlined, UploadOutlined } from '@ant-design/icons'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { PageContainer } from '@ant-design/pro-components'
@@ -9,6 +9,8 @@ import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { CrudForm } from '@/shared/ui/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { Survey, SurveyStatus } from '@/shared/api/mocks/handlers/sys02'
 
@@ -35,6 +37,30 @@ const STATUS_LABEL_MAP: Record<SurveyStatus, string> = {
 
 const TARGET_UNITS = ['1사단', '2사단', '3사단', '해병대사령부', '교육훈련단']
 const TARGET_RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '준위', '원사', '상사', '중사', '하사']
+const TARGET_POSITIONS = ['지휘관', '참모', '행정관', '교관', '분대장', '소대장', '중대장', '대대장']
+const TARGET_GENDERS = ['남', '여', '전체']
+
+// 검색 필드 정의
+const searchFields: SearchField[] = [
+  {
+    name: 'status',
+    label: '설문상태',
+    type: 'select',
+    options: [
+      { label: '작성중', value: 'draft' },
+      { label: '제출됨', value: 'submitted' },
+      { label: '승인', value: 'approved' },
+      { label: '반려', value: 'rejected' },
+      { label: '진행중', value: 'active' },
+      { label: '마감', value: 'closed' },
+    ],
+  },
+  {
+    name: 'period',
+    label: '설문기간',
+    type: 'dateRange',
+  },
+]
 
 export default function MySurveyPage() {
   const navigate = useNavigate()
@@ -42,12 +68,18 @@ export default function MySurveyPage() {
   const [modalOpen, setModalOpen] = useState(false)
   const [editRecord, setEditRecord] = useState<Survey | null>(null)
   const [targetType, setTargetType] = useState<string>('전체')
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [form] = Form.useForm()
 
   // 설문 목록 조회
   const { data, isLoading } = useQuery({
-    queryKey: ['sys02', 'surveys'],
-    queryFn: () => apiClient.get<{ content: Survey[]; totalElements: number }>('/sys02/surveys'),
+    queryKey: ['sys02', 'surveys', searchParams],
+    queryFn: () => apiClient.get<{ content: Survey[]; totalElements: number }>('/sys02/surveys', {
+      params: {
+        status: searchParams.status || '',
+        keyword: searchParams.keyword || '',
+      },
+    }),
   })
 
   // 생성 뮤테이션
@@ -214,8 +246,24 @@ export default function MySurveyPage() {
     setModalOpen(true)
   }
 
+  // 검색 처리
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+  }
+
   return (
     <PageContainer title="나의 설문관리">
+      {/* 검색영역 */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={handleSearch}
+        onReset={handleSearchReset}
+      />
+
       <DataTable<Survey>
         columns={columns}
         dataSource={surveys}
@@ -312,6 +360,49 @@ export default function MySurveyPage() {
                 ]
               : []),
             {
+              name: 'targetRank',
+              label: '설문조사 대상 계급',
+              children: (
+                <Select
+                  mode="multiple"
+                  placeholder="대상 계급 선택"
+                  options={TARGET_RANKS.map((r) => ({ label: r, value: r }))}
+                />
+              ),
+            },
+            {
+              name: 'targetUnit',
+              label: '설문조사 대상 부대',
+              children: (
+                <Select
+                  mode="multiple"
+                  placeholder="대상 부대 선택"
+                  options={TARGET_UNITS.map((u) => ({ label: u, value: u }))}
+                />
+              ),
+            },
+            {
+              name: 'targetPosition',
+              label: '설문조사 대상 직책',
+              children: (
+                <Select
+                  mode="multiple"
+                  placeholder="대상 직책 선택"
+                  options={TARGET_POSITIONS.map((p) => ({ label: p, value: p }))}
+                />
+              ),
+            },
+            {
+              name: 'targetGender',
+              label: '설문조사 대상 성별',
+              children: (
+                <Select
+                  placeholder="대상 성별 선택"
+                  options={TARGET_GENDERS.map((g) => ({ label: g, value: g }))}
+                />
+              ),
+            },
+            {
               name: 'isPublicResult',
               label: '결과 공개',
               rules: [{ required: true, message: '결과 공개 여부를 선택하세요' }],
@@ -335,6 +426,33 @@ export default function MySurveyPage() {
                     { label: '실명', value: false },
                   ]}
                 />
+              ),
+            },
+            {
+              name: 'referenceFile',
+              label: '관련근거(승인공문)',
+              children: (
+                <Upload beforeUpload={() => false} maxCount={1}>
+                  <Button icon={<UploadOutlined />}>파일 선택</Button>
+                </Upload>
+              ),
+            },
+            {
+              name: 'surveyFile',
+              label: '설문지',
+              children: (
+                <Upload beforeUpload={() => false} maxCount={1}>
+                  <Button icon={<UploadOutlined />}>파일 선택</Button>
+                </Upload>
+              ),
+            },
+            {
+              name: 'securityReviewFile',
+              label: '보안성검토 결과',
+              children: (
+                <Upload beforeUpload={() => false} maxCount={1}>
+                  <Button icon={<UploadOutlined />}>파일 선택</Button>
+                </Upload>
               ),
             },
           ]}

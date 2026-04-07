@@ -4,6 +4,9 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { IndividualTarget } from '@/shared/api/mocks/handlers/sys03-performance'
@@ -12,16 +15,23 @@ const RANKS = ['대장', '중장', '소장', '준장', '대령', '중령', '소�
 const DEPT_NAMES = ['작전처', '정보처', '인사처', '군수처', '기획처', '교육훈련처', '통신처', '동원처']
 const YEARS = ['2022', '2023', '2024', '2025', '2026']
 
-async function fetchIndividualTargets(params: PageRequest): Promise<PageResponse<IndividualTarget>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '성명/부대(서)', type: 'text', placeholder: '성명 또는 부대(서) 검색' },
+  { name: 'year', label: '기준년도', type: 'select', options: YEARS.map((y) => ({ label: y, value: y })) },
+]
+
+async function fetchIndividualTargets(params: PageRequest & { keyword?: string; year?: string }): Promise<PageResponse<IndividualTarget>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<IndividualTarget>>>(
     '/sys03/individual-targets',
-    { params: { current: params.page + 1, pageSize: params.size } },
+    { params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword, year: params.year } },
   )
   return (res as ApiResult<PageResponse<IndividualTarget>>).data ?? (res as unknown as PageResponse<IndividualTarget>)
 }
 
 export default function PerfIndividualTargetPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<IndividualTarget | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<IndividualTarget | null>(null)
@@ -59,8 +69,7 @@ export default function PerfIndividualTargetPage() {
 
   const columns: ProColumns<IndividualTarget>[] = [
     { title: '번호', dataIndex: 'index', valueType: 'index', width: 60 },
-    { title: '성명', dataIndex: 'name', width: 120 },
-    { title: '계급', dataIndex: 'rank', width: 100 },
+    militaryPersonColumn<IndividualTarget>('대상자', { serviceNumber: 'serviceNumber', rank: 'rank', name: 'name' }),
     { title: '부대(서)', dataIndex: 'deptName' },
     { title: '기준년도', dataIndex: 'year', width: 100 },
     {
@@ -89,12 +98,13 @@ export default function PerfIndividualTargetPage() {
 
   return (
     <PageContainer title="개인 업무실적 대상자 관리">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<IndividualTarget>
         rowKey="id"
         columns={columns}
         headerTitle="개인 업무실적 대상자 목록"
         actionRef={actionRef}
-        request={(params) => fetchIndividualTargets(params)}
+        request={(params) => fetchIndividualTargets({ ...params, ...searchParams } as PageRequest & { keyword?: string; year?: string })}
         toolBarRender={() => [
           <Button
             key="add"
@@ -122,6 +132,9 @@ export default function PerfIndividualTargetPage() {
         confirmLoading={saveMutation.isPending}
       >
         <Form form={form} layout="vertical" onFinish={(values) => saveMutation.mutate(values)}>
+          <Form.Item name="serviceNumber" label="군번" rules={[{ required: true, message: '군번을 입력하세요' }]}>
+            <Input placeholder="예) 19-70012345" />
+          </Form.Item>
           <Form.Item name="name" label="성명" rules={[{ required: true, message: '성명을 입력하세요' }]}>
             <Input />
           </Form.Item>

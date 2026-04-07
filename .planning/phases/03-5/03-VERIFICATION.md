@@ -193,5 +193,38 @@ human_verification:
 
 ---
 
+## GAP 수정 반영 (2026-04-07)
+
+2026-04-07 req_spec 기반 전체 GAP 분석 후 Phase 3 소속 5개 서브시스템에 6개 규칙을 일괄 적용하였다.
+
+### 적용 규칙
+
+| 규칙 | 내용 | 적용 결과 |
+|------|------|----------|
+| R1 | 입력값 컬럼 반영 (CSV 입력값 → CrudForm fields) | 각 서브시스템 등록/수정 폼에 누락 필드 추가 |
+| R2 | 검색영역 100px SearchForm 추가 | 목록 그리드 상단에 SearchForm 컴포넌트 배치 |
+| R3 | 규칙/예외사항 UI 로직 반영 | 조건부 표시, 안내문, 제한조건 구현 |
+| R4 | 관리자 메뉴 포함 | 공통기능 관리자 메뉴 서브시스템별 배포 |
+| R5 | 테이블 군청색 라인 (DataTable CSS) | navy-bordered-table 클래스 전역 적용 |
+| R6 | 신청자 = 군번/계급/성명 (militaryPersonColumn) | formatMilitaryPerson() 헬퍼 사용 |
+
+### 서브시스템별 수정 내역
+
+| 서브시스템 | SearchForm | militaryPersonColumn | CrudForm 필드 추가 | 기타 |
+|-----------|-----------|---------------------|-------------------|------|
+| SYS04 인증서 | 3개 조건 (발급유형/상태/기간) | 적용 | 소속기관, 활용동의 checkbox | - |
+| SYS05 행정규칙 | 3개 조건 (규정명/문서번호/분류) | 적용 | - | - |
+| SYS14 나의제언 | 4개 조건 | 적용 ('제언자') | - | 반려사유 모달 추가 |
+| SYS11 연구자료 | 5개 조건 | 적용 | 첨부파일 구분 4종 | - |
+| SYS16 회의실예약 | 적용 | 적용 | 회의명/등급/주관부서 | - |
+
+### 검증 상태
+
+- GAP 수정 코드 반영: 완료
+- 공통 컴포넌트(DataTable, SearchForm, CrudForm, military.ts) 수정: 완료
+- 기존 테스트 regression: 없음
+
+---
+
 _Verified: 2026-04-05T16:30:18Z_
 _Verifier: Claude (gsd-verifier)_

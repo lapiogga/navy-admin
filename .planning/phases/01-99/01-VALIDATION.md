@@ -84,3 +84,9 @@ All test scaffold files are created within each plan's tasks (Wave 0 in-task pat
 - [x] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 1 검증 전략은 변경 없음. 공통 컴포넌트 강화(DataTable CSS, SearchForm wrapper, CrudForm 필드 타입 추가)는 Phase 1 테스트에 영향을 주지 않으며, 기존 66개 테스트는 유효.

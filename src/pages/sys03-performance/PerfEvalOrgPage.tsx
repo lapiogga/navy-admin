@@ -4,20 +4,32 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { EvalOrg, EvalGroup } from '@/shared/api/mocks/handlers/sys03-performance'
 
-async function fetchEvalOrgs(params: PageRequest): Promise<PageResponse<EvalOrg>> {
+/** 평가대상부서 검색 필드 */
+const orgSearchFields: SearchField[] = [
+  { name: 'keyword', label: '부대(서)명/코드', type: 'text', placeholder: '부대(서)명 또는 코드 검색' },
+]
+
+/** 평가그룹 검색 필드 */
+const groupSearchFields: SearchField[] = [
+  { name: 'keyword', label: '그룹명', type: 'text', placeholder: '그룹명 검색' },
+]
+
+async function fetchEvalOrgs(params: PageRequest & { keyword?: string }): Promise<PageResponse<EvalOrg>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<EvalOrg>>>('/sys03/eval-orgs', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<EvalOrg>>).data ?? (res as unknown as PageResponse<EvalOrg>)
 }
 
-async function fetchEvalGroups(params: PageRequest): Promise<PageResponse<EvalGroup>> {
+async function fetchEvalGroups(params: PageRequest & { keyword?: string }): Promise<PageResponse<EvalGroup>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<EvalGroup>>>('/sys03/eval-groups', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<EvalGroup>>).data ?? (res as unknown as PageResponse<EvalGroup>)
 }
@@ -33,6 +45,7 @@ async function fetchAllOrgs(): Promise<EvalOrg[]> {
 // 평가 대상 부서 탭
 function EvalOrgTab() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EvalOrg | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<EvalOrg | null>(null)
@@ -104,12 +117,13 @@ function EvalOrgTab() {
 
   return (
     <>
+      <SearchForm fields={orgSearchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<EvalOrg>
         rowKey="id"
         columns={columns}
         headerTitle="평가 대상 부대(서) 목록"
         actionRef={actionRef}
-        request={(params) => fetchEvalOrgs(params)}
+        request={(params) => fetchEvalOrgs({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="add"
@@ -165,6 +179,7 @@ function EvalOrgTab() {
 // 평가그룹 탭
 function EvalGroupTab() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<EvalGroup | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<EvalGroup | null>(null)
@@ -250,12 +265,13 @@ function EvalGroupTab() {
 
   return (
     <>
+      <SearchForm fields={groupSearchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<EvalGroup>
         rowKey="id"
         columns={columns}
         headerTitle="평가그룹 목록"
         actionRef={actionRef}
-        request={(params) => fetchEvalGroups(params)}
+        request={(params) => fetchEvalGroups({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="add"

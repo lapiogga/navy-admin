@@ -41,26 +41,28 @@ export function SearchForm({ fields, onSearch, onReset }: SearchFormProps) {
   }
 
   return (
-    <Form form={form} onFinish={onSearch} layout="inline" className="mb-4">
-      <Row gutter={[16, 16]} className="w-full">
-        {fields.map((field) => (
-          <Col key={field.name} xs={24} sm={12} md={8} lg={6}>
-            <Form.Item name={field.name} label={field.label}>
-              {renderField(field)}
-            </Form.Item>
+    <div className="search-form-container">
+      <Form form={form} onFinish={onSearch} layout="inline" style={{ width: '100%' }}>
+        <Row gutter={[16, 8]} style={{ width: '100%' }}>
+          {fields.map((field) => (
+            <Col key={field.name} xs={24} sm={12} md={8} lg={6}>
+              <Form.Item name={field.name} label={field.label} style={{ marginBottom: 0 }}>
+                {renderField(field)}
+              </Form.Item>
+            </Col>
+          ))}
+          <Col>
+            <Space>
+              <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
+                검색
+              </Button>
+              <Button onClick={handleReset} icon={<ReloadOutlined />}>
+                초기화
+              </Button>
+            </Space>
           </Col>
-        ))}
-        <Col>
-          <Space>
-            <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>
-              검색
-            </Button>
-            <Button onClick={handleReset} icon={<ReloadOutlined />}>
-              초기화
-            </Button>
-          </Space>
-        </Col>
-      </Row>
-    </Form>
+        </Row>
+      </Form>
+    </div>
   )
 }

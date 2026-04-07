@@ -110,3 +110,9 @@ Commits verified:
 - c970e34: Task 1 (entity/MSW/tests)
 - 56bffbb: Task 2 (ApprovalLinePage)
 - 57430e5: Task 3 (system-mgr pages + routing)
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 03 (결재관리/시스템관리) 화면은 직접 수정 대상 아님. 공통 컴포넌트 강화(DataTable CSS, SearchForm wrapper)가 자동 적용됨.

@@ -6,6 +6,8 @@ import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
 import type { CrudFormField } from '@/shared/ui/CrudForm/CrudForm'
 import { apiClient } from '@/shared/api/client'
@@ -13,6 +15,18 @@ import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { ApprovalItem, Approver, JobDescStatus } from '@/shared/api/mocks/handlers/sys18'
 
 const { TextArea } = Input
+
+// 결재대기 검색 필드 (CSV 행 27: 검색기능 추가)
+const APPROVAL_SEARCH_FIELDS: SearchField[] = [
+  { name: 'writerName', label: '작성자', type: 'text', placeholder: '작성자명 검색' },
+  { name: 'department', label: '부서', type: 'text', placeholder: '부서명 검색' },
+  { name: 'status', label: '상태', type: 'select', options: [
+    { label: '결재대기', value: 'submitted' },
+    { label: '1차완료', value: 'approved_1st' },
+    { label: '결재완료', value: 'completed' },
+    { label: '반려', value: 'rejected' },
+  ]},
+]
 
 // 결재 상태 맵
 const APPROVAL_STATUS_COLOR_MAP: Record<string, string> = {
@@ -57,9 +71,9 @@ const APPROVAL_STEPS_DEF = [
   { title: '완료' },
 ]
 
-async function fetchApprovals(params: PageRequest): Promise<PageResponse<ApprovalItem>> {
+async function fetchApprovals(params: PageRequest & Record<string, unknown>): Promise<PageResponse<ApprovalItem>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalItem>>>('/sys18/approvals', {
-    params: { page: params.page, size: params.size },
+    params: { page: params.page, size: params.size, ...params },
   })
   const data = (res as ApiResult<PageResponse<ApprovalItem>>).data ?? (res as unknown as PageResponse<ApprovalItem>)
   return data
@@ -104,6 +118,17 @@ function ApprovalPendingTab() {
   const [rejectModalOpen, setRejectModalOpen] = useState(false)
   const [rejectTarget, setRejectTarget] = useState<ApprovalItem | null>(null)
   const [rejectReason, setRejectReason] = useState('')
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    actionRef.current?.reload()
+  }
 
   const approveMutation = useMutation({
     mutationFn: (id: string) => apiClient.put(`/sys18/approvals/${id}/approve`),
@@ -191,9 +216,12 @@ function ApprovalPendingTab() {
 
   return (
     <>
+      {/* 검색 영역 (R2) */}
+      <SearchForm fields={APPROVAL_SEARCH_FIELDS} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <DataTable<ApprovalItem>
         columns={columns}
-        request={fetchApprovals}
+        request={(params) => fetchApprovals({ ...params, ...searchParams })}
         rowKey="id"
         actionRef={actionRef}
         headerTitle="결재대기 목록"

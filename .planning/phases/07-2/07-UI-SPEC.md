@@ -429,3 +429,24 @@ const AuthGroupPage = React.lazy(() => import('@/pages/common/auth-group'))
 | /sys15/7/1~2 | BoardListPage (sys15-notice/qna) | 게시판 |
 | /sys15/8/1~5 | CheckItemMgmtPage, HolidayMgmtPage, NotifyTimeMgmtPage, LogHistoryPage, ExceptionMgmtPage | 관리자 |
 | /sys15/9/1~2 | CodeManagementPage, AuthGroupPage | 시스템 |
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+req_spec 기반 GAP 분석 결과, 아래 UI 규칙이 Phase 7 전체 서브시스템에 소급 적용되었다.
+
+### 적용된 UI 변경
+
+1. **SearchForm 100px 영역**: 모든 목록 화면 상단에 높이 100px 검색 폼 영역 추가. `search-form-container` CSS wrapper 사용.
+2. **DataTable 군청색 라인**: 테이블 최상단 군청색(#003366) 2px, 최하단 1px. `navy-bordered-table` CSS 클래스로 통일.
+3. **militaryPersonColumn**: 신청자/등록자/사용자 컬럼에 군번/계급/성명 3항목 동시 표시. `military.ts` 헬퍼 함수 사용.
+4. **CrudForm 필드 확장**: CSV 입력값의 모든 컬럼을 CrudForm 필드에 반영. file/dateRange 타입 추가.
+5. **관리자 메뉴**: SYS03/SYS15 각각에 관리자 기능 메뉴 포함.
+
+### 서브시스템별 UI 변경 요약
+
+| 서브시스템 | SearchForm 변경 | CrudForm 변경 | militaryPersonColumn | 특수 규칙 |
+|-----------|----------------|--------------|---------------------|----------|
+| SYS03 | 15개 페이지 추가 | 입력값 반영 | 4개 페이지 적용 | 검색필터 15개 |
+| SYS15 | 다수 페이지 추가 | 입력값 반영 | 적용 | 미실시자/부재자 사유 필수 |

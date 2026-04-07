@@ -4,15 +4,24 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { DetailTask, SubTask } from '@/shared/api/mocks/handlers/sys03-performance'
 
 const DEPT_NAMES = ['작전처', '정보처', '인사처', '군수처', '기획처', '교육훈련처', '통신처', '동원처']
+const RANKS = ['대장', '중장', '소장', '준장', '대령', '중령', '소령', '대위', '중위', '소위', '원사', '상사', '중사', '하사']
 
-async function fetchDetailTasks(params: PageRequest): Promise<PageResponse<DetailTask>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '과제명/부대(서)/담당자', type: 'text', placeholder: '과제명, 부대(서) 또는 담당자 검색' },
+]
+
+async function fetchDetailTasks(params: PageRequest & { keyword?: string }): Promise<PageResponse<DetailTask>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<DetailTask>>>('/sys03/detail-tasks', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<DetailTask>>).data ?? (res as unknown as PageResponse<DetailTask>)
 }
@@ -27,6 +36,7 @@ async function fetchAllSubTasks(): Promise<SubTask[]> {
 
 export default function PerfDetailTaskPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<DetailTask | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<DetailTask | null>(null)
@@ -72,7 +82,7 @@ export default function PerfDetailTaskPage() {
     { title: '소과제', dataIndex: 'subTaskTitle' },
     { title: '상세과제명', dataIndex: 'title' },
     { title: '부대(서)', dataIndex: 'deptName', width: 120 },
-    { title: '담당자', dataIndex: 'manager', width: 100 },
+    militaryPersonColumn<DetailTask>('담당자', { serviceNumber: 'managerServiceNumber', rank: 'managerRank', name: 'manager' }),
     { title: '가중치(%)', dataIndex: 'weight', width: 100 },
     {
       title: '관리',
@@ -100,12 +110,13 @@ export default function PerfDetailTaskPage() {
 
   return (
     <PageContainer title="상세과제 관리">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<DetailTask>
         rowKey="id"
         columns={columns}
         headerTitle="상세과제 목록"
         actionRef={actionRef}
-        request={(params) => fetchDetailTasks(params)}
+        request={(params) => fetchDetailTasks({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="add"
@@ -145,7 +156,13 @@ export default function PerfDetailTaskPage() {
           <Form.Item name="deptName" label="부대(서)" rules={[{ required: true, message: '부대(서)를 선택하세요' }]}>
             <Select options={DEPT_NAMES.map((d) => ({ label: d, value: d }))} />
           </Form.Item>
-          <Form.Item name="manager" label="담당자" rules={[{ required: true, message: '담당자를 입력하세요' }]}>
+          <Form.Item name="managerServiceNumber" label="담당자 군번" rules={[{ required: true, message: '군번을 입력하세요' }]}>
+            <Input placeholder="예) 19-70012345" />
+          </Form.Item>
+          <Form.Item name="managerRank" label="담당자 계급" rules={[{ required: true, message: '계급을 선택하세요' }]}>
+            <Select options={RANKS.map((r) => ({ label: r, value: r }))} placeholder="계급 선택" />
+          </Form.Item>
+          <Form.Item name="manager" label="담당자 성명" rules={[{ required: true, message: '성명을 입력하세요' }]}>
             <Input />
           </Form.Item>
           <Form.Item name="weight" label="가중치(%)">

@@ -107,14 +107,14 @@
 
 #### 13_지식관리체계 (23개)
 
-- [ ] **KNOW-01**: 지식열람 (목록조회, 상세조회, 검색, 추천, 즐겨찾기, 다운로드, 신고) [7]
-- [ ] **KNOW-02**: 나의 지식 관리 (등록, 수정, 삭제, 목록조회) [4]
-- [ ] **KNOW-03**: 지식 관리 (관리자 승인, 반려) [2]
-- [ ] **KNOW-04**: 지식통계 (분야별, 부대별, 기간별, 인기순, 저장) [5]
-- [ ] **KNOW-05**: 게시판 (공지사항, 질의응답) [2]
-- [ ] **KNOW-06**: 권한관리 [1]
-- [ ] **KNOW-07**: 메뉴관리 [1]
-- [ ] **KNOW-08**: 코드관리 [1]
+- [x] **KNOW-01**: 지식열람 (목록조회, 상세조회, 검색, 추천, 즐겨찾기, 다운로드, 신고) [7]
+- [x] **KNOW-02**: 나의 지식 관리 (등록, 수정, 삭제, 목록조회) [4]
+- [x] **KNOW-03**: 지식 관리 (관리자 승인, 반려) [2]
+- [x] **KNOW-04**: 지식통계 (분야별, 부대별, 기간별, 인기순, 저장) [5]
+- [x] **KNOW-05**: 게시판 (공지사항, 질의응답) [2]
+- [x] **KNOW-06**: 권한관리 [1]
+- [x] **KNOW-07**: 메뉴관리 [1]
+- [x] **KNOW-08**: 코드관리 [1]
 
 #### 17_검열결과관리체계 (25개)
 
@@ -144,13 +144,13 @@
 
 #### 02_설문종합관리체계 (31개)
 
-- [ ] **SURV-01**: 설문참여 (목록조회, 설문응답, 결과보기) [3]
-- [ ] **SURV-02**: 나의 설문관리 (설문생성, 문항편집, 수정, 삭제, 배포, 마감, 결과분석, 저장) [8]
-- [ ] **SURV-03**: 지난 설문보기 (목록조회, 상세조회, 결과보기) [3]
-- [ ] **SURV-04**: 체계관리 (설문관리, 사용자관리, 카테고리관리, 통계, 설문템플릿, 대상자관리 등) [13]
-- [ ] **SURV-05**: 게시판 (공지사항, 질의응답) [2]
-- [ ] **SURV-06**: 공통코드관리 [1]
-- [ ] **SURV-07**: 권한관리 [1]
+- [x] **SURV-01**: 설문참여 (목록조회, 설문응답, 결과보기) [3]
+- [x] **SURV-02**: 나의 설문관리 (설문생성, 문항편집, 수정, 삭제, 배포, 마감, 결과분석, 저장) [8]
+- [x] **SURV-03**: 지난 설문보기 (목록조회, 상세조회, 결과보기) [3]
+- [x] **SURV-04**: 체계관리 (설문관리, 사용자관리, 카테고리관리, 통계, 설문템플릿, 대상자관리 등) [13]
+- [x] **SURV-05**: 게시판 (공지사항, 질의응답) [2]
+- [x] **SURV-06**: 공통코드관리 [1]
+- [x] **SURV-07**: 권한관리 [1]
 
 #### 12_지시건의사항관리체계 (32개)
 
@@ -205,10 +205,10 @@
 
 #### 18_직무기술서관리체계 (47개)
 
-- [ ] **JOB-01**: 직무기술서 작성 (목록조회, 신규작성, 수정, 삭제, 상세조회, 복사, 업무분류, 시간배분, 역량입력, 자격요건, 임시저장, 제출, 검색, 버전관리, 인쇄, 저장) [16]
+- [x] **JOB-01**: 직무기술서 작성 (목록조회, 신규작성, 수정, 삭제, 상세조회, 복사, 업무분류, 시간배분, 역량입력, 자격요건, 임시저장, 제출, 검색, 버전관리, 인쇄, 저장) [16]
 - [x] **JOB-02**: 직무기술서 조회-관리자 (목록조회, 상세조회, 통계, 부대별현황, 직급별, 업무분류별, 검색, 저장, 인쇄, 비교, 이력) [11]
-- [ ] **JOB-03**: 결재 (결재대기, 결재완료, 결재요청, 승인, 반려, 결재이력, 재결재요청, 위임결재, 저장) [9]
-- [ ] **JOB-04**: 조직진단 대상 관리 (대상부대선정, 기간설정, 대상자관리, 진행현황, 저장) [5]
+- [x] **JOB-03**: 결재 (결재대기, 결재완료, 결재요청, 승인, 반려, 결재이력, 재결재요청, 위임결재, 저장) [9]
+- [x] **JOB-04**: 조직진단 대상 관리 (대상부대선정, 기간설정, 대상자관리, 진행현황, 저장) [5]
 - [x] **JOB-05**: 게시판 (공지사항, 질의응답, 자료실) [3]
 - [x] **JOB-06**: 공통���드관리 [1]
 - [x] **JOB-07**: 사용자권한관리 [1]
@@ -265,23 +265,23 @@
 
 #### 03_성과관리체계 (76개)
 
-- [ ] **PERF-01**: 메인화면 (과제현황, 실적현황, 알림) [3]
-- [ ] **PERF-02**: 과제등록 (목록조회, 신규등록, 수정, 삭제, 상세조회, 하위과제, 지표설정, 목표값, 담당자, 저장) [10]
-- [ ] **PERF-03**: 업무실적 입력 (목록조회, 실적입력, 수정, 첨부파일, 제출, 임시저장, 저장) [7]
-- [ ] **PERF-04**: 과제실적 승인 (대기목록, 승인, 반려, 상세조회) [4]
-- [ ] **PERF-05**: 과제실적 평가 (평가대상, 평가입력, 저장) [3]
-- [ ] **PERF-06**: 업무실적(개인) 평가 (대상조회, 평가입력, 저장) [3]
-- [ ] **PERF-07**: 추진진도율 (과제별, 부대별, 기간별, 차트, 저장, 인쇄) [6]
-- [ ] **PERF-08**: 입력현황 (부대별, 기간별, 저장) [3]
-- [ ] **PERF-09**: 평가결과 (과제별, 부대별, 저장) [3]
-- [ ] **PERF-10**: 과제검색 [1]
-- [ ] **PERF-11**: 과제관리 (기준정보: 과제분류, 평가기준, 가중치, 기간설정 등) [14]
-- [ ] **PERF-12**: 업무실적(개인) 기준정보 (평가항목, 평가기준, 가중치, 저장) [4]
-- [ ] **PERF-13**: 평가조직 관리 (조직설정, 평가자지정, 피평가자, 평가기간, 평가유형, 가중치, 저장, 이력) [8]
-- [ ] **PERF-14**: 시스템관리 (사용자, 부대, 권한, 저장) [4]
-- [ ] **PERF-15**: 공지사항 [1]
-- [ ] **PERF-16**: 자료실 [1]
-- [ ] **PERF-17**: 질의응답 [1]
+- [x] **PERF-01**: 메인화면 (과제현황, 실적현황, 알림) [3]
+- [x] **PERF-02**: 과제등록 (목록조회, 신규등록, 수정, 삭제, 상세조회, 하위과제, 지표설정, 목표값, 담당자, 저장) [10]
+- [x] **PERF-03**: 업무실적 입력 (목록조회, 실적입력, 수정, 첨부파일, 제출, 임시저장, 저장) [7]
+- [x] **PERF-04**: 과제실적 승인 (대기목록, 승인, 반려, 상세조회) [4]
+- [x] **PERF-05**: 과제실적 평가 (평가대상, 평가입력, 저장) [3]
+- [x] **PERF-06**: 업무실적(개인) 평가 (대상조회, 평가입력, 저장) [3]
+- [x] **PERF-07**: 추진진도율 (과제별, 부대별, 기간별, 차트, 저장, 인쇄) [6]
+- [x] **PERF-08**: 입력현황 (부대별, 기간별, 저장) [3]
+- [x] **PERF-09**: 평가결과 (과제별, 부대별, 저장) [3]
+- [x] **PERF-10**: 과제검색 [1]
+- [x] **PERF-11**: 과제관리 (기준정보: 과제분류, 평가기준, 가중치, 기간설정 등) [14]
+- [x] **PERF-12**: 업무실적(개인) 기준정보 (평가항목, 평가기준, 가중치, 저장) [4]
+- [x] **PERF-13**: 평가조직 관리 (조직설정, 평가자지정, 피평가자, 평가기간, 평가유형, 가중치, 저장, 이력) [8]
+- [x] **PERF-14**: 시스템관리 (사용자, 부대, 권한, 저장) [4]
+- [x] **PERF-15**: 공지사항 [1]
+- [x] **PERF-16**: 자료실 [1]
+- [x] **PERF-17**: 질의응답 [1]
 
 #### 15_보안일일결산체계 (138개)
 
@@ -338,39 +338,58 @@
 | AI/ML 기능 | MVP 범위 초과 |
 | 모바일 앱 | 웹 우선, 추후 검토 |
 
+### Phase 8: GAP 수정 규칙 (6대 규칙, 2026-04-07 적용)
+
+- [x] **GAP-R1**: 입력값 컬럼 반영 — CSV '입력값' 항목의 모든 컬럼을 CrudForm fields에 반영
+- [x] **GAP-R2**: 검색영역 100px — 목록 그리드 상단에 높이 100px SearchForm (CSV '검색기능' 항목 반영)
+- [x] **GAP-R3**: 규칙/예외사항 반영 — CSV '규칙/예외조건' 내용을 UI 로직/안내문/제한조건으로 구현
+- [x] **GAP-R4**: 관리자 메뉴 포함 — 18개 서브시스템 각각에 관리자 기능 메뉴 포함
+- [x] **GAP-R5**: 테이블 군청색 라인 — 최상단 군청색 2px, 최하단 군청색 1px (DataTable CSS)
+- [x] **GAP-R6**: 신청자/사용자 = 군번/계급/성명 — 3항목 동시 표시 (militaryPersonColumn 헬퍼)
+
+#### 공통 컴포넌트 강화 (GAP 수정 과정에서 추가/변경)
+
+- [x] **GAP-CC1**: DataTable.tsx navy-bordered-table CSS 클래스 적용
+- [x] **GAP-CC2**: SearchForm.tsx search-form-container wrapper 추가
+- [x] **GAP-CC3**: CrudForm.tsx file/dateRange/checkbox 타입 필드 추가
+- [x] **GAP-CC4**: military.ts formatMilitaryPerson() + militaryPersonColumn() 헬퍼 신규 생성
+- [x] **GAP-CC5**: index.css 글로벌 CSS (테이블 라인, 검색영역 컨테이너)
+- [x] **GAP-CC6**: SYS06 독립화 — SYS05에서 분리, 별도 페이지 + API 핸들러
+
 ## Traceability
 
 | Requirement | Phase | Status |
 |-------------|-------|--------|
-| BASE-01~09 | Phase 0 | Pending |
-| COM-01~14 | Phase 1 | Pending |
-| PTL-01~05 | Phase 2 | Pending |
-| CERT-01~06 | Phase 3 | Pending |
-| AREG-01~04 | Phase 3 | Pending |
-| SUGST-01~05 | Phase 3 | Pending |
-| RSRC-01~06 | Phase 3 | Pending |
-| ROOM-01~07 | Phase 3 | Pending |
-| KNOW-01~08 | Phase 4 | Pending |
-| INSP-01~12 | Phase 4 | Pending |
-| MREG-01~08 | Phase 4 | Pending |
-| SURV-01~07 | Phase 4 | Pending |
-| DRCT-01~07 | Phase 4 | Pending |
-| HONOR-01~17 | Phase 4 | Pending |
-| MDATA-01~04 | Phase 5 | Pending |
-| BUS-01~09 | Phase 5 | Pending |
-| JOB-01~08 | Phase 5 | Pending |
-| UNIT-01~11 | Phase 6 | Pending |
-| OT-01~28 | Phase 6 | Pending |
-| PERF-01~17 | Phase 7 | Pending |
-| SEC-01~09 | Phase 7 Plan 04 | Complete |
-| SEC-14~18 | Phase 7 Plan 02 | Complete |
-| SEC-10~13, SEC-19~28 | Phase 7 Plan 06 | Pending |
+| BASE-01~09 | Phase 0 | Complete |
+| COM-01~14 | Phase 1 | Complete |
+| PTL-01~05 | Phase 2 | Complete |
+| CERT-01~06 | Phase 3 | Complete + GAP Fixed |
+| AREG-01~04 | Phase 3 | Complete + GAP Fixed |
+| SUGST-01~05 | Phase 3 | Complete + GAP Fixed |
+| RSRC-01~06 | Phase 3 | Complete + GAP Fixed |
+| ROOM-01~07 | Phase 3 | Complete + GAP Fixed |
+| KNOW-01~08 | Phase 4 | Complete + GAP Fixed |
+| INSP-01~12 | Phase 4 | Complete + GAP Fixed |
+| MREG-01~08 | Phase 4 | Complete + GAP Fixed |
+| SURV-01~07 | Phase 4 | Complete + GAP Fixed |
+| DRCT-01~07 | Phase 4 | Complete + GAP Fixed |
+| HONOR-01~17 | Phase 4 | Complete + GAP Fixed |
+| MDATA-01~04 | Phase 5 | Complete + GAP Fixed |
+| BUS-01~09 | Phase 5 | Complete + GAP Fixed |
+| JOB-01~08 | Phase 5 | Complete + GAP Fixed |
+| UNIT-01~11 | Phase 6 | Complete + GAP Fixed |
+| OT-01~28 | Phase 6 | Complete + GAP Fixed |
+| PERF-01~17 | Phase 7 | Complete + GAP Fixed |
+| SEC-01~28 | Phase 7 | Complete + GAP Fixed |
+| GAP-R1~R6 | Phase 8 | Complete |
+| GAP-CC1~CC6 | Phase 8 | Complete |
 
 **Coverage:**
-- v1 requirements: 209 total (845 unit processes)
-- Mapped to phases: 209
-- Unmapped: 0 ✓
+- v1 requirements: 209 total (845 unit processes) + 6 GAP rules + 6 component enhancements
+- Mapped to phases: 221
+- Unmapped: 0
+- Completion: 100%
 
 ---
 *Requirements defined: 2026-04-05*
-*Last updated: 2026-04-05 after initial definition*
+*Last updated: 2026-04-07 after Phase 8 GAP fix completion*

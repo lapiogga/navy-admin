@@ -145,5 +145,12 @@ None - MSW Mock 기반, 외부 서비스 설정 불요.
 - commonHandlers에 permissionHandlers 등록 완료 → MSW 핸들러 체인 정상 작동
 
 ---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 02 (권한관리) 화면은 직접 수정 대상 아님. DataTable navy-bordered-table CSS 및 SearchForm container 스타일이 자동 적용됨. usePermission 훅 인터페이스는 변경 없음.
+
+---
 *Phase: 01-99*
 *Completed: 2026-04-05*
+*GAP 수정: 2026-04-07*

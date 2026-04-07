@@ -284,3 +284,19 @@ PageContainer title="공통게시판"
 - [x] Dimension 6 Registry Safety: PASS
 
 **Approval:** approved 2026-04-05
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 0 공통 컴포넌트 강화에 따른 UI-SPEC 보충 사항.
+
+### UI 변경 영향
+
+1. **테이블 보더**: Phase 1의 모든 목록 화면(코드관리, 권한관리, 게시판, 시스템관리)에 `navy-bordered-table` CSS가 자동 적용됨 (상단 군청색 2px, 하단 1px)
+2. **검색 영역**: SearchForm 사용 화면에 높이 100px 고정 검색 영역(background #fafafa) 자동 적용
+3. **CrudForm 필드**: `file`, `dateRange`, `checkbox` 타입이 추가되어 공통게시판 등에서 활용 가능
+
+### 기존 UI-SPEC과의 호환성
+
+기존 승인된 UI-SPEC(2026-04-05)의 레이아웃/색상/타이포그래피 규격은 유효. 추가된 CSS는 기존 디자인 토큰(#003366 군청색)과 일관됨.

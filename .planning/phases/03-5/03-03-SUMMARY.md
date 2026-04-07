@@ -106,3 +106,13 @@ None - 플랜대로 정확히 실행됨.
 
 커밋 존재 확인:
 - 248e0f8: feat(03-03): 14_나의제언 구현 — FOUND
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS14 나의 제언에 req_spec 기반 GAP 수정 적용:
+- **R2**: 목록 화면 상단에 SearchForm 4개 조건 추가
+- **R3**: 반려사유 모달 추가 (규칙/예외사항 UI 로직)
+- **R5**: DataTable에 navy-bordered-table CSS 적용
+- **R6**: 제언자 컬럼에 militaryPersonColumn('제언자') 헬퍼 적용 (군번/계급/성명)

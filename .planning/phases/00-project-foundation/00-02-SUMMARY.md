@@ -166,5 +166,12 @@ completed: 2026-04-05
 - Vitest: 23/23 tests passed
 
 ---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 02 라우팅/인증/레이아웃 기반은 변경 없음. 공통 컴포넌트 강화(Plan 03 영역)는 기존 라우팅 구조에 영향 없이 적용됨.
+
+---
 *Phase: 00-project-foundation*
 *Completed: 2026-04-05*
+*GAP 수정: 2026-04-07*

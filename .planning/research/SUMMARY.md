@@ -211,3 +211,38 @@ Feature-Sliced Design(FSD) 레이어 구조를 채택한다. `app/pages/widgets/
 
 *Research completed: 2026-04-05*
 *Ready for roadmap: yes*
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+### 프로젝트 최종 상태 업데이트
+
+리서치 단계에서 수립한 아키텍처/기능/스택 결정은 모두 유효하다. GAP 분석(req_spec vs 구현 비교)에 따라 공통 컴포넌트가 강화되었으며, 이는 초기 리서치의 "공통 컴포넌트 재사용 극대화" 전략을 실증적으로 검증한 결과이다.
+
+### 리서치 예측 vs 실제 결과
+
+| 리서치 예측 | 실제 결과 | 평가 |
+|------------|----------|------|
+| FSD shared 레이어로 공통 UI 재사용 | DataTable/SearchForm/CrudForm이 18개 서브시스템에서 100% 재사용 | 적중 |
+| ProTable/ProForm으로 행정 화면 개발 가속 | CrudForm이 ProForm 래퍼로 동작, 필드 타입 3종 추가 확장 | 적중 |
+| MSW Mock API로 프론트엔드 독립 개발 | 845개 프로세스 전체 Mock API 연동 완료 | 적중 |
+| Ant Design 5 테마 커스터마이징 | 군청색(#003366) 테이블 보더 CSS로 군 행정 브랜딩 강화 | 적중 (CSS 추가) |
+| 군 도메인 특수 요구사항 | military.ts 헬퍼(군번/계급/성명) 신규 생성 필요 | 추가 발견 |
+
+### GAP 규칙 6개 요약
+
+1. R1: 입력값 컬럼 반영 (CrudForm 필드 확장)
+2. R2: 검색영역 100px 고정 (SearchForm wrapper)
+3. R3: 규칙/예외사항 UI 구현 (각 서브시스템별)
+4. R4: 관리자 메뉴 포함 (18개 서브시스템)
+5. R5: 테이블 군청색 보더 (DataTable CSS)
+6. R6: 군번/계급/성명 3항목 표시 (military.ts 헬퍼)
+
+### 문서 현행화 범위
+
+- Phase 0~2 planning 문서: GAP 수정 영향 사항 추가
+- Research ARCHITECTURE/FEATURES/SUMMARY: 아키텍처 패턴 및 표준 기능 업데이트
+- spec-doc 5종: 전면 재생성 완료
+
+*GAP 수정 반영: 2026-04-07*

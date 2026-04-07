@@ -5,6 +5,8 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
@@ -25,6 +27,11 @@ const APPROVAL_STATUS_COLOR_MAP: Record<string, string> = {
   반려: 'red',
 }
 
+// 검색 필드 정의 (R2 규칙)
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '활동명', type: 'text', placeholder: '활동명 검색' },
+]
+
 function getApprovalCurrentStep(status: string): number {
   switch (status) {
     case '결재대기':
@@ -38,14 +45,14 @@ function getApprovalCurrentStep(status: string): number {
   }
 }
 
-async function fetchPendingActivities(params: PageRequest): Promise<PageResponse<UnitActivity>> {
+async function fetchPendingActivities(params: PageRequest & Record<string, unknown>): Promise<PageResponse<UnitActivity>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<UnitActivity>>>('/sys08/activity-approvals', {
     params: { ...params, approvalStatus: '결재대기' },
   })
   return (res as ApiResult<PageResponse<UnitActivity>>).data ?? (res as unknown as PageResponse<UnitActivity>)
 }
 
-async function fetchAllActivities(params: PageRequest): Promise<PageResponse<UnitActivity>> {
+async function fetchAllActivities(params: PageRequest & Record<string, unknown>): Promise<PageResponse<UnitActivity>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<UnitActivity>>>('/sys08/activity-approvals', {
     params,
   })
@@ -119,11 +126,13 @@ function ApprovalDetailModal({ activity, open, onClose }: ApprovalDetailModalPro
       <div style={{ marginBottom: 16 }}>
         <strong>활동명:</strong> {activity.activityName}
         <br />
-        <strong>분류:</strong> {activity.category}
+        <strong>연혁부호:</strong> {activity.historySymbol || '-'}
+        <br />
+        <strong>카테고리:</strong> {activity.category}
         <br />
         <strong>일시:</strong> {activity.activityDate}
         <br />
-        <strong>장소:</strong> {activity.location}
+        <strong>비밀여부:</strong> {activity.isSecret ? activity.secretGrade : '일반'}
         <br />
         <strong>결재상태:</strong>{' '}
         <StatusBadge status={activity.approvalStatus} colorMap={APPROVAL_STATUS_COLOR_MAP} />
@@ -181,6 +190,15 @@ function ApprovalDetailModal({ activity, open, onClose }: ApprovalDetailModalPro
 export default function UnitActivityApprovalPage() {
   const [selectedActivity, setSelectedActivity] = useState<UnitActivity | null>(null)
   const [detailOpen, setDetailOpen] = useState(false)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+  }
 
   const pendingColumns: ProColumns<UnitActivity>[] = [
     {
@@ -200,9 +218,9 @@ export default function UnitActivityApprovalPage() {
         </Button>
       ),
     },
-    { title: '분류', dataIndex: 'category', width: 100 },
+    { title: '연혁부호', dataIndex: 'historySymbol', width: 100 },
+    { title: '카테고리', dataIndex: 'category', width: 110 },
     { title: '일시', dataIndex: 'activityDate', width: 120 },
-    { title: '장소', dataIndex: 'location', width: 130 },
     {
       title: '결재상태',
       dataIndex: 'approvalStatus',
@@ -219,7 +237,7 @@ export default function UnitActivityApprovalPage() {
       label: '결재대기',
       children: (
         <DataTable<UnitActivity>
-          request={fetchPendingActivities}
+          request={(params) => fetchPendingActivities({ ...params, ...searchParams })}
           columns={pendingColumns}
           rowKey="id"
         />
@@ -230,7 +248,7 @@ export default function UnitActivityApprovalPage() {
       label: '전체 결재',
       children: (
         <DataTable<UnitActivity>
-          request={fetchAllActivities}
+          request={(params) => fetchAllActivities({ ...params, ...searchParams })}
           columns={pendingColumns}
           rowKey="id"
         />
@@ -240,6 +258,9 @@ export default function UnitActivityApprovalPage() {
 
   return (
     <PageContainer title="주요활동 결재">
+      {/* 검색영역 (R2 규칙) */}
+      <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
+
       <Tabs items={tabItems} />
 
       <ApprovalDetailModal

@@ -1343,3 +1343,25 @@ const STATUS_COLOR: Record<SeatStatus, string> = {
 | 차트 패턴 | CONTEXT.md D-37, Phase 4 UI-SPEC |
 | 테이블 컬럼 상세 | req_analysis.txt 284~327행, 427~472행, 771~819행 |
 | 색상/폰트/스페이싱 | Phase 4 UI-SPEC (동결값 상속) |
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+req_spec 기반 GAP 분석 결과, 아래 UI 규칙이 Phase 5 전체 서브시스템에 소급 적용되었다.
+
+### 적용된 UI 변경
+
+1. **SearchForm 100px 영역**: 모든 목록 화면 상단에 높이 100px 검색 폼 영역 추가. `search-form-container` CSS wrapper 사용.
+2. **DataTable 군청색 라인**: 테이블 최상단 군청색(#003366) 2px, 최하단 1px. `navy-bordered-table` CSS 클래스로 통일.
+3. **militaryPersonColumn**: 신청자/등록자/사용자 컬럼에 군번/계급/성명 3항목 동시 표시. `military.ts` 헬퍼 함수 사용.
+4. **CrudForm 필드 확장**: CSV 입력값의 모든 컬럼을 CrudForm 필드에 반영. file/dateRange 타입 추가.
+5. **관리자 메뉴**: 18개 서브시스템 각각에 관리자 기능 메뉴 포함.
+
+### 서브시스템별 UI 변경 요약
+
+| 서브시스템 | SearchForm 변경 | CrudForm 변경 | militaryPersonColumn |
+|-----------|----------------|--------------|---------------------|
+| SYS07 | 검색조건 5→14개 | 17개 필드 추가 | 적용 |
+| SYS10 | 다수 페이지 추가 | 외부사용자 필드 | 적용 |
+| SYS18 | 추가 | 결재자/엑셀/초과근무 | - |

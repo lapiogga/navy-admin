@@ -9,12 +9,29 @@ import type { Dayjs } from 'dayjs'
 import { DatePicker } from 'antd'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { PrintableReport } from '@/pages/sys09-memorial/PrintableReport'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 import type { JobDesc, JobDescType } from '@/shared/api/mocks/handlers/sys18'
 
 const { RangePicker } = DatePicker
 const { TextArea } = Input
+
+// 관리자 검색 필드 (CSV 행 36: 진단명, 검색기간, 부대명, 직책명)
+const ADMIN_PERSONAL_SEARCH_FIELDS: SearchField[] = [
+  { name: 'diagnosisName', label: '진단명', type: 'text', placeholder: '진단명 검색' },
+  { name: 'dateRange', label: '검색기간', type: 'dateRange' },
+  { name: 'unit', label: '부대명', type: 'text', placeholder: '부대명 검색' },
+  { name: 'position', label: '직책명', type: 'text', placeholder: '직책명 검색' },
+]
+
+// 부서직무기술서 검색 필드 (CSV 행 44: 검색기간, 부대명)
+const ADMIN_DEPT_SEARCH_FIELDS: SearchField[] = [
+  { name: 'dateRange', label: '검색기간', type: 'dateRange' },
+  { name: 'unit', label: '부대명', type: 'text', placeholder: '부대명 검색' },
+]
 
 // 상태 컬러맵
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -221,6 +238,24 @@ function JobDescTab({ type }: { type: JobDescType }) {
   const queryClient = useQueryClient()
   const actionRef = useRef<ActionType>()
   const [filter, setFilter] = useState<SearchFilter>({})
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // SearchForm 검색 처리
+  const handleSearch = (values: Record<string, unknown>) => {
+    setSearchParams(values)
+    setFilter({
+      diagnosisName: values.diagnosisName as string | undefined,
+      unit: values.unit as string | undefined,
+      position: values.position as string | undefined,
+    })
+    actionRef.current?.reload()
+  }
+
+  const handleSearchReset = () => {
+    setSearchParams({})
+    setFilter({})
+    actionRef.current?.reload()
+  }
   const [reviewModal, setReviewModal] = useState<{ open: boolean; record: AdminJobDesc | null }>({ open: false, record: null })
   const [opinionModal, setOpinionModal] = useState<{ open: boolean; record: AdminJobDesc | null }>({ open: false, record: null })
   const [returnModal, setReturnModal] = useState<{ open: boolean; record: AdminJobDesc | null }>({ open: false, record: null })
@@ -275,10 +310,14 @@ function JobDescTab({ type }: { type: JobDescType }) {
 
   const columns: ProColumns<AdminJobDesc>[] = [
     { title: '진단명', dataIndex: 'diagnosisName', width: 180, ellipsis: true },
-    { title: '작성자', dataIndex: 'writerName', width: 100 },
-    { title: '부대(서)', dataIndex: 'department', width: 120 },
+    // 군번/계급/성명 동시 표시 (R6)
+    militaryPersonColumn<AdminJobDesc>('작성자', {
+      serviceNumber: 'writerMilitaryId',
+      rank: 'rank',
+      name: 'writerName',
+    }),
+    { title: '부대(서)', dataIndex: 'unit', width: 120 },
     { title: '직위', dataIndex: 'position', width: 120, ellipsis: true },
-    { title: '계급', dataIndex: 'rank', width: 80 },
     {
       title: '상태',
       dataIndex: 'status',
@@ -327,37 +366,12 @@ function JobDescTab({ type }: { type: JobDescType }) {
 
   return (
     <div>
-      {/* 검색 영역 */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <Select
-          placeholder="진단명 선택"
-          style={{ width: 180 }}
-          allowClear
-          onChange={(v) => setFilter((f) => ({ ...f, diagnosisName: v as string }))}
-          options={[1, 2, 3, 4, 5].map((i) => ({
-            label: `2024년도 직무기술서 조직진단 ${i}차`,
-            value: `diag-${i}`,
-          }))}
-        />
-        <RangePicker
-          placeholder={['시작일', '종료일']}
-          format="YYYY-MM-DD"
-          onChange={(range) => setFilter((f) => ({ ...f, dateRange: range ? [range[0], range[1]] : undefined }))}
-        />
-        <Input
-          placeholder="부대(서) 검색"
-          style={{ width: 140 }}
-          allowClear
-          onChange={(e) => setFilter((f) => ({ ...f, unit: e.target.value }))}
-        />
-        <Input
-          placeholder="직위 검색"
-          style={{ width: 140 }}
-          allowClear
-          onChange={(e) => setFilter((f) => ({ ...f, position: e.target.value }))}
-        />
-        <Button type="primary" onClick={() => actionRef.current?.reload()}>조회</Button>
-      </div>
+      {/* 검색 영역 (R2: SearchForm 컴포넌트 사용) */}
+      <SearchForm
+        fields={type === 'personal' ? ADMIN_PERSONAL_SEARCH_FIELDS : ADMIN_DEPT_SEARCH_FIELDS}
+        onSearch={handleSearch}
+        onReset={handleSearchReset}
+      />
 
       <DataTable<AdminJobDesc>
         columns={columns}
@@ -470,28 +484,25 @@ function StatsTab() {
     label: { type: 'spider' as const },
   }
 
+  const handleStatsSearch = (values: Record<string, unknown>) => {
+    setFilter({
+      diagnosisName: values.diagnosisName as string | undefined,
+      unit: values.unit as string | undefined,
+    })
+  }
+
+  const handleStatsReset = () => {
+    setFilter({})
+  }
+
   return (
     <div>
-      {/* 검색 영역 */}
-      <div style={{ marginBottom: 16, display: 'flex', gap: 8, flexWrap: 'wrap', alignItems: 'center' }}>
-        <Select
-          placeholder="진단명 선택"
-          style={{ width: 200 }}
-          allowClear
-          onChange={(v) => setFilter((f) => ({ ...f, diagnosisName: v as string }))}
-          options={[1, 2, 3, 4, 5].map((i) => ({
-            label: `2024년도 직무기술서 조직진단 ${i}차`,
-            value: `diag-${i}`,
-          }))}
-        />
-        <RangePicker placeholder={['시작일', '종료일']} format="YYYY-MM-DD" />
-        <Input
-          placeholder="부대(서) 검색"
-          style={{ width: 140 }}
-          allowClear
-          onChange={(e) => setFilter((f) => ({ ...f, unit: e.target.value }))}
-        />
-      </div>
+      {/* 검색 영역 (R2: SearchForm 컴포넌트 사용) */}
+      <SearchForm
+        fields={ADMIN_DEPT_SEARCH_FIELDS}
+        onSearch={handleStatsSearch}
+        onReset={handleStatsReset}
+      />
 
       <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 24, marginBottom: 24 }}>
         <div>

@@ -25,4 +25,8 @@ tests_added: 0
 
 - 07-01에서 SYS03 전체 구현으로 별도 작업 불필요
 
+## GAP 수정 반영 (2026-04-07)
+
+SYS03 성과관리체계 평가결과/입력현황/라우터에 동일한 6대 규칙 소급 적용 (07-01에서 이미 구현된 파일 대상). SearchForm, militaryPersonColumn, navy-bordered-table CSS 통일.
+
 ## Self-Check: PASSED

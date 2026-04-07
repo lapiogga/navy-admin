@@ -126,3 +126,9 @@ Duration    90.92s
 - 5e071a0: feat(07-2-06) Wave3 결산종합현황 + 관리자 5종
 - 1d1388c: feat(07-2-06) 개인설정 + 전체 라우터 + 테스트
 - 129d1f8: docs(07-2-06) UI-SPEC 생성
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS15 보안일일결산체계 결산종합현황/관리자/개인설정/게시판/시스템 페이지에 req_spec 기반 6대 규칙 적용. SearchForm 추가, militaryPersonColumn 적용, DataTable navy-bordered-table CSS 적용. 관리자 메뉴(점검항목/휴일/알림시간/로그/예외관리) 포함 확인.

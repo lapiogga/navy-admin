@@ -1,4 +1,5 @@
 import { http, HttpResponse } from 'msw'
+import { randomServiceNumber } from '../mockServiceNumber'
 
 // 노선 Mock 데이터
 const routes = [
@@ -76,7 +77,7 @@ function generateSeats(dispatchId: string) {
   })
 }
 
-// 예약 Mock 데이터 15건
+// 예약 Mock 데이터 15건 (serviceNumber 필드 추가 - R6 군번/계급/성명)
 const reservations = Array.from({ length: 15 }, (_, i) => ({
   id: `res${i + 1}`,
   routeId: routes[i % 5].id,
@@ -86,9 +87,12 @@ const reservations = Array.from({ length: 15 }, (_, i) => ({
   seatNo: `${Math.floor(i / 4) + 1}${'ABCD'[i % 4]}`,
   unit: ['1사단', '2사단', '포병여단', '본부대', '지원대'][i % 5],
   userName: ['김해병', '이병장', '박상병', '최일병', '정해병'][i % 5],
+  serviceNumber: randomServiceNumber(),
   rank: ['대령', '중령', '소령', '대위', '중위', '소위', '준위', '원사', '상사', '중사'][i % 10],
-  militaryId: `2026-${String(1000 + i).padStart(6, '0')}`,
+  militaryId: randomServiceNumber(),
   status: ['reserved', 'cancelled', 'waiting'][i % 3] as 'reserved' | 'cancelled' | 'waiting',
+  totalSeats: 40,
+  reservedCount: Math.floor(Math.random() * 30),
 }))
 
 // 예약시간 Mock 데이터

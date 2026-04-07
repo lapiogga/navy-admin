@@ -7,6 +7,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import { showConfirmDialog } from '@/shared/ui/ConfirmDialog/ConfirmDialog'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
@@ -98,7 +99,16 @@ function EduFormModal({ open, record, onClose, onSuccess }: EduFormModalProps) {
         <Form.Item name="duration" label="소요시간(h)" rules={[{ required: true }]}>
           <InputNumber min={0.5} max={24} step={0.5} style={{ width: '100%' }} />
         </Form.Item>
-        <Form.Item name="instructor" label="교관" rules={[{ required: true }]}>
+        <Form.Item name="instructorRank" label="교관 계급" rules={[{ required: true }]}>
+          <Select options={[
+            { value: '중위', label: '중위' },
+            { value: '대위', label: '대위' },
+            { value: '소령', label: '소령' },
+            { value: '중령', label: '중령' },
+            { value: '대령', label: '대령' },
+          ]} />
+        </Form.Item>
+        <Form.Item name="instructorName" label="교관 성명" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
         <Form.Item name="participants" label="이수인원" rules={[{ required: true }]}>
@@ -107,8 +117,11 @@ function EduFormModal({ open, record, onClose, onSuccess }: EduFormModalProps) {
         <Form.Item name="department" label="부대(서)" rules={[{ required: true }]}>
           <Input />
         </Form.Item>
-        <Form.Item name="content" label="교육내용">
+        <Form.Item name="content" label="교육내용" rules={[{ required: true }]}>
           <TextArea rows={4} />
+        </Form.Item>
+        <Form.Item name="etcContent" label="기타내용">
+          <TextArea rows={2} placeholder="기타 특이사항을 입력하세요" />
         </Form.Item>
       </Form>
     </Modal>
@@ -135,7 +148,7 @@ export default function SecurityEduPage() {
     { title: '교육구분', dataIndex: 'eduType', width: 120 },
     { title: '실시일자', dataIndex: 'eduDate', width: 120 },
     { title: '소요시간(h)', dataIndex: 'duration', width: 100 },
-    { title: '교관', dataIndex: 'instructor', width: 100 },
+    militaryPersonColumn<SecurityEduRecord>('교관', { serviceNumber: 'instructorServiceNumber', rank: 'instructorRank', name: 'instructorName' }),
     { title: '이수인원', dataIndex: 'participants', width: 80 },
     { title: '부대(서)', dataIndex: 'department', width: 120 },
     {

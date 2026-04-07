@@ -1,6 +1,8 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { ALL_UNITS } from '../mockUnits'
 
 // ==================== 타입 정의 ====================
 
@@ -26,17 +28,33 @@ export interface UnitLineage extends Record<string, unknown> {
   lineageNo: string
   unitName: string
   establishDate: string
+  relatedBasis: string
+  mission: string
+  address: string
+  buildingStatus: string
+  landScale: string
   relatedOrg: string
+  remarks: string
 }
 
 export interface UnitKeyPerson extends Record<string, unknown> {
   id: string
   unitId: string
   category: string
+  lineageNo: string
+  generation: string
+  serviceNumber: string
   name: string
+  nameHanja: string
   rank: string
+  position: string
+  branch: string
+  commissionType: string
   termStart: string
   termEnd: string
+  isActingDuty: boolean
+  motto: string
+  policy: string
   remarks: string
 }
 
@@ -44,6 +62,7 @@ export interface UnitKeyPersonHistory extends Record<string, unknown> {
   id: string
   personId: string
   category: string
+  serviceNumber: string
   name: string
   rank: string
   termStart: string
@@ -55,10 +74,15 @@ export interface UnitActivity extends Record<string, unknown> {
   id: string
   unitId: string
   activityName: string
+  historySymbol: string
   category: string
   activityDate: string
   location: string
   description: string
+  isSecret: boolean
+  secretGrade: string
+  representativePhoto?: string
+  relatedBasis: string
   approvalStatus: string
   attachFile?: string
 }
@@ -69,6 +93,9 @@ export interface UnitFlag extends Record<string, unknown> {
   unitName: string
   flagType: string
   revisionDate: string
+  creator: string
+  meaning: string
+  motivation: string
   imageBase64?: string
   remarks: string
 }
@@ -77,6 +104,8 @@ export interface UnitAuthRequest extends Record<string, unknown> {
   id: string
   requestUnit: string
   requestRole: string
+  milPhone: string
+  personnelOrderBasis: string
   reason: string
   status: string
   requestedAt: string
@@ -112,7 +141,7 @@ const APPROVAL_STATUSES = ['작성중', '결재대기', '승인', '반려']
 const FLAG_TYPES = ['부대기', '부대마크']
 const AUTH_ROLES = ['계보담당', '중간결재자', '확인관', '부대관리자']
 const RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '원사', '상사', '중사']
-const UNITS = ['해군사령부', '1함대', '2함대', '3함대', '기뢰전전대', '잠수함전대', '항공전대', '해병대사령부']
+const UNITS = ALL_UNITS
 
 const NAVY_UNITS = [
   { key: 'fleet-1', title: '제1함대', level: 1, parent: null },
@@ -163,28 +192,55 @@ let unitLineages: UnitLineage[] = Array.from({ length: 30 }, (_, i) => ({
   lineageNo: `LIN-${String(i + 1).padStart(3, '0')}`,
   unitName: `${UNITS[i % UNITS.length]}`,
   establishDate: faker.date.past({ years: 20 }).toISOString().split('T')[0],
+  relatedBasis: faker.lorem.sentence(),
+  mission: faker.lorem.sentence(),
+  address: `${faker.location.city()} ${faker.location.streetAddress()}`,
+  buildingStatus: `건물 ${faker.number.int({ min: 1, max: 10 })}동`,
+  landScale: `${faker.number.int({ min: 1000, max: 50000 })}평`,
   relatedOrg: faker.company.name(),
+  remarks: faker.lorem.sentence(),
 }))
+
+const BRANCH_OPTIONS = ['보병', '포병', '기갑', '공병', '통신', '병참', '수송', '정보통신']
+const COMMISSION_TYPES = ['학사', '학군', '3사', '부사관', '간부후보생']
 
 let unitKeyPersons: UnitKeyPerson[] = Array.from({ length: 25 }, (_, i) => ({
   id: `person-${i + 1}`,
   unitId: `unit-${(i % 8) + 1}`,
   category: UNIT_CATEGORIES[i % UNIT_CATEGORIES.length],
+  lineageNo: `LIN-${String(i + 1).padStart(3, '0')}`,
+  generation: `${i + 1}`,
+  serviceNumber: randomServiceNumber(),
   name: faker.person.fullName(),
+  nameHanja: '',
   rank: RANKS[i % RANKS.length],
+  position: UNIT_CATEGORIES[i % UNIT_CATEGORIES.length],
+  branch: BRANCH_OPTIONS[i % BRANCH_OPTIONS.length],
+  commissionType: COMMISSION_TYPES[i % COMMISSION_TYPES.length],
   termStart: faker.date.past({ years: 3 }).toISOString().split('T')[0],
   termEnd: faker.date.future({ years: 1 }).toISOString().split('T')[0],
+  isActingDuty: i % 5 === 0,
+  motto: i % 3 === 0 ? faker.lorem.sentence() : '',
+  policy: i % 4 === 0 ? faker.lorem.sentence() : '',
   remarks: faker.lorem.sentence(),
 }))
+
+const ACTIVITY_CATEGORY_OPTIONS_DATA = ['부대계보자료', '해군사 자료', '정기역사보고']
+const SECRET_GRADES = ['비밀', '대외비', '일반']
 
 let unitActivities: UnitActivity[] = Array.from({ length: 30 }, (_, i) => ({
   id: `act-${i + 1}`,
   unitId: `unit-${(i % 8) + 1}`,
   activityName: `${ACTIVITY_CATEGORIES[i % ACTIVITY_CATEGORIES.length]} ${faker.lorem.words(2)}`,
-  category: ACTIVITY_CATEGORIES[i % ACTIVITY_CATEGORIES.length],
+  historySymbol: `HS-${String(i + 1).padStart(3, '0')}`,
+  category: ACTIVITY_CATEGORY_OPTIONS_DATA[i % ACTIVITY_CATEGORY_OPTIONS_DATA.length],
   activityDate: faker.date.past({ years: 2 }).toISOString().split('T')[0],
   location: faker.location.city(),
   description: faker.lorem.paragraph(),
+  isSecret: i % 4 === 0,
+  secretGrade: i % 4 === 0 ? SECRET_GRADES[i % SECRET_GRADES.length] : '',
+  representativePhoto: undefined,
+  relatedBasis: i % 2 === 0 ? faker.lorem.sentence() : '',
   approvalStatus: APPROVAL_STATUSES[i % APPROVAL_STATUSES.length],
   attachFile: i % 3 === 0 ? `attachment_${i + 1}.pdf` : undefined,
 }))
@@ -195,6 +251,9 @@ let unitFlags: UnitFlag[] = Array.from({ length: 16 }, (_, i) => ({
   unitName: UNITS[i % UNITS.length],
   flagType: FLAG_TYPES[i % FLAG_TYPES.length],
   revisionDate: faker.date.past({ years: 5 }).toISOString().split('T')[0],
+  creator: faker.person.fullName(),
+  meaning: faker.lorem.sentence(),
+  motivation: faker.lorem.sentence(),
   imageBase64: undefined,
   remarks: faker.lorem.sentence(),
 }))
@@ -203,6 +262,8 @@ let authRequests: UnitAuthRequest[] = Array.from({ length: 15 }, (_, i) => ({
   id: `auth-req-${i + 1}`,
   requestUnit: UNITS[i % UNITS.length],
   requestRole: AUTH_ROLES[i % AUTH_ROLES.length],
+  milPhone: `${faker.number.int({ min: 100, max: 999 })}-${faker.number.int({ min: 1000, max: 9999 })}`,
+  personnelOrderBasis: i % 2 === 0 ? `인사명령_${i + 1}.pdf` : '',
   reason: faker.lorem.sentence(),
   status: ['신청', '승인', '반려'][i % 3],
   requestedAt: faker.date.past({ years: 1 }).toISOString().split('T')[0],
@@ -252,9 +313,11 @@ export const sys08Handlers = [
     const page = Number(url.searchParams.get('page') ?? 0)
     const size = Number(url.searchParams.get('size') ?? 10)
     const keyword = url.searchParams.get('keyword')
+    const unitCode = url.searchParams.get('unitCode')
 
     let filtered = unitRecords
     if (keyword) filtered = filtered.filter((r) => r.unitName.includes(keyword))
+    if (unitCode) filtered = filtered.filter((r) => r.unitCode.includes(unitCode))
 
     return HttpResponse.json(ok(paginate(filtered, page, size)))
   }),
@@ -307,7 +370,13 @@ export const sys08Handlers = [
       lineageNo: (body.lineageNo as string) ?? `LIN-${Date.now()}`,
       unitName: (body.unitName as string) ?? '',
       establishDate: (body.establishDate as string) ?? new Date().toISOString().split('T')[0],
+      relatedBasis: (body.relatedBasis as string) ?? '',
+      mission: (body.mission as string) ?? '',
+      address: (body.address as string) ?? '',
+      buildingStatus: (body.buildingStatus as string) ?? '',
+      landScale: (body.landScale as string) ?? '',
       relatedOrg: (body.relatedOrg as string) ?? '',
+      remarks: (body.remarks as string) ?? '',
     }
     unitLineages = [...unitLineages, newLineage]
     return HttpResponse.json({ code: 'SUCCESS', message: '등록 성공', data: newLineage })
@@ -345,6 +414,7 @@ export const sys08Handlers = [
       id: `hist-${i + 1}`,
       personId: params.id as string,
       category: UNIT_CATEGORIES[i % UNIT_CATEGORIES.length],
+      serviceNumber: randomServiceNumber(),
       name: faker.person.fullName(),
       rank: RANKS[i % RANKS.length],
       termStart: faker.date.past({ years: 5 }).toISOString().split('T')[0],
@@ -360,10 +430,20 @@ export const sys08Handlers = [
       id: `person-${Date.now()}`,
       unitId: (body.unitId as string) ?? '',
       category: (body.category as string) ?? '',
+      lineageNo: (body.lineageNo as string) ?? '',
+      generation: (body.generation as string) ?? '',
+      serviceNumber: (body.serviceNumber as string) ?? '',
       name: (body.name as string) ?? '',
+      nameHanja: (body.nameHanja as string) ?? '',
       rank: (body.rank as string) ?? '',
+      position: (body.position as string) ?? '',
+      branch: (body.branch as string) ?? '',
+      commissionType: (body.commissionType as string) ?? '',
       termStart: (body.termStart as string) ?? new Date().toISOString().split('T')[0],
       termEnd: (body.termEnd as string) ?? '',
+      isActingDuty: (body.isActingDuty as boolean) ?? false,
+      motto: (body.motto as string) ?? '',
+      policy: (body.policy as string) ?? '',
       remarks: (body.remarks as string) ?? '',
     }
     unitKeyPersons = [...unitKeyPersons, newPerson]
@@ -403,10 +483,15 @@ export const sys08Handlers = [
       id: `act-${Date.now()}`,
       unitId: (body.unitId as string) ?? '',
       activityName: (body.activityName as string) ?? '',
+      historySymbol: (body.historySymbol as string) ?? '',
       category: (body.category as string) ?? '',
       activityDate: (body.activityDate as string) ?? new Date().toISOString().split('T')[0],
       location: (body.location as string) ?? '',
       description: (body.description as string) ?? '',
+      isSecret: (body.isSecret as boolean) ?? false,
+      secretGrade: (body.secretGrade as string) ?? '',
+      representativePhoto: body.representativePhoto as string | undefined,
+      relatedBasis: (body.relatedBasis as string) ?? '',
       approvalStatus: '작성중',
       attachFile: body.attachFile as string | undefined,
     }
@@ -450,9 +535,11 @@ export const sys08Handlers = [
     const page = Number(url.searchParams.get('page') ?? 0)
     const size = Number(url.searchParams.get('size') ?? 10)
     const statusFilter = url.searchParams.get('approvalStatus')
+    const keyword = url.searchParams.get('keyword')
 
     let filtered = unitActivities.filter((a) => a.approvalStatus !== '작성중')
     if (statusFilter) filtered = filtered.filter((a) => a.approvalStatus === statusFilter)
+    if (keyword) filtered = filtered.filter((a) => a.activityName.includes(keyword))
 
     return HttpResponse.json(ok(paginate(filtered, page, size)))
   }),
@@ -478,9 +565,11 @@ export const sys08Handlers = [
     const page = Number(url.searchParams.get('page') ?? 0)
     const size = Number(url.searchParams.get('size') ?? 10)
     const flagType = url.searchParams.get('flagType')
+    const keyword = url.searchParams.get('keyword')
 
     let filtered = unitFlags
     if (flagType) filtered = filtered.filter((f) => f.flagType === flagType)
+    if (keyword) filtered = filtered.filter((f) => f.unitName.includes(keyword))
 
     return HttpResponse.json(ok(paginate(filtered, page, size)))
   }),
@@ -493,6 +582,9 @@ export const sys08Handlers = [
       unitName: (body.unitName as string) ?? '',
       flagType: (body.flagType as string) ?? '부대기',
       revisionDate: (body.revisionDate as string) ?? new Date().toISOString().split('T')[0],
+      creator: (body.creator as string) ?? '',
+      meaning: (body.meaning as string) ?? '',
+      motivation: (body.motivation as string) ?? '',
       imageBase64: body.imageBase64 as string | undefined,
       remarks: (body.remarks as string) ?? '',
     }
@@ -519,6 +611,8 @@ export const sys08Handlers = [
       id: `auth-req-${Date.now()}`,
       requestUnit: (body.requestUnit as string) ?? '',
       requestRole: (body.requestRole as string) ?? '',
+      milPhone: (body.milPhone as string) ?? '',
+      personnelOrderBasis: (body.personnelOrderBasis as string) ?? '',
       reason: (body.reason as string) ?? '',
       status: '신청',
       requestedAt: new Date().toISOString().split('T')[0],
@@ -540,8 +634,14 @@ export const sys08Handlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? 0)
     const size = Number(url.searchParams.get('size') ?? 10)
+    const keyword = url.searchParams.get('keyword')
+    const status = url.searchParams.get('status')
 
-    return HttpResponse.json(ok(paginate(authRequests, page, size)))
+    let filtered = authRequests
+    if (keyword) filtered = filtered.filter((r) => r.requestUnit.includes(keyword) || r.requestRole.includes(keyword))
+    if (status) filtered = filtered.filter((r) => r.status === status)
+
+    return HttpResponse.json(ok(paginate(filtered, page, size)))
   }),
 
   http.put('/api/sys08/auth-mgmt/:id/approve', ({ params }) => {
@@ -575,9 +675,11 @@ export const sys08Handlers = [
     const page = Number(url.searchParams.get('page') ?? 0)
     const size = Number(url.searchParams.get('size') ?? 10)
     const unit = url.searchParams.get('unit')
+    const keyword = url.searchParams.get('keyword')
 
     let filtered = authViews
     if (unit) filtered = filtered.filter((v) => v.unit === unit)
+    if (keyword) filtered = filtered.filter((v) => v.userName.includes(keyword) || v.role.includes(keyword))
 
     return HttpResponse.json(ok(paginate(filtered, page, size)))
   }),

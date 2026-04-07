@@ -626,4 +626,121 @@ Dev server: http://localhost:5173/ (running)
 
 ---
 
+## 2026-04-07 (Session 8)
+
+### #37~38 v1.0.0 태그 + 서브시스템 메인화면 (13:20~13:35)
+
+```
+git tag v1.0.0
+git push origin master --tags
+→ v1.0.0 태그 생성 완료
+
+SubsystemHomePage 공통 컴포넌트 생성
+→ 18개 서브시스템 index.tsx 라우트 수정
+→ 18개 서브시스템 Mock API 추가
+```
+
+### #39~46 GAP 분석 + 수정 + spec-doc + 마크다운 업그레이드 (13:35~18:30)
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ GAP 분석 및 수정 (18개 서브시스템 x 6 규칙)
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+[공통 컴포넌트 수정]
+  ✓ DataTable.tsx — navy-bordered-table CSS
+  ✓ SearchForm.tsx — search-form-container wrapper
+  ✓ CrudForm.tsx — file/dateRange/checkbox 타입 추가
+  ✓ military.ts — formatMilitaryPerson() + militaryPersonColumn()
+  ✓ index.css — 글로벌 CSS (테이블 라인, 검색영역)
+
+[Wave 1] SYS04, SYS05, SYS14, SYS11, SYS16 — 21개 파일 수정 ✓
+[Wave 2] SYS13, SYS17, SYS06, SYS02, SYS12, SYS09 — 31개 파일 수정 ✓
+[Wave 3] SYS07, SYS10, SYS18 — 21개 파일 수정 ✓
+[Wave 4] SYS08, SYS01, SYS03, SYS15 — 47개 파일 수정 ✓
+
+npx tsc --noEmit → 0 errors ✓
+
+[spec-doc 5종 재생성] ✓
+[PPT 18개 생성] spec-doc/ppt/ → 18 .pptx files ✓
+[마크다운 80+ 파일 업그레이드] .planning/ 전체 ✓
+```
+
+### #47 UI 공통 7개 수정 (18:30~19:00)
+
+```
+[1] 검색영역 높이: height:100px → min-height:100px, max-height:150px
+[2] '해병대 행정포탈 시스템' 타이틀 삭제
+[3] 상단 대메뉴 바: 배경 #f0f5ff + font-weight:700
+[4] 좌측 사이드바: 배경 #f5f7fa
+[5] 날짜 1줄 표시: white-space:nowrap, 사용자 컬럼 180→220px
+[6] 상태 태그: bordered={false}, 버튼 border-radius:6px + box-shadow
+[7] 여백 조정 기능 삭제: options={{ density: false }}, padding:8px 12px
+
+npx tsc --noEmit → 0 errors ✓
+```
+
+### #48 군번 규칙 적용 (19:00~19:30)
+
+```
+[신규] mockServiceNumber.ts — 해군 군번 부여규칙
+  장교: YY-1NNNN  부사관: YY-2NNNN  병: YY-7NNNNNNN  군무원: YY-5NNNN
+
+[교체] 18개 핸들러 일괄 수정 (4 Wave 병렬)
+  Wave 1: sys01, sys04, sys05, sys06
+  Wave 2: sys02, sys03, sys07, sys08, sys09
+  Wave 3: sys10, sys11, sys12, sys13, sys14
+  Wave 4: sys15, sys16, sys17, sys18
+
+npx tsc --noEmit → 0 errors ✓
+```
+
+### #49 부대 조직도 적용 (19:30~20:00)
+
+```
+[신규] mockUnits.ts — 해군 11개 + 해병대 8개 = 19개 부대
+  해군: 해군본부, 해군작전사령부, 제1~3함대, 잠수함사령부, 해군항공사령부,
+        특수전전단, 해군교육사령부, 해군군수사령부, 해군사관학교
+  해병대: 해병대사령부, 제1~2해병사단, 제6해병여단, 제9해병여단,
+          연평부대, 해병대교육훈련단, 해병대군수단
+
+[교체] 11개 핸들러 UNITS 배열 교체 (3 Wave 병렬)
+  Wave 1: sys01, sys02, sys04 (+ sys05 확인)
+  Wave 2: sys07, sys08, sys09, sys12, sys13
+  Wave 3: sys15, sys17, sys18 (+ sys03,06,10,11,14,16 확인)
+
+[부대명 수정]
+  1함대 → 제1함대, 해군사령부 → 해군본부
+  1사단 → 제1해병사단, 교육사령부 → 해군교육사령부 등
+
+npx tsc --noEmit → 0 errors ✓
+```
+
+### #50 문서 현행화 + GitHub 배포 (20:00~20:15)
+
+```
+WORK-LOG.md 업데이트
+TERMINAL-LOG.md 업데이트
+CLAUDE.md 진행 기록 업데이트
+
+git add → git commit → git push origin master
+```
+
+---
+
+### 세션 8 종료 시점 상태
+
+```
+Phase 0~7: 전체 완료 (845개 프로세스, 18개 서브시스템)
+GAP 수정: 18개 서브시스템 x 6 규칙 완료
+Mock 데이터: 해군 군번 규칙 + 부대 조직도 반영
+UI 공통: 7개 항목 개선
+spec-doc: 6개 문서 + PPT 18개
+마크다운: 80+ 파일 최신 업데이트
+
+GitHub: https://github.com/lapiogga/navy-admin.git (master)
+```
+
+---
+
 *이후 모든 터미널 출력은 이 파일에 append됩니다.*

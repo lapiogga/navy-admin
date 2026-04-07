@@ -167,5 +167,29 @@ None — 계획대로 정확히 실행.
 - shared/ui/index.ts: 6개 컴포넌트 모두 배럴 export 확인
 
 ---
+
+## GAP 수정 반영 (2026-04-07)
+
+Plan 03에서 제공한 공통 UI 컴포넌트가 GAP 분석에 따라 강화되었다. 기존 provides 목록은 유효하며, 아래 변경사항이 추가됨.
+
+### 공통 컴포넌트 변경 사항
+
+- **DataTable**: `navy-bordered-table` CSS 클래스 자동 적용 (군청색 상단 2px/하단 1px 보더)
+- **SearchForm**: `search-form-container` wrapper div 추가 (height 100px, background #fafafa, 고정 검색 영역)
+- **CrudForm**: `file` (ProFormUploadButton), `dateRange` (ProFormDateRangePicker), `checkbox` (ProFormCheckbox) 필드 타입 3종 추가
+- **DetailModal**: render 콜백 시그니처에 두 번째 `record` 인자 추가 (상세 모달에서 원본 레코드 접근 가능)
+- **index.css**: 글로벌 CSS로 navy 테이블 보더 및 검색 폼 컨테이너 스타일 정의
+
+### 신규 헬퍼
+
+- **shared/lib/military.ts**: `formatMilitaryPerson(record)` (군번/계급/성명 문자열 포맷), `militaryPersonColumn(fieldPrefix)` (ProTable 컬럼 정의 헬퍼)
+
+### 영향 범위
+
+- Phase 3~7의 모든 서브시스템(18개)이 이 변경된 공통 컴포넌트를 사용
+- GAP 규칙 R5(테이블 보더), R6(군인정보 표시)는 공통 컴포넌트 레벨에서 해결되어 서브시스템별 개별 수정 불필요
+
+---
 *Phase: 00-project-foundation*
 *Completed: 2026-04-05*
+*GAP 수정: 2026-04-07*

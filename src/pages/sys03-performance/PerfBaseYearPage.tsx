@@ -4,19 +4,27 @@ import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { BaseYear } from '@/shared/api/mocks/handlers/sys03-performance'
 
-async function fetchBaseYears(params: PageRequest): Promise<PageResponse<BaseYear>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '기준년도', type: 'text', placeholder: '기준년도 검색' },
+]
+
+async function fetchBaseYears(params: PageRequest & { keyword?: string }): Promise<PageResponse<BaseYear>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<BaseYear>>>('/sys03/base-years', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<BaseYear>>).data ?? (res as unknown as PageResponse<BaseYear>)
 }
 
 export default function PerfBaseYearPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<BaseYear | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<BaseYear | null>(null)
@@ -90,12 +98,13 @@ export default function PerfBaseYearPage() {
 
   return (
     <PageContainer title="기준년도 관리">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<BaseYear>
         rowKey="id"
         columns={columns}
         headerTitle="기준년도 목록"
         actionRef={actionRef}
-        request={(params) => fetchBaseYears(params)}
+        request={(params) => fetchBaseYears({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="add"

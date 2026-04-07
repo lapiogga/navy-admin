@@ -4,6 +4,8 @@ import type { ActionType, ProColumns } from '@ant-design/pro-components'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { StatusBadge } from '@/shared/ui/StatusBadge'
 import { PrintableReport } from '@/pages/sys09-memorial/PrintableReport'
 import { apiClient } from '@/shared/api/client'
@@ -68,6 +70,20 @@ export function BusViolatorPage() {
   const [printModalOpen, setPrintModalOpen] = useState(false)
   const [violators, setViolators] = useState<ViolatorItem[]>([])
   const [loading, setLoading] = useState(false)
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
+
+  // 검색 필드 정의 (CSV: 위규자 검색기능 추가)
+  const searchFields: SearchField[] = [
+    { name: 'keyword', label: '성명/군번', type: 'text', placeholder: '성명 또는 군번 검색' },
+    { name: 'rank', label: '계급', type: 'select', options: RANK_OPTIONS },
+    {
+      name: 'violationType',
+      label: '위규 유형',
+      type: 'select',
+      options: VIOLATION_TYPE_OPTIONS,
+    },
+    { name: 'unit', label: '부대(서)', type: 'text', placeholder: '부대(서) 입력' },
+  ]
 
   const columns: ProColumns<ViolatorItem>[] = [
     { title: '성명', dataIndex: 'userName', width: 100 },
@@ -131,9 +147,16 @@ export function BusViolatorPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/sys10/violators', {
-      params: { page: params.page, size: params.size },
+    const qs = new URLSearchParams({
+      page: String(params.page),
+      size: String(params.size),
+      ...Object.fromEntries(
+        Object.entries(searchParams)
+          .filter(([, v]) => v != null && v !== '')
+          .map(([k, v]) => [k, String(v)])
+      ),
     })
+    const res = await apiClient.get(`/sys10/violators?${qs.toString()}`)
     const data = res.data as { content: ViolatorItem[]; totalElements: number }
     setViolators(data.content ?? [])
     return res.data
@@ -183,6 +206,19 @@ export function BusViolatorPage() {
 
   return (
     <>
+      {/* 검색영역 (R2: CSV 검색기능 추가) */}
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => {
+          setSearchParams(values)
+          actionRef.current?.reload()
+        }}
+        onReset={() => {
+          setSearchParams({})
+          actionRef.current?.reload()
+        }}
+      />
+
       <DataTable<ViolatorItem>
         headerTitle="위규자 관리"
         columns={columns}

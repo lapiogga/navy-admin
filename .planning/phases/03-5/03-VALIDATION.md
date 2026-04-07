@@ -78,3 +78,16 @@ created: 2026-04-05
 - [ ] `nyquist_compliant: true` set in frontmatter
 
 **Approval:** pending
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+Phase 3 전체 서브시스템(SYS04, SYS05, SYS14, SYS11, SYS16)에 req_spec 기반 GAP 수정이 적용되었다. 주요 변경:
+
+- **R1 입력값 컬럼**: CrudForm 필드에 CSV 입력값 항목 반영 (SYS04: 소속기관/활용동의, SYS11: 첨부파일 4종, SYS16: 회의명/등급/주관부서)
+- **R2 SearchForm**: 5개 서브시스템 모두 목록 상단에 100px 검색영역 추가
+- **R5 테이블 라인**: DataTable CSS navy-bordered-table 전역 적용
+- **R6 militaryPersonColumn**: 신청자/제언자 등 인물 컬럼에 군번/계급/성명 3항목 표시
+
+기존 테스트 250개 regression 없음. 추가 검증 항목은 각 서브시스템 SUMMARY에 기록.

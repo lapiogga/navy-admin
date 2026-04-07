@@ -5,15 +5,22 @@ import { DownloadOutlined, UploadOutlined } from '@ant-design/icons'
 import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { SubTask, MidTask } from '@/shared/api/mocks/handlers/sys03-performance'
 
 const DEPT_NAMES = ['작전처', '정보처', '인사처', '군수처', '기획처', '교육훈련처', '통신처', '동원처']
 
-async function fetchSubTasks(params: PageRequest): Promise<PageResponse<SubTask>> {
+/** 검색 필드 정의 */
+const searchFields: SearchField[] = [
+  { name: 'keyword', label: '소과제명/부대(서)', type: 'text', placeholder: '소과제명 또는 부대(서) 검색' },
+]
+
+async function fetchSubTasks(params: PageRequest & { keyword?: string }): Promise<PageResponse<SubTask>> {
   const res = await apiClient.get<never, ApiResult<PageResponse<SubTask>>>('/sys03/sub-tasks', {
-    params: { current: params.page + 1, pageSize: params.size },
+    params: { current: params.page + 1, pageSize: params.size, keyword: params.keyword },
   })
   return (res as ApiResult<PageResponse<SubTask>>).data ?? (res as unknown as PageResponse<SubTask>)
 }
@@ -28,6 +35,7 @@ async function fetchAllMidTasks(): Promise<MidTask[]> {
 
 export default function PerfSubTaskPage() {
   const queryClient = useQueryClient()
+  const [searchParams, setSearchParams] = useState<Record<string, unknown>>({})
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<SubTask | null>(null)
   const [deleteTarget, setDeleteTarget] = useState<SubTask | null>(null)
@@ -106,12 +114,13 @@ export default function PerfSubTaskPage() {
 
   return (
     <PageContainer title="소과제 관리">
+      <SearchForm fields={searchFields} onSearch={(v) => { setSearchParams(v); actionRef.current?.reload() }} onReset={() => { setSearchParams({}); actionRef.current?.reload() }} />
       <DataTable<SubTask>
         rowKey="id"
         columns={columns}
         headerTitle="소과제 목록"
         actionRef={actionRef}
-        request={(params) => fetchSubTasks(params)}
+        request={(params) => fetchSubTasks({ ...params, ...searchParams } as PageRequest & { keyword?: string })}
         toolBarRender={() => [
           <Button
             key="export"

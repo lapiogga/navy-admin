@@ -1,5 +1,7 @@
 import { http, HttpResponse } from 'msw'
 import { faker } from '@faker-js/faker/locale/ko'
+import { randomServiceNumber } from '../mockServiceNumber'
+import { MARINE_UNITS } from '../mockUnits'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 // 타입 정의
@@ -12,6 +14,8 @@ export interface Knowledge extends Record<string, unknown> {
   source: string
   keywords: string[]
   content: string
+  serviceNumber: string
+  rank: string
   authorName: string
   authorUnit: string
   viewCount: number
@@ -33,9 +37,10 @@ export interface KnowledgeComment extends Record<string, unknown> {
 }
 
 const CATEGORIES = ['업무지식', '기술지식', '행정지식', '법규지식', '기타']
-const UNITS = ['1사단', '2사단', '해병대사령부', '교육훈련단', '상륙기동단']
+const UNITS = [...MARINE_UNITS]
 const STATUSES: KnowledgeStatus[] = ['pending', 'approved', 'rejected', 'hidden']
 const SOURCES = ['생산', '카피']
+const RANKS = ['이병', '일병', '상병', '병장', '하사', '중사', '상사', '원사', '소위', '중위', '대위', '소령', '중령', '대령']
 
 // Mock 데이터 30건 생성
 let knowledgeList: Knowledge[] = Array.from({ length: 30 }, (_, i) => ({
@@ -45,6 +50,8 @@ let knowledgeList: Knowledge[] = Array.from({ length: 30 }, (_, i) => ({
   source: SOURCES[i % SOURCES.length],
   keywords: [faker.word.noun(), faker.word.noun(), faker.word.noun()],
   content: faker.lorem.paragraphs(3),
+  serviceNumber: randomServiceNumber(),
+  rank: faker.helpers.arrayElement(RANKS),
   authorName: faker.person.lastName() + faker.person.firstName(),
   authorUnit: UNITS[i % UNITS.length],
   viewCount: faker.number.int({ min: 0, max: 500 }),
@@ -83,11 +90,17 @@ export const sys13Handlers = [
     const keyword = url.searchParams.get('keyword') || ''
     const searchType = url.searchParams.get('searchType') || '전체'
     const sortBy = url.searchParams.get('sortBy') || '최신순'
+    const authorUnit = url.searchParams.get('authorUnit') || ''
 
     let filtered = [...knowledgeList]
 
     if (category) {
       filtered = filtered.filter((item) => item.category === category)
+    }
+
+    // 작성부대 필터
+    if (authorUnit) {
+      filtered = filtered.filter((item) => item.authorUnit.includes(authorUnit))
     }
 
     if (keyword) {
@@ -139,6 +152,8 @@ export const sys13Handlers = [
       source: body.source || '생산',
       keywords: (body.keywords as string[]) || [],
       content: body.content || '',
+      serviceNumber: 'M-20210001',
+      rank: '중위',
       authorName: '홍길동',
       authorUnit: '해병대사령부',
       viewCount: 0,
@@ -313,12 +328,12 @@ export const sys13Handlers = [
     if (startDate) filtered = filtered.filter((k) => k.createdAt >= startDate)
     if (endDate) filtered = filtered.filter((k) => k.createdAt <= endDate)
 
-    // 작성자별 집계
-    const authorMap = new Map<string, { unit: string; authorName: string; count: number; recommendCount: number; rating: number; viewCount: number }>()
+    // 작성자별 집계 (군번/계급/성명 포함)
+    const authorMap = new Map<string, { unit: string; serviceNumber: string; rank: string; authorName: string; count: number; recommendCount: number; rating: number; viewCount: number }>()
     filtered.forEach((k) => {
       const key = `${k.authorUnit}__${k.authorName}`
       if (!authorMap.has(key)) {
-        authorMap.set(key, { unit: k.authorUnit, authorName: k.authorName, count: 0, recommendCount: 0, rating: 0, viewCount: 0 })
+        authorMap.set(key, { unit: k.authorUnit, serviceNumber: k.serviceNumber, rank: k.rank, authorName: k.authorName, count: 0, recommendCount: 0, rating: 0, viewCount: 0 })
       }
       const entry = authorMap.get(key)!
       authorMap.set(key, {

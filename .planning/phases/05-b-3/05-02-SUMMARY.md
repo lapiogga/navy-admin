@@ -108,3 +108,9 @@ None - 계획대로 실행됨.
 - sys10.ts: FOUND
 - commit 219bb27: FOUND
 - commit 65b935a: FOUND
+
+---
+
+## GAP 수정 반영 (2026-04-07)
+
+SYS10 주말버스예약관리체계에 req_spec 기반 6대 규칙 적용. 예약자/신청자 컬럼에 militaryPersonColumn(군번/계급/성명) 헬퍼 적용. SearchForm 다수 페이지에 추가 (예약목록, 배차관리, 대기자, 위규자 등). 외부사용자 관련 필드 확장. DataTable에 navy-bordered-table CSS 적용.

@@ -5,6 +5,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { militaryPersonColumn } from '@/shared/lib/military'
 import type { PageResponse, ApiResult } from '@/shared/api/types'
 import type { Knowledge, KnowledgeStatus } from '@/shared/api/mocks/handlers/sys13'
 
@@ -130,11 +131,12 @@ export default function KnowledgeAdminPage() {
         <Tag color={CATEGORY_COLOR[record.category] || 'default'}>{record.category}</Tag>
       ),
     },
-    {
-      title: '작성자',
-      dataIndex: 'authorName',
-      width: 100,
-    },
+    // R6: 작성자 군번/계급/성명
+    militaryPersonColumn<Knowledge>('작성자', {
+      serviceNumber: 'serviceNumber',
+      rank: 'rank',
+      name: 'authorName',
+    }),
     {
       title: '상태',
       dataIndex: 'status',
