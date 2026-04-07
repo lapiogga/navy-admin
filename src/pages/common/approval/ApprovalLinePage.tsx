@@ -79,7 +79,8 @@ export default function ApprovalLinePage() {
     staleTime: 5 * 60 * 1000,
   })
 
-  const users: UserOption[] = (usersData as ApiResult<UserOption[]> | undefined)?.data ?? []
+  const rawUsers = (usersData as ApiResult<UserOption[]> | undefined)?.data
+  const users: UserOption[] = Array.isArray(rawUsers) ? rawUsers : []
 
   const transferDataSource: TransferItem[] = users.map((u) => ({
     key: u.id,

@@ -201,7 +201,7 @@ let unitLineages: UnitLineage[] = Array.from({ length: 30 }, (_, i) => ({
   remarks: faker.lorem.sentence(),
 }))
 
-const BRANCH_OPTIONS = ['보병', '포병', '기갑', '공병', '통신', '병참', '수송', '정보통신']
+const BRANCH_OPTIONS = ['항해', '기관', '전투체계', '통신전자', '항공', '잠수함', '의무', '정보', '군수', '행정']
 const COMMISSION_TYPES = ['학사', '학군', '3사', '부사관', '간부후보생']
 
 let unitKeyPersons: UnitKeyPerson[] = Array.from({ length: 25 }, (_, i) => ({

@@ -33,6 +33,15 @@ const committeeData = [
 export default function CertReviewResultPage() {
   const [selectedId, setSelectedId] = useState<string>('review-1')
 
+  const { data: listData } = useQuery({
+    queryKey: ['sys09/review-list'],
+    queryFn: async () => {
+      const res = await apiClient.get<never, ApiResult<{ content: CombatReview[] }>>('/sys09/reviews?page=0&size=100')
+      const d = (res as ApiResult<{ content: CombatReview[] }>).data
+      return d?.content ?? []
+    },
+  })
+
   const { data } = useQuery({
     queryKey: ['sys09/reports/review-result', selectedId],
     queryFn: () => fetchReviewResult(selectedId),
@@ -41,14 +50,16 @@ export default function CertReviewResultPage() {
   return (
     <PageContainer title="전공사상심사결과">
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span>심사 ID:</span>
+        <span>대상자:</span>
         <Select
           value={selectedId}
           onChange={setSelectedId}
-          style={{ width: 200 }}
-          options={Array.from({ length: 10 }, (_, i) => ({
-            label: `review-${i + 1}`,
-            value: `review-${i + 1}`,
+          style={{ width: 350 }}
+          showSearch
+          optionFilterProp="label"
+          options={(listData ?? []).map((d) => ({
+            label: `${d.serviceNumber} / ${d.rank} / ${d.name}`,
+            value: d.id,
           }))}
         />
       </div>

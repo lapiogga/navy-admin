@@ -13,6 +13,24 @@ import { militaryPersonColumn } from '@/shared/lib/military'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { Directive, ActionItem, ActionHistory } from '@/shared/api/mocks/handlers/sys12'
+import type { DirectiveCategory } from './DirectiveProgressPage'
+
+// 카테고리별 API 경로 매핑
+const API_PATH_MAP: Record<DirectiveCategory, string> = {
+  commander: '/sys12/directives',
+  president: '/sys12/presidential-directives',
+  minister: '/sys12/minister-directives',
+}
+
+const TITLE_MAP: Record<DirectiveCategory, string> = {
+  commander: '지휘관 지시사항 목록',
+  president: '대통령 지시사항 목록',
+  minister: '국방부장관 지시사항 목록',
+}
+
+interface Props {
+  category?: DirectiveCategory
+}
 
 // 상태 매핑
 const STATUS_COLOR_MAP: Record<string, string> = {
@@ -58,8 +76,8 @@ const searchFields: SearchField[] = [
 ]
 
 // API 함수
-async function fetchDirectives(params: PageRequest & Record<string, unknown>): Promise<PageResponse<Directive>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<Directive>>>('/sys12/directives', {
+async function fetchDirectives(apiPath: string, params: PageRequest & Record<string, unknown>): Promise<PageResponse<Directive>> {
+  const res = await apiClient.get<never, ApiResult<PageResponse<Directive>>>(apiPath, {
     params: {
       page: params.page,
       size: params.size,
@@ -75,8 +93,8 @@ async function fetchDirectives(params: PageRequest & Record<string, unknown>): P
   return data
 }
 
-async function fetchDirectiveHistory(id: string): Promise<ActionHistory[]> {
-  const res = await apiClient.get<never, ApiResult<ActionHistory[]>>(`/sys12/directives/${id}/history`)
+async function fetchDirectiveHistory(apiPath: string, id: string): Promise<ActionHistory[]> {
+  const res = await apiClient.get<never, ApiResult<ActionHistory[]>>(`${apiPath}/${id}/history`)
   const data = (res as ApiResult<ActionHistory[]>).data ?? (res as unknown as ActionHistory[])
   return data
 }
@@ -185,7 +203,9 @@ const actionFormFields: CrudFormField[] = [
   },
 ]
 
-export default function DirectiveListPage() {
+export default function DirectiveListPage({ category = 'commander' }: Props) {
+  const apiPath = API_PATH_MAP[category]
+  const title = TITLE_MAP[category]
   const queryClient = useQueryClient()
   const actionRef = useRef<ActionType>()
   const [formOpen, setFormOpen] = useState(false)
@@ -216,21 +236,21 @@ export default function DirectiveListPage() {
 
   // 지시사항 이행 이력 조회
   const { data: history = [] } = useQuery({
-    queryKey: ['sys12-directive-history', selectedDirective?.id],
-    queryFn: () => fetchDirectiveHistory(selectedDirective!.id),
+    queryKey: ['sys12-directive-history', category, selectedDirective?.id],
+    queryFn: () => fetchDirectiveHistory(apiPath, selectedDirective!.id),
     enabled: !!selectedDirective?.id,
   })
 
   // 등록 mutation
   const createMutation = useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      return apiClient.post('/sys12/directives', values)
+      return apiClient.post(apiPath, values)
     },
     onSuccess: () => {
       message.success('지시사항이 등록되었습니다')
       setFormOpen(false)
       actionRef.current?.reload()
-      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress'] })
+      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress', category] })
     },
     onError: () => message.error('등록에 실패했습니다'),
   })
@@ -238,14 +258,14 @@ export default function DirectiveListPage() {
   // 수정 mutation
   const updateMutation = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) => {
-      return apiClient.put(`/sys12/directives/${id}`, values)
+      return apiClient.put(`${apiPath}/${id}`, values)
     },
     onSuccess: () => {
       message.success('지시사항이 수정되었습니다')
       setFormOpen(false)
       setEditTarget(null)
       actionRef.current?.reload()
-      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress'] })
+      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress', category] })
     },
     onError: () => message.error('수정에 실패했습니다'),
   })
@@ -253,12 +273,12 @@ export default function DirectiveListPage() {
   // 삭제 mutation
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      return apiClient.delete(`/sys12/directives/${id}`)
+      return apiClient.delete(`${apiPath}/${id}`)
     },
     onSuccess: () => {
       message.success('삭제되었습니다')
       actionRef.current?.reload()
-      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress'] })
+      queryClient.invalidateQueries({ queryKey: ['sys12-directive-progress', category] })
     },
     onError: () => message.error('삭제에 실패했습니다'),
   })
@@ -266,7 +286,7 @@ export default function DirectiveListPage() {
   // 조치사항 등록 mutation
   const actionMutation = useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      return apiClient.post(`/sys12/directives/${selectedDirective?.id}/actions`, values)
+      return apiClient.post(`${apiPath}/${selectedDirective?.id}/actions`, values)
     },
     onSuccess: () => {
       message.success('조치사항이 등록되었습니다')
@@ -365,14 +385,14 @@ export default function DirectiveListPage() {
   ]
 
   return (
-    <PageContainer title="지시사항 목록">
+    <PageContainer title={title}>
       {/* 검색영역 (CSV 검색조건: 지시일, 지시자, 수명부대, 진행상황, 지시내용) */}
       <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
 
       <DataTable<Directive>
         rowKey="id"
         columns={columns}
-        request={(params) => fetchDirectives({ ...params, ...searchParams } as PageRequest & Record<string, unknown>)}
+        request={(params) => fetchDirectives(apiPath, { ...params, ...searchParams } as PageRequest & Record<string, unknown>)}
         actionRef={actionRef}
         toolBarRender={() => [
           <Button

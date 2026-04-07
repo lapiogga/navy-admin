@@ -22,6 +22,15 @@ async function fetchDeathCert(id: string): Promise<Deceased> {
 export default function CertDeathPage() {
   const [selectedId, setSelectedId] = useState<string>('deceased-1')
 
+  const { data: listData } = useQuery({
+    queryKey: ['sys09/deceased-list'],
+    queryFn: async () => {
+      const res = await apiClient.get<never, ApiResult<{ content: Deceased[] }>>('/sys09/deceased?page=0&size=100')
+      const d = (res as ApiResult<{ content: Deceased[] }>).data
+      return d?.content ?? []
+    },
+  })
+
   const { data } = useQuery({
     queryKey: ['sys09/reports/death-cert', selectedId],
     queryFn: () => fetchDeathCert(selectedId),
@@ -33,14 +42,16 @@ export default function CertDeathPage() {
   return (
     <PageContainer title="순직/사망확인서">
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span>대상자 ID:</span>
+        <span>대상자:</span>
         <Select
           value={selectedId}
           onChange={setSelectedId}
-          style={{ width: 200 }}
-          options={Array.from({ length: 10 }, (_, i) => ({
-            label: `deceased-${i + 1}`,
-            value: `deceased-${i + 1}`,
+          style={{ width: 350 }}
+          showSearch
+          optionFilterProp="label"
+          options={(listData ?? []).map((d) => ({
+            label: `${d.serviceNumber} / ${d.rank} / ${d.name}`,
+            value: d.id,
           }))}
         />
       </div>

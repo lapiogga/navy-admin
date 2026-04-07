@@ -44,38 +44,39 @@ const SEARCH_FIELDS: SearchField[] = [
   },
 ]
 
-// 조직도 트리 데이터 (G09) - 부/실/단 구조
+// 조직도 트리 데이터 (G09) - 해군본부 조직 구조
 const ORG_TREE_DATA = [
   {
-    title: '해병대사령부',
+    title: '해군본부',
     key: 'hq',
     children: [
       {
-        title: '부(部)',
+        title: '참모부',
         key: 'dept-group',
         children: [
-          { title: '기획부', key: '기획부' },
-          { title: '인사부', key: '인사부' },
-          { title: '작전부', key: '작전부' },
-          { title: '군수부', key: '군수부' },
-          { title: '정보부', key: '정보부' },
+          { title: '인사참모부', key: '인사참모부' },
+          { title: '정보작전참모부', key: '정보작전참모부' },
+          { title: '전력기획참모부', key: '전력기획참모부' },
+          { title: '군수참모부', key: '군수참모부' },
+          { title: '교육훈련참모부', key: '교육훈련참모부' },
         ],
       },
       {
-        title: '실(室)',
+        title: '직할부서',
         key: 'office-group',
         children: [
           { title: '감찰실', key: '감찰실' },
           { title: '법무실', key: '법무실' },
-          { title: '공보실', key: '공보실' },
+          { title: '공보정훈실', key: '공보정훈실' },
+          { title: '군종실', key: '군종실' },
         ],
       },
       {
-        title: '단(團)',
-        key: 'unit-group',
+        title: '처(處)',
+        key: 'bureau-group',
         children: [
-          { title: '교육훈련단', key: '교육훈련단' },
-          { title: '상륙기동단', key: '상륙기동단' },
+          { title: '정보통신처', key: '정보통신처' },
+          { title: '시설처', key: '시설처' },
         ],
       },
     ],
@@ -104,16 +105,16 @@ const REGULATION_FIELDS: CrudFormField[] = [
     type: 'select' as const,
     required: true,
     options: [
-      { label: '기획부', value: '기획부' },
-      { label: '인사부', value: '인사부' },
-      { label: '작전부', value: '작전부' },
-      { label: '군수부', value: '군수부' },
-      { label: '정보부', value: '정보부' },
+      { label: '인사참모부', value: '인사참모부' },
+      { label: '정보작전참모부', value: '정보작전참모부' },
+      { label: '전력기획참모부', value: '전력기획참모부' },
+      { label: '군수참모부', value: '군수참모부' },
+      { label: '교육훈련참모부', value: '교육훈련참모부' },
       { label: '감찰실', value: '감찰실' },
       { label: '법무실', value: '법무실' },
-      { label: '공보실', value: '공보실' },
-      { label: '교육훈련단', value: '교육훈련단' },
-      { label: '상륙기동단', value: '상륙기동단' },
+      { label: '공보정훈실', value: '공보정훈실' },
+      { label: '정보통신처', value: '정보통신처' },
+      { label: '시설처', value: '시설처' },
     ],
   },
   { name: 'effectiveDate', label: '시행일', type: 'date' as const, required: true },
@@ -181,7 +182,7 @@ export default function RegulationListPage() {
   }
 
   // 조직도 선택 핸들러 (G09) - 그룹 노드 선택 시 전체 조회
-  const GROUP_KEYS = ['hq', 'dept-group', 'office-group', 'unit-group']
+  const GROUP_KEYS = ['hq', 'dept-group', 'office-group', 'bureau-group']
   const handleOrgSelect = (selectedKeys: React.Key[]) => {
     const key = selectedKeys[0] as string
     if (!key || GROUP_KEYS.includes(key)) {

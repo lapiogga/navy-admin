@@ -6,6 +6,25 @@ import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult } from '@/shared/api/types'
 
+// 카테고리별 API 경로 매핑
+export type DirectiveCategory = 'commander' | 'president' | 'minister'
+
+const API_PATH_MAP: Record<DirectiveCategory, string> = {
+  commander: '/sys12/directives',
+  president: '/sys12/presidential-directives',
+  minister: '/sys12/minister-directives',
+}
+
+const TITLE_MAP: Record<DirectiveCategory, string> = {
+  commander: '지휘관 지시사항 추진현황',
+  president: '대통령 지시사항 추진현황',
+  minister: '국방부장관 지시사항 추진현황',
+}
+
+interface Props {
+  category?: DirectiveCategory
+}
+
 // 추진현황 통계 타입
 interface CategoryStat extends Record<string, unknown> {
   category: string
@@ -27,8 +46,8 @@ interface DirectiveProgress {
   categoryStats: CategoryStat[]
 }
 
-async function fetchDirectiveProgress(): Promise<DirectiveProgress> {
-  const res = await apiClient.get<never, ApiResult<DirectiveProgress>>('/sys12/directives/progress')
+async function fetchDirectiveProgress(apiPath: string): Promise<DirectiveProgress> {
+  const res = await apiClient.get<never, ApiResult<DirectiveProgress>>(`${apiPath}/progress`)
   const data = (res as ApiResult<DirectiveProgress>).data ?? (res as unknown as DirectiveProgress)
   return data
 }
@@ -84,16 +103,19 @@ const columns: ProColumns<CategoryStat>[] = [
   },
 ]
 
-export default function DirectiveProgressPage() {
+export default function DirectiveProgressPage({ category = 'commander' }: Props) {
+  const apiPath = API_PATH_MAP[category]
+  const title = TITLE_MAP[category]
+
   const { data: progress, isLoading } = useQuery({
-    queryKey: ['sys12-directive-progress'],
-    queryFn: fetchDirectiveProgress,
+    queryKey: ['sys12-directive-progress', category],
+    queryFn: () => fetchDirectiveProgress(apiPath),
   })
 
   const categoryStats = progress?.categoryStats ?? []
 
   return (
-    <PageContainer title="지시사항 추진현황">
+    <PageContainer title={title}>
       {/* 요약 통계 카드 */}
       <Row gutter={[16, 16]} style={{ marginBottom: 24 }}>
         <Col span={4}>

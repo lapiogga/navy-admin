@@ -20,6 +20,15 @@ async function fetchMeritInjured(id: string): Promise<Injured> {
 export default function CertMeritInjuredPage() {
   const [selectedId, setSelectedId] = useState<string>('injured-1')
 
+  const { data: listData } = useQuery({
+    queryKey: ['sys09/injured-list'],
+    queryFn: async () => {
+      const res = await apiClient.get<never, ApiResult<{ content: Injured[] }>>('/sys09/injured?page=0&size=100')
+      const d = (res as ApiResult<{ content: Injured[] }>).data
+      return d?.content ?? []
+    },
+  })
+
   const { data } = useQuery({
     queryKey: ['sys09/reports/merit-injured', selectedId],
     queryFn: () => fetchMeritInjured(selectedId),
@@ -30,14 +39,16 @@ export default function CertMeritInjuredPage() {
   return (
     <PageContainer title="국가유공자 요건 해당사실 확인서(상이자)">
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
-        <span>대상자 ID:</span>
+        <span>대상자:</span>
         <Select
           value={selectedId}
           onChange={setSelectedId}
-          style={{ width: 200 }}
-          options={Array.from({ length: 10 }, (_, i) => ({
-            label: `injured-${i + 1}`,
-            value: `injured-${i + 1}`,
+          style={{ width: 350 }}
+          showSearch
+          optionFilterProp="label"
+          options={(listData ?? []).map((d) => ({
+            label: `${d.serviceNumber} / ${d.rank} / ${d.name}`,
+            value: d.id,
           }))}
         />
       </div>

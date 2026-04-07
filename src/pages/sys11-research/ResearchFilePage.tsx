@@ -29,7 +29,7 @@ async function fetchFiles(params: PageRequest): Promise<PageResponse<FileItem>> 
 
 export default function ResearchFilePage() {
   const columns: ProColumns<FileItem>[] = [
-    { title: '번호', dataIndex: 'id', width: 80 },
+    { title: '번호', dataIndex: 'id', width: 60, render: (_: unknown, __: unknown, index: number) => index + 1 },
     { title: '제목', dataIndex: 'title', ellipsis: true },
     { title: '파일명', dataIndex: 'fileName', width: 180 },
     {

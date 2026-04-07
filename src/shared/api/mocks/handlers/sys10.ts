@@ -151,13 +151,13 @@ const violators = Array.from({ length: 5 }, (_, i) => ({
 export const sys10Handlers = [
   // 노선 목록
   http.get('/api/sys10/routes', () => {
-    return HttpResponse.json({ content: routes, totalElements: routes.length })
+    return HttpResponse.json({ success: true, data: { content: routes, totalElements: routes.length } })
   }),
 
   // 좌석 현황
   http.get('/api/sys10/routes/:id/seats', ({ params }) => {
     const seats = generateSeats(String(params.id))
-    return HttpResponse.json({ content: seats, totalElements: seats.length })
+    return HttpResponse.json({ success: true, data: { content: seats, totalElements: seats.length } })
   }),
 
   // 예약 신청
@@ -168,12 +168,12 @@ export const sys10Handlers = [
       ...body,
       status: 'reserved',
     }
-    return HttpResponse.json(newReservation, { status: 201 })
+    return HttpResponse.json({ success: true, data: newReservation }, { status: 201 })
   }),
 
   // 예약 취소
   http.put('/api/sys10/reservations/:id/cancel', ({ params }) => {
-    return HttpResponse.json({ id: params.id, status: 'cancelled' })
+    return HttpResponse.json({ success: true, data: { id: params.id, status: 'cancelled' } })
   }),
 
   // 예약현황 목록
@@ -183,7 +183,7 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = reservations.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: reservations.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: reservations.length } })
   }),
 
   // 배차 목록
@@ -193,32 +193,32 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = dispatches.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: dispatches.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: dispatches.length } })
   }),
 
   // 배차 등록
   http.post('/api/sys10/dispatches', async ({ request }) => {
     const body = await request.json() as Record<string, unknown>
     const newDispatch = { id: `d${Date.now()}`, ...body }
-    return HttpResponse.json(newDispatch, { status: 201 })
+    return HttpResponse.json({ success: true, data: newDispatch }, { status: 201 })
   }),
 
   // 배차 수정
   http.put('/api/sys10/dispatches/:id', async ({ params, request }) => {
     const body = await request.json() as Record<string, unknown>
     const updated = { id: params.id, ...body }
-    return HttpResponse.json(updated)
+    return HttpResponse.json({ success: true, data: updated })
   }),
 
   // 배차 삭제
   http.delete('/api/sys10/dispatches/:id', ({ params }) => {
-    return HttpResponse.json({ id: params.id, deleted: true })
+    return HttpResponse.json({ success: true, data: { id: params.id, deleted: true } })
   }),
 
   // 배차별 좌석 현황 (SeatGrid readOnly용)
   http.get('/api/sys10/dispatches/:id/seats', ({ params }) => {
     const seats = generateSeats(String(params.id))
-    return HttpResponse.json({ content: seats, totalElements: seats.length })
+    return HttpResponse.json({ success: true, data: { content: seats, totalElements: seats.length } })
   }),
 
   // 예약시간 목록
@@ -228,26 +228,26 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = schedules.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: schedules.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: schedules.length } })
   }),
 
   // 예약시간 등록
   http.post('/api/sys10/schedule', async ({ request }) => {
     const body = await request.json() as Record<string, unknown>
     const newSchedule = { id: `sch${Date.now()}`, ...body }
-    return HttpResponse.json(newSchedule, { status: 201 })
+    return HttpResponse.json({ success: true, data: newSchedule }, { status: 201 })
   }),
 
   // 예약시간 수정
   http.put('/api/sys10/schedule/:id', async ({ params, request }) => {
     const body = await request.json() as Record<string, unknown>
     const updated = { id: params.id, ...body }
-    return HttpResponse.json(updated)
+    return HttpResponse.json({ success: true, data: updated })
   }),
 
   // 예약시간 삭제
   http.delete('/api/sys10/schedule/:id', ({ params }) => {
-    return HttpResponse.json({ id: params.id, deleted: true })
+    return HttpResponse.json({ success: true, data: { id: params.id, deleted: true } })
   }),
 
   // 사용현황
@@ -257,7 +257,7 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = usageStats.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: usageStats.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: usageStats.length } })
   }),
 
   // 대기자 목록
@@ -267,7 +267,7 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = waitlist.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: waitlist.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: waitlist.length } })
   }),
 
   // 자동 배정
@@ -277,7 +277,7 @@ export const sys10Handlers = [
     waitingItems.slice(0, assignCount).forEach((w) => {
       w.status = 'assigned'
     })
-    return HttpResponse.json({ assignedCount: assignCount })
+    return HttpResponse.json({ success: true, data: { assignedCount: assignCount } })
   }),
 
   // 수동 배정 가능 좌석 목록
@@ -286,14 +286,14 @@ export const sys10Handlers = [
       id: `seat-${params.id}-${i + 1}`,
       seatNo: `${i + 1}A`,
     }))
-    return HttpResponse.json(seats)
+    return HttpResponse.json({ success: true, data: seats })
   }),
 
   // 수동 배정
   http.post('/api/sys10/waitlist/:id/manual-assign', ({ params }) => {
     const item = waitlist.find((w) => w.id === params.id)
     if (item) item.status = 'assigned'
-    return HttpResponse.json({ id: params.id, status: 'assigned' })
+    return HttpResponse.json({ success: true, data: { id: params.id, status: 'assigned' } })
   }),
 
   // 위규자 목록
@@ -303,7 +303,7 @@ export const sys10Handlers = [
     const size = Number(url.searchParams.get('size') ?? 10)
     const start = page * size
     const items = violators.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: violators.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: violators.length } })
   }),
 
   // 위규자 등록
@@ -311,7 +311,7 @@ export const sys10Handlers = [
     const body = await request.json() as Record<string, unknown>
     const newViolator = { id: `vio${Date.now()}`, registeredAt: new Date().toISOString().slice(0, 10), ...body }
     violators.push(newViolator as typeof violators[0])
-    return HttpResponse.json(newViolator, { status: 201 })
+    return HttpResponse.json({ success: true, data: newViolator }, { status: 201 })
   }),
 
   // 위규자 수정
@@ -319,14 +319,14 @@ export const sys10Handlers = [
     const body = await request.json() as Record<string, unknown>
     const idx = violators.findIndex((v) => v.id === params.id)
     if (idx !== -1) Object.assign(violators[idx], body)
-    return HttpResponse.json({ id: params.id, ...body })
+    return HttpResponse.json({ success: true, data: { id: params.id, ...body } })
   }),
 
   // 위규자 삭제
   http.delete('/api/sys10/violators/:id', ({ params }) => {
     const idx = violators.findIndex((v) => v.id === params.id)
     if (idx !== -1) violators.splice(idx, 1)
-    return HttpResponse.json({ id: params.id, deleted: true })
+    return HttpResponse.json({ success: true, data: { id: params.id, deleted: true } })
   }),
 
   // 타군 사용자 Mock 데이터 (모듈 레벨로 올릴 수 없으므로 핸들러 내 클로저로 관리)
@@ -334,15 +334,15 @@ export const sys10Handlers = [
   http.post('/api/sys10/external-auth/login', async ({ request }) => {
     const body = await request.json() as { militaryId: string; password: string }
     if (body.militaryId && body.password) {
-      return HttpResponse.json({ token: 'mock-external-token', user: { militaryId: body.militaryId } })
+      return HttpResponse.json({ success: true, data: { token: 'mock-external-token', user: { militaryId: body.militaryId } } })
     }
-    return HttpResponse.json({ message: '인증 실패' }, { status: 401 })
+    return HttpResponse.json({ success: false, message: '인증 실패' }, { status: 401 })
   }),
 
   // 타군 사용자 회원등록
   http.post('/api/sys10/external-users/register', async ({ request }) => {
     const body = await request.json() as Record<string, unknown>
-    return HttpResponse.json({ id: `ext${Date.now()}`, ...body, status: 'pending' }, { status: 201 })
+    return HttpResponse.json({ success: true, data: { id: `ext${Date.now()}`, ...body, status: 'pending' } }, { status: 201 })
   }),
 
   // 타군 사용자 목록
@@ -365,22 +365,22 @@ export const sys10Handlers = [
     }))
     const start = page * size
     const items = externalUsers.slice(start, start + size)
-    return HttpResponse.json({ content: items, totalElements: externalUsers.length })
+    return HttpResponse.json({ success: true, data: { content: items, totalElements: externalUsers.length } })
   }),
 
   // 타군 사용자 승인
   http.put('/api/sys10/external-users/:id/approve', ({ params }) => {
-    return HttpResponse.json({ id: params.id, status: 'approved' })
+    return HttpResponse.json({ success: true, data: { id: params.id, status: 'approved' } })
   }),
 
   // 타군 사용자 반려
   http.put('/api/sys10/external-users/:id/reject', async ({ params, request }) => {
     const body = await request.json() as { rejectReason: string }
-    return HttpResponse.json({ id: params.id, status: 'rejected', rejectReason: body.rejectReason })
+    return HttpResponse.json({ success: true, data: { id: params.id, status: 'rejected', rejectReason: body.rejectReason } })
   }),
 
   // 패스워드 초기화
   http.post('/api/sys10/external-users/:id/reset-password', ({ params }) => {
-    return HttpResponse.json({ id: params.id, message: '임시 패스워드가 발송되었습니다.' })
+    return HttpResponse.json({ success: true, data: { id: params.id, message: '임시 패스워드가 발송되었습니다.' } })
   }),
 ]

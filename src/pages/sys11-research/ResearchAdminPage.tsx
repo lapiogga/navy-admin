@@ -270,7 +270,7 @@ function DownloadHistoryTab() {
   }
 
   const columns: ProColumns<DownloadHistoryItem>[] = [
-    { title: '순번', dataIndex: 'id', width: 80 },
+    { title: '순번', dataIndex: 'id', width: 60, render: (_: unknown, __: unknown, index: number) => index + 1 },
     { title: '게시판', dataIndex: 'boardType', width: 100 },
     { title: '게시글번호', dataIndex: 'postId', width: 110 },
     { title: '군번', dataIndex: 'downloaderServiceNumber', width: 120 },

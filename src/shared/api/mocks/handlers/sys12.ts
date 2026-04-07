@@ -75,6 +75,69 @@ const STATUSES: ProgressStatus[] = ['notStarted', 'inProgress', 'completed', 'de
 const DIRECTIVE_TYPES: Array<'문서' | '구두'> = ['문서', '구두']
 const RANKS = ['대령', '중령', '소령', '대위', '중위', '소위', '상사', '중사']
 
+// 대통령 지시사항 내용 샘플
+const PRESIDENTIAL_CONTENTS = [
+  '국방개혁 2.0 추진 가속화 지시',
+  '장병 복무여건 개선 대책 수립',
+  '군 사이버 보안 강화 방안 마련',
+  '방위산업 경쟁력 제고 방안 수립',
+  '전시 작전계획 보완 지시',
+  '군 의료체계 개선 추진',
+  '예비전력 정예화 방안 수립',
+  '국방 R&D 투자 확대 방안',
+  '남북 군사합의 이행 점검',
+  '군 인권 개선 종합대책 수립',
+  '첨단 무기체계 전력화 가속',
+  '장병 급식 질 향상 대책',
+  '군 시설 현대화 추진 점검',
+  '국방 예산 효율화 방안',
+  '장병 정신전력 강화 지시',
+]
+
+// 국방부장관 지시사항 내용 샘플
+const MINISTER_CONTENTS = [
+  '해병대 상륙작전 능력 강화',
+  '합동작전 수행체계 개선',
+  '군수 물자 관리 효율화',
+  '부대 안전관리 체계 점검',
+  '군 간부 인사제도 개선',
+  '전투준비태세 점검 강화',
+  '군사보안 실태 점검',
+  '방위력 개선사업 추진 현황 보고',
+  '군 교육훈련 혁신 방안',
+  '장병 사기 진작 방안 수립',
+  '국방 정보화 추진 계획',
+  '군 환경 보전 대책 수립',
+  '예비군 훈련 체계 개선',
+  '군 복지시설 확충 계획',
+  '해외파병 부대 지원 강화',
+]
+
+// 지시사항 Mock 데이터 생성 공통 함수
+function generateDirectives(prefix: string, count: number, contents: string[]): Directive[] {
+  return Array.from({ length: count }, (_, i) => {
+    const sn = randomServiceNumber()
+    const rank = RANKS[i % RANKS.length]
+    const name = faker.person.lastName() + faker.person.firstName()
+    return {
+      id: `${prefix}-${i + 1}`,
+      directiveNo: `${prefix.toUpperCase()}-${2025}-${String(i + 1).padStart(3, '0')}`,
+      directorServiceNumber: sn,
+      directorRank: rank,
+      directorName: name,
+      director: `${sn} / ${rank} / ${name}`,
+      directiveDate: faker.date.recent({ days: 180 }).toISOString().split('T')[0],
+      targetUnit: UNITS[i % UNITS.length],
+      content: contents[i % contents.length],
+      progressStatus: STATUSES[i % STATUSES.length],
+      category: CATEGORIES[i % CATEGORIES.length],
+      directiveType: DIRECTIVE_TYPES[i % DIRECTIVE_TYPES.length],
+      attachments: [],
+      createdAt: faker.date.recent({ days: 180 }).toISOString(),
+    }
+  })
+}
+
 // 지시사항 Mock 데이터 20건
 let directives: Directive[] = Array.from({ length: 20 }, (_, i) => {
   const sn = randomServiceNumber()
@@ -145,6 +208,74 @@ let actions: ActionItem[] = Array.from({ length: 30 }, (_, i) => {
 const histories: ActionHistory[] = Array.from({ length: 60 }, (_, i) => ({
   id: `hist-${i + 1}`,
   parentId: i < 30 ? `dir-${(i % 20) + 1}` : `prop-${(i % 15) + 1}`,
+  date: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
+  assignee: faker.person.lastName() + faker.person.firstName(),
+  status: ['미착수', '진행중', '완료', '지연'][i % 4],
+  content: faker.lorem.sentence(),
+}))
+
+// 대통령 지시사항 Mock 데이터 15건
+let presidentialDirectives: Directive[] = generateDirectives('pdir', 15, PRESIDENTIAL_CONTENTS)
+
+// 국방부장관 지시사항 Mock 데이터 15건
+let ministerDirectives: Directive[] = generateDirectives('mdir', 15, MINISTER_CONTENTS)
+
+// 대통령 조치사항 Mock 데이터
+let presidentialActions: ActionItem[] = Array.from({ length: 15 }, (_, i) => {
+  const sn = randomServiceNumber()
+  const rank = RANKS[i % RANKS.length]
+  const name = faker.person.lastName() + faker.person.firstName()
+  return {
+    id: `pact-${i + 1}`,
+    parentId: `pdir-${(i % 15) + 1}`,
+    parentType: 'directive' as const,
+    assigneeServiceNumber: sn,
+    assigneeRank: rank,
+    assigneeName: name,
+    assignee: `${sn} / ${rank} / ${name}`,
+    progressStatus: STATUSES[i % STATUSES.length],
+    plan: faker.lorem.sentence(),
+    result: faker.lorem.sentence(),
+    attachments: [],
+    createdAt: faker.date.recent({ days: 90 }).toISOString(),
+  }
+})
+
+// 국방부장관 조치사항 Mock 데이터
+let ministerActions: ActionItem[] = Array.from({ length: 15 }, (_, i) => {
+  const sn = randomServiceNumber()
+  const rank = RANKS[i % RANKS.length]
+  const name = faker.person.lastName() + faker.person.firstName()
+  return {
+    id: `mact-${i + 1}`,
+    parentId: `mdir-${(i % 15) + 1}`,
+    parentType: 'directive' as const,
+    assigneeServiceNumber: sn,
+    assigneeRank: rank,
+    assigneeName: name,
+    assignee: `${sn} / ${rank} / ${name}`,
+    progressStatus: STATUSES[i % STATUSES.length],
+    plan: faker.lorem.sentence(),
+    result: faker.lorem.sentence(),
+    attachments: [],
+    createdAt: faker.date.recent({ days: 90 }).toISOString(),
+  }
+})
+
+// 대통령 이력 Mock 데이터
+const presidentialHistories: ActionHistory[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `phist-${i + 1}`,
+  parentId: `pdir-${(i % 15) + 1}`,
+  date: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
+  assignee: faker.person.lastName() + faker.person.firstName(),
+  status: ['미착수', '진행중', '완료', '지연'][i % 4],
+  content: faker.lorem.sentence(),
+}))
+
+// 국방부장관 이력 Mock 데이터
+const ministerHistories: ActionHistory[] = Array.from({ length: 30 }, (_, i) => ({
+  id: `mhist-${i + 1}`,
+  parentId: `mdir-${(i % 15) + 1}`,
   date: faker.date.recent({ days: 90 }).toISOString().split('T')[0],
   assignee: faker.person.lastName() + faker.person.firstName(),
   status: ['미착수', '진행중', '완료', '지연'][i % 4],
@@ -458,5 +589,183 @@ export const sys12Handlers = [
     ])
     const result: ApiResult<typeof chartData> = { success: true, data: chartData }
     return HttpResponse.json(result)
+  }),
+
+  // === 대통령 지시사항 ===
+  http.get('/api/sys12/presidential-directives', ({ request }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') || '0')
+    const size = parseInt(url.searchParams.get('size') || '10')
+    const progressStatus = url.searchParams.get('progressStatus') || ''
+    const director = url.searchParams.get('director') || ''
+    const keyword = url.searchParams.get('keyword') || ''
+    const targetUnit = url.searchParams.get('targetUnit') || ''
+    const directiveDateFrom = url.searchParams.get('directiveDateFrom') || ''
+    const directiveDateTo = url.searchParams.get('directiveDateTo') || ''
+
+    let filtered = [...presidentialDirectives]
+    if (progressStatus) filtered = filtered.filter((d) => d.progressStatus === progressStatus)
+    if (director) filtered = filtered.filter((d) => d.directorName.includes(director) || d.director.includes(director))
+    if (keyword) filtered = filtered.filter((d) => d.content.includes(keyword))
+    if (targetUnit) filtered = filtered.filter((d) => d.targetUnit === targetUnit)
+    if (directiveDateFrom) filtered = filtered.filter((d) => d.directiveDate >= directiveDateFrom)
+    if (directiveDateTo) filtered = filtered.filter((d) => d.directiveDate <= directiveDateTo)
+
+    const result: ApiResult<PageResponse<Directive>> = { success: true, data: paginate(filtered, page, size) }
+    return HttpResponse.json(result)
+  }),
+
+  http.get('/api/sys12/presidential-directives/progress', () => {
+    const result: ApiResult<ReturnType<typeof calcProgress>> = { success: true, data: calcProgress(presidentialDirectives) }
+    return HttpResponse.json(result)
+  }),
+
+  http.get('/api/sys12/presidential-directives/:id', ({ params }) => {
+    const item = presidentialDirectives.find((d) => d.id === params.id)
+    if (!item) return HttpResponse.json({ success: false, message: '지시사항을 찾을 수 없습니다' }, { status: 404 })
+    return HttpResponse.json({ success: true, data: item } as ApiResult<Directive>)
+  }),
+
+  http.post('/api/sys12/presidential-directives', async ({ request }) => {
+    const body = (await request.json()) as Partial<Directive>
+    const newItem: Directive = {
+      id: `pdir-${Date.now()}`, directiveNo: `PDIR-${Date.now()}`,
+      directorServiceNumber: (body.directorServiceNumber as string) || '', directorRank: (body.directorRank as string) || '',
+      directorName: (body.directorName as string) || '', director: body.director || '',
+      directiveDate: body.directiveDate || new Date().toISOString().split('T')[0],
+      targetUnit: body.targetUnit || '해병대사령부', content: body.content || '',
+      progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
+      category: body.category || '작전', directiveType: (body.directiveType as '문서' | '구두') || '문서',
+      attachments: [], createdAt: new Date().toISOString(),
+    }
+    presidentialDirectives = [newItem, ...presidentialDirectives]
+    return HttpResponse.json({ success: true, data: newItem } as ApiResult<Directive>)
+  }),
+
+  http.put('/api/sys12/presidential-directives/:id', async ({ params, request }) => {
+    const body = (await request.json()) as Partial<Directive>
+    const index = presidentialDirectives.findIndex((d) => d.id === params.id)
+    if (index === -1) return HttpResponse.json({ success: false, message: '지시사항을 찾을 수 없습니다' }, { status: 404 })
+    presidentialDirectives[index] = { ...presidentialDirectives[index], ...body }
+    return HttpResponse.json({ success: true, data: presidentialDirectives[index] } as ApiResult<Directive>)
+  }),
+
+  http.delete('/api/sys12/presidential-directives/:id', ({ params }) => {
+    const index = presidentialDirectives.findIndex((d) => d.id === params.id)
+    if (index !== -1) presidentialDirectives.splice(index, 1)
+    return HttpResponse.json({ success: true, data: null } as ApiResult<null>)
+  }),
+
+  http.get('/api/sys12/presidential-directives/:id/actions', ({ params }) => {
+    const filtered = presidentialActions.filter((a) => a.parentId === params.id)
+    return HttpResponse.json({ success: true, data: filtered } as ApiResult<ActionItem[]>)
+  }),
+
+  http.post('/api/sys12/presidential-directives/:id/actions', async ({ params, request }) => {
+    const body = (await request.json()) as Partial<ActionItem>
+    const newItem: ActionItem = {
+      id: `pact-${Date.now()}`, parentId: params.id as string, parentType: 'directive',
+      assigneeServiceNumber: (body.assigneeServiceNumber as string) || '', assigneeRank: (body.assigneeRank as string) || '',
+      assigneeName: (body.assigneeName as string) || '', assignee: body.assignee || '',
+      progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
+      plan: body.plan || '', result: body.result || '', attachments: (body.attachments as string[]) || [],
+      createdAt: new Date().toISOString(),
+    }
+    presidentialActions = [newItem, ...presidentialActions]
+    return HttpResponse.json({ success: true, data: newItem } as ApiResult<ActionItem>)
+  }),
+
+  http.get('/api/sys12/presidential-directives/:id/history', ({ params }) => {
+    const filtered = presidentialHistories.filter((h) => h.parentId === params.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return HttpResponse.json({ success: true, data: filtered } as ApiResult<ActionHistory[]>)
+  }),
+
+  // === 국방부장관 지시사항 ===
+  http.get('/api/sys12/minister-directives', ({ request }) => {
+    const url = new URL(request.url)
+    const page = parseInt(url.searchParams.get('page') || '0')
+    const size = parseInt(url.searchParams.get('size') || '10')
+    const progressStatus = url.searchParams.get('progressStatus') || ''
+    const director = url.searchParams.get('director') || ''
+    const keyword = url.searchParams.get('keyword') || ''
+    const targetUnit = url.searchParams.get('targetUnit') || ''
+    const directiveDateFrom = url.searchParams.get('directiveDateFrom') || ''
+    const directiveDateTo = url.searchParams.get('directiveDateTo') || ''
+
+    let filtered = [...ministerDirectives]
+    if (progressStatus) filtered = filtered.filter((d) => d.progressStatus === progressStatus)
+    if (director) filtered = filtered.filter((d) => d.directorName.includes(director) || d.director.includes(director))
+    if (keyword) filtered = filtered.filter((d) => d.content.includes(keyword))
+    if (targetUnit) filtered = filtered.filter((d) => d.targetUnit === targetUnit)
+    if (directiveDateFrom) filtered = filtered.filter((d) => d.directiveDate >= directiveDateFrom)
+    if (directiveDateTo) filtered = filtered.filter((d) => d.directiveDate <= directiveDateTo)
+
+    const result: ApiResult<PageResponse<Directive>> = { success: true, data: paginate(filtered, page, size) }
+    return HttpResponse.json(result)
+  }),
+
+  http.get('/api/sys12/minister-directives/progress', () => {
+    const result: ApiResult<ReturnType<typeof calcProgress>> = { success: true, data: calcProgress(ministerDirectives) }
+    return HttpResponse.json(result)
+  }),
+
+  http.get('/api/sys12/minister-directives/:id', ({ params }) => {
+    const item = ministerDirectives.find((d) => d.id === params.id)
+    if (!item) return HttpResponse.json({ success: false, message: '지시사항을 찾을 수 없습니다' }, { status: 404 })
+    return HttpResponse.json({ success: true, data: item } as ApiResult<Directive>)
+  }),
+
+  http.post('/api/sys12/minister-directives', async ({ request }) => {
+    const body = (await request.json()) as Partial<Directive>
+    const newItem: Directive = {
+      id: `mdir-${Date.now()}`, directiveNo: `MDIR-${Date.now()}`,
+      directorServiceNumber: (body.directorServiceNumber as string) || '', directorRank: (body.directorRank as string) || '',
+      directorName: (body.directorName as string) || '', director: body.director || '',
+      directiveDate: body.directiveDate || new Date().toISOString().split('T')[0],
+      targetUnit: body.targetUnit || '해병대사령부', content: body.content || '',
+      progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
+      category: body.category || '작전', directiveType: (body.directiveType as '문서' | '구두') || '문서',
+      attachments: [], createdAt: new Date().toISOString(),
+    }
+    ministerDirectives = [newItem, ...ministerDirectives]
+    return HttpResponse.json({ success: true, data: newItem } as ApiResult<Directive>)
+  }),
+
+  http.put('/api/sys12/minister-directives/:id', async ({ params, request }) => {
+    const body = (await request.json()) as Partial<Directive>
+    const index = ministerDirectives.findIndex((d) => d.id === params.id)
+    if (index === -1) return HttpResponse.json({ success: false, message: '지시사항을 찾을 수 없습니다' }, { status: 404 })
+    ministerDirectives[index] = { ...ministerDirectives[index], ...body }
+    return HttpResponse.json({ success: true, data: ministerDirectives[index] } as ApiResult<Directive>)
+  }),
+
+  http.delete('/api/sys12/minister-directives/:id', ({ params }) => {
+    const index = ministerDirectives.findIndex((d) => d.id === params.id)
+    if (index !== -1) ministerDirectives.splice(index, 1)
+    return HttpResponse.json({ success: true, data: null } as ApiResult<null>)
+  }),
+
+  http.get('/api/sys12/minister-directives/:id/actions', ({ params }) => {
+    const filtered = ministerActions.filter((a) => a.parentId === params.id)
+    return HttpResponse.json({ success: true, data: filtered } as ApiResult<ActionItem[]>)
+  }),
+
+  http.post('/api/sys12/minister-directives/:id/actions', async ({ params, request }) => {
+    const body = (await request.json()) as Partial<ActionItem>
+    const newItem: ActionItem = {
+      id: `mact-${Date.now()}`, parentId: params.id as string, parentType: 'directive',
+      assigneeServiceNumber: (body.assigneeServiceNumber as string) || '', assigneeRank: (body.assigneeRank as string) || '',
+      assigneeName: (body.assigneeName as string) || '', assignee: body.assignee || '',
+      progressStatus: (body.progressStatus as ProgressStatus) || 'notStarted',
+      plan: body.plan || '', result: body.result || '', attachments: (body.attachments as string[]) || [],
+      createdAt: new Date().toISOString(),
+    }
+    ministerActions = [newItem, ...ministerActions]
+    return HttpResponse.json({ success: true, data: newItem } as ApiResult<ActionItem>)
+  }),
+
+  http.get('/api/sys12/minister-directives/:id/history', ({ params }) => {
+    const filtered = ministerHistories.filter((h) => h.parentId === params.id).sort((a, b) => new Date(b.date).getTime() - new Date(a.date).getTime())
+    return HttpResponse.json({ success: true, data: filtered } as ApiResult<ActionHistory[]>)
   }),
 ]

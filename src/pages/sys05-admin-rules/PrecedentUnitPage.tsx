@@ -12,14 +12,16 @@ interface UnitCard {
 }
 
 const UNIT_LINKS: UnitCard[] = [
-  { name: '제1사단', url: '#', description: '포항 소재, 동해안 방어', regulationCount: 12, type: '사단' },
-  { name: '제2사단', url: '#', description: '김포 소재, 수도권 방어', regulationCount: 9, type: '사단' },
-  { name: '교육훈련단', url: '#', description: '해병대 교육훈련 전담', regulationCount: 15, type: '단' },
-  { name: '상륙기동단', url: '#', description: '상륙작전 전담 부대', regulationCount: 8, type: '단' },
-  { name: '항공단', url: '#', description: '해병대 항공 지원', regulationCount: 6, type: '단' },
-  { name: '군수단', url: '#', description: '군수지원 전담 부대', regulationCount: 5, type: '단' },
-  { name: '제6여단', url: '#', description: '서해 도서 방어', regulationCount: 7, type: '여단' },
-  { name: '제9여단', url: '#', description: '백령도 방어', regulationCount: 4, type: '여단' },
+  { name: '해군작전사령부', url: '#', description: '해군 작전 총괄', regulationCount: 18, type: '사단' },
+  { name: '제1함대', url: '#', description: '동해 작전 담당', regulationCount: 12, type: '여단' },
+  { name: '제2함대', url: '#', description: '서해 작전 담당', regulationCount: 14, type: '여단' },
+  { name: '제3함대', url: '#', description: '남해 작전 담당', regulationCount: 11, type: '여단' },
+  { name: '잠수함사령부', url: '#', description: '잠수함 작전 전담', regulationCount: 9, type: '단' },
+  { name: '해군항공사령부', url: '#', description: '해군 항공 작전', regulationCount: 8, type: '단' },
+  { name: '해군교육사령부', url: '#', description: '해군 교육훈련 전담', regulationCount: 15, type: '단' },
+  { name: '해군군수사령부', url: '#', description: '해군 군수지원 전담', regulationCount: 10, type: '단' },
+  { name: '특수전전단', url: '#', description: '특수작전 전담 부대', regulationCount: 6, type: '여단' },
+  { name: '해군사관학교', url: '#', description: '해군 장교 양성', regulationCount: 7, type: '단' },
 ]
 
 // 부대 유형별 색상

@@ -35,7 +35,7 @@ export default function SurveyParticipationPage() {
     queryFn: () => apiClient.get<Survey[]>('/sys02/surveys/participation'),
   })
 
-  const surveys = (data as Survey[] | undefined) || []
+  const surveys: Survey[] = (data as { data?: Survey[] } | undefined)?.data ?? []
 
   // 검색 필터링 (클라이언트 사이드)
   const filteredSurveys = surveys.filter((s) => {

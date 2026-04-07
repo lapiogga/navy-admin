@@ -167,7 +167,7 @@ export default function ResearchListPage() {
 
   // CSV 스펙: 순번, 제목, 연구자, 연구년도, 연구예산, 과제담당관, 게시자, 게시일자, 진행상황
   const columns: ProColumns<ResearchItem>[] = [
-    { title: '순번', dataIndex: 'id', width: 80 },
+    { title: '순번', dataIndex: 'id', width: 60, render: (_: unknown, __: unknown, index: number) => index + 1 },
     { title: '제목', dataIndex: 'title', ellipsis: true },
     militaryPersonColumn<ResearchItem>('연구자', {
       serviceNumber: 'researcherServiceNumber',

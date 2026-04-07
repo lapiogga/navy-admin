@@ -743,4 +743,42 @@ GitHub: https://github.com/lapiogga/navy-admin.git (master)
 
 ---
 
+---
+
+## 세션 9 (2026-04-07 21:00~22:30)
+
+### 주요 명령어
+
+```
+npx tsc --noEmit        # 빌드 에러 체크 → 통과
+git diff --stat HEAD    # 24 files changed, +538 insertions, -149 deletions
+```
+
+### 수정 파일 목록 (24개)
+
+**버그 수정:**
+- SYS02: SurveyParticipationPage, PastSurveyPage, SurveyAdminPage (ApiResult data 추출)
+- SYS10: sys10.ts (ApiResult 래퍼 추가 30개 handler)
+- SYS99: ApprovalLinePage (Array.isArray 방어)
+
+**UI 개선:**
+- SYS03: PerfMainPage (타이틀 제거)
+- SYS08: UnitKeyPersonPage, UnitStatsPage (해군 병과 + 차트축)
+- SYS09: CertDeathPage, CertMeritDeathPage, CertMeritInjuredPage, CertReviewResultPage (대상자 선택)
+- SYS11: ResearchListPage, ResearchFilePage, ResearchAdminPage (순번 1줄)
+
+**데이터/구조 변경:**
+- SYS05: RegulationListPage, PrecedentHQPage, PrecedentUnitPage, sys05.ts (해군 조직)
+- SYS08: sys08-unit-lineage.ts (해군 병과)
+- SYS12: DirectiveListPage, DirectiveProgressPage, index.tsx, sys12.ts (지시사항 통합 구조)
+
+### 세션 9 종료 시점 상태
+
+```
+10개 버그/개선 수정 완료 (24개 파일)
+TypeScript 빌드: 에러 0건
+```
+
+---
+
 *이후 모든 터미널 출력은 이 파일에 append됩니다.*

@@ -53,7 +53,7 @@ export default function PerfMainPage() {
   }
 
   return (
-    <PageContainer title="성과관리체계 메인">
+    <PageContainer title={false}>
       {/* 요약 통계 */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>

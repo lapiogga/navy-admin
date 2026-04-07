@@ -38,14 +38,16 @@ const RANK_OPTIONS = [
 ]
 
 const BRANCH_OPTIONS = [
-  { label: '보병', value: '보병' },
-  { label: '포병', value: '포병' },
-  { label: '기갑', value: '기갑' },
-  { label: '공병', value: '공병' },
-  { label: '통신', value: '통신' },
-  { label: '병참', value: '병참' },
-  { label: '수송', value: '수송' },
-  { label: '정보통신', value: '정보통신' },
+  { label: '항해', value: '항해' },
+  { label: '기관', value: '기관' },
+  { label: '전투체계', value: '전투체계' },
+  { label: '통신전자', value: '통신전자' },
+  { label: '항공', value: '항공' },
+  { label: '잠수함', value: '잠수함' },
+  { label: '의무', value: '의무' },
+  { label: '정보', value: '정보' },
+  { label: '군수', value: '군수' },
+  { label: '행정', value: '행정' },
 ]
 
 const COMMISSION_OPTIONS = [

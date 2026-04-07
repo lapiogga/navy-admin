@@ -15,10 +15,12 @@ const BoardIndex = lazy(() => import('@/pages/common/board'))
 const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 
 // 지시사항 통합 뷰 (추진현황 + 목록 Tabs)
-const DirectiveView = () => (
+import type { DirectiveCategory } from './DirectiveProgressPage'
+
+const DirectiveView = ({ category = 'commander' }: { category?: DirectiveCategory }) => (
   <div>
-    <DirectiveProgressPage />
-    <DirectiveListPage />
+    <DirectiveProgressPage category={category} />
+    <DirectiveListPage category={category} />
   </div>
 )
 
@@ -63,25 +65,11 @@ export default function Sys12Page() {
         }
       />
 
-      {/* 대통령 지시사항 (DRCT-02, 공통게시판 읽기전용) */}
-      <Route
-        path="2/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      {/* 대통령 지시사항 (DRCT-02, 추진현황 + 목록) */}
+      <Route path="2/1" element={<DirectiveView category="president" />} />
 
-      {/* 국방부장관 지시사항 (DRCT-03, 공통게시판 읽기전용) */}
-      <Route
-        path="2/2"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      {/* 국방부장관 지시사항 (DRCT-03, 추진현황 + 목록) */}
+      <Route path="2/2" element={<DirectiveView category="minister" />} />
 
       {/* 지휘관 지시사항 (DRCT-01: 추진현황 + 목록) */}
       <Route path="2/3" element={<DirectiveView />} />
