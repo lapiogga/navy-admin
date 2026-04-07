@@ -3,7 +3,7 @@ import { Tree, Table, Button, Card, Row, Col, message } from 'antd'
 import { DeleteOutlined, SaveOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { apiClient } from '@/shared/api/apiClient'
+import { apiClient } from '@/shared/api/client'
 import type { ApiResult } from '@/shared/api/types'
 
 interface UnitTreeNode {

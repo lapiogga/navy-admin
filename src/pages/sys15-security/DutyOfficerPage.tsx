@@ -32,7 +32,7 @@ interface DutyInspection extends Record<string, unknown> {
 }
 
 async function fetchDutySchedules(params: PageRequest): Promise<PageResponse<DutySchedule>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<DutySchedule>>>('/api/sys15/duty-officer', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<DutySchedule>>>('/sys15/duty-officer', {
     params: { page: params.page, size: params.size, type: 'schedule' },
   })
   const data = (res as ApiResult<PageResponse<DutySchedule>>).data ?? (res as unknown as PageResponse<DutySchedule>)
@@ -40,7 +40,7 @@ async function fetchDutySchedules(params: PageRequest): Promise<PageResponse<Dut
 }
 
 async function fetchDutyInspections(params: PageRequest): Promise<PageResponse<DutyInspection>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<DutyInspection>>>('/api/sys15/duty-officer', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<DutyInspection>>>('/sys15/duty-officer', {
     params: { page: params.page, size: params.size, type: 'inspection' },
   })
   const data = (res as ApiResult<PageResponse<DutyInspection>>).data ?? (res as unknown as PageResponse<DutyInspection>)
@@ -88,9 +88,9 @@ function DutyScheduleModal({ open, selectedDate, record, onClose, onSuccess }: D
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => {
       if (record) {
-        return apiClient.put(`/api/sys15/duty-officer/${record.id}`, values)
+        return apiClient.put(`/sys15/duty-officer/${record.id}`, values)
       }
-      return apiClient.post('/api/sys15/duty-officer', { ...values, type: 'schedule' })
+      return apiClient.post('/sys15/duty-officer', { ...values, type: 'schedule' })
     },
     onSuccess: () => {
       message.success('저장되었습니다.')
@@ -258,9 +258,9 @@ function InspectionFormModal({ open, record, onClose, onSuccess }: InspectionFor
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => {
       if (record) {
-        return apiClient.put(`/api/sys15/duty-officer/${record.id}`, values)
+        return apiClient.put(`/sys15/duty-officer/${record.id}`, values)
       }
-      return apiClient.post('/api/sys15/duty-officer', { ...values, type: 'inspection' })
+      return apiClient.post('/sys15/duty-officer', { ...values, type: 'inspection' })
     },
     onSuccess: () => {
       message.success('점검결과가 저장되었습니다.')

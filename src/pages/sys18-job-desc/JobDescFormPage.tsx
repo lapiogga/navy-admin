@@ -43,14 +43,14 @@ const STEP_ITEMS = [
 
 // 표준업무시간 조회
 async function fetchStandardHours(): Promise<number> {
-  const res = await apiClient.get<never, ApiResult<{ standardHours: number }>>('/api/sys18/standard-hours')
+  const res = await apiClient.get<never, ApiResult<{ standardHours: number }>>('/sys18/standard-hours')
   const data = (res as ApiResult<{ standardHours: number }>).data ?? (res as unknown as { standardHours: number })
   return data.standardHours
 }
 
 // 조직진단 목록 조회
 async function fetchOrgDiagnoses(): Promise<OrgDiagnosis[]> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OrgDiagnosis>>>('/api/sys18/org-diagnosis', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OrgDiagnosis>>>('/sys18/org-diagnosis', {
     params: { page: 0, size: 100 },
   })
   const data = (res as ApiResult<PageResponse<OrgDiagnosis>>).data ?? (res as unknown as PageResponse<OrgDiagnosis>)
@@ -83,7 +83,7 @@ export default function JobDescFormPage({ type, id, onClose }: JobDescFormPagePr
     mutationFn: async () => {
       const values = form.getFieldsValue()
       const jdId = id || `jd-temp-${Date.now()}`
-      await apiClient.put(`/api/sys18/job-descs/${jdId}/draft`, { ...values, type })
+      await apiClient.put(`/sys18/job-descs/${jdId}/draft`, { ...values, type })
     },
     onSuccess: () => message.success('임시저장되었습니다.'),
     onError: () => message.error('임시저장에 실패했습니다.'),
@@ -93,7 +93,7 @@ export default function JobDescFormPage({ type, id, onClose }: JobDescFormPagePr
   const submitMutation = useMutation({
     mutationFn: async () => {
       const jdId = id || `jd-temp-${Date.now()}`
-      await apiClient.put(`/api/sys18/job-descs/${jdId}/submit`)
+      await apiClient.put(`/sys18/job-descs/${jdId}/submit`)
     },
     onSuccess: () => {
       message.success('결재 요청이 완료되었습니다.')

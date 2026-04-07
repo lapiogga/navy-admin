@@ -16,7 +16,7 @@ export function ExternalLoginPage() {
     try {
       const values = await form.validateFields()
       setLoading(true)
-      await apiClient.post('/api/sys10/external-auth/login', values)
+      await apiClient.post('/sys10/external-auth/login', values)
       message.success('로그인 성공')
       navigate('/sys10/1/2')
     } catch {

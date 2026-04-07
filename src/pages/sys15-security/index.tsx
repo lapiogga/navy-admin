@@ -36,9 +36,8 @@ const NotifyTimeMgmtPage = React.lazy(() => import('./NotifyTimeMgmtPage'))
 const LogHistoryPage = React.lazy(() => import('./LogHistoryPage'))
 const ExceptionMgmtPage = React.lazy(() => import('./ExceptionMgmtPage'))
 
-// Phase 1 공통기능 lazy import (7대 규칙 7번: 관리자 대메뉴 시스템)
-const CodeManagementPage = React.lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
-const AuthGroupPage = React.lazy(() => import('@/pages/common/auth-group'))
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
 // 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys15)
 const BoardListPage = React.lazy(() =>
@@ -115,9 +114,8 @@ export default function Sys15Page() {
       <Route path="8/4" element={withSuspense(LogHistoryPage)} />
       <Route path="8/5" element={withSuspense(ExceptionMgmtPage)} />
 
-      {/* 시스템 (9) - 공통기능 lazy import */}
-      <Route path="9/1" element={withSuspense(CodeManagementPage)} />
-      <Route path="9/2" element={withSuspense(AuthGroupPage)} />
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

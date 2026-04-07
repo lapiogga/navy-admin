@@ -47,7 +47,7 @@ export default function MeetingStatusPage() {
   const { data: roomsData } = useQuery({
     queryKey: ['sys16', 'meeting-rooms', 'list'],
     queryFn: async () => {
-      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/api/sys16/meeting-rooms', {
+      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
         params: { page: 0, size: 100 },
       })
       return res.data.data.content
@@ -67,7 +67,7 @@ export default function MeetingStatusPage() {
       queryParams.startDate = dateRange[0]
       queryParams.endDate = dateRange[1]
     }
-    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/api/sys16/reservations/status', {
+    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/status', {
       params: queryParams,
     })
     return res.data.data

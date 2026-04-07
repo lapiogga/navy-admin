@@ -1,6 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { Spin } from 'antd'
+import { PageSpinner } from '@/app/components/PageSpinner'
 import { BusReservationPage } from './BusReservationPage'
 import { BusReservationStatusPage } from './BusReservationStatusPage'
 import { BusDispatchPage } from './BusDispatchPage'
@@ -22,6 +23,9 @@ const CodeGroupPage = lazy(() =>
 const PermissionGroupPage = lazy(() =>
   import('@/pages/common/auth-group/PermissionGroupPage').then((m) => ({ default: m.PermissionGroupPage }))
 )
+
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 
 function Loading() {
   return (
@@ -74,6 +78,9 @@ export default function Page() {
         {/* 관리자 대메뉴 [규칙 7] */}
         <Route path="2/1" element={<CodeGroupPage />} />
         <Route path="2/2" element={<PermissionGroupPage />} />
+
+        {/* 관리자 대메뉴 - 공통기능 */}
+        <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
       </Routes>
     </Suspense>
   )

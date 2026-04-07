@@ -37,7 +37,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchSecurityLevels(params: PageRequest & { evalType?: string }): Promise<PageResponse<SecurityLevelRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<SecurityLevelRecord>>>('/api/sys15/security-level', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<SecurityLevelRecord>>>('/sys15/security-level', {
     params: { page: params.page, size: params.size, evalType: params.evalType },
   })
   const data = (res as ApiResult<PageResponse<SecurityLevelRecord>>).data ?? (res as unknown as PageResponse<SecurityLevelRecord>)
@@ -45,7 +45,7 @@ async function fetchSecurityLevels(params: PageRequest & { evalType?: string }):
 }
 
 async function fetchStats(): Promise<SecurityLevelStats> {
-  const res = await apiClient.get<never, ApiResult<SecurityLevelStats>>('/api/sys15/security-level/stats')
+  const res = await apiClient.get<never, ApiResult<SecurityLevelStats>>('/sys15/security-level/stats')
   const data = (res as ApiResult<SecurityLevelStats>).data ?? (res as unknown as SecurityLevelStats)
   return data
 }
@@ -65,9 +65,9 @@ function EvalModal({ open, evalType, record, onClose, onSuccess }: EvalModalProp
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => {
       if (record) {
-        return apiClient.put(`/api/sys15/security-level/${record.id}`, values)
+        return apiClient.put(`/sys15/security-level/${record.id}`, values)
       }
-      return apiClient.post('/api/sys15/security-level', { ...values, evalType })
+      return apiClient.post('/sys15/security-level', { ...values, evalType })
     },
     onSuccess: () => {
       message.success('저장되었습니다.')
@@ -192,7 +192,7 @@ function SecurityLevelEvalTab({ evalType }: { evalType: '수시' | '정기' }) {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys15/security-level/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys15/security-level/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-security-level'] })

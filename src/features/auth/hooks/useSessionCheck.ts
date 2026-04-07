@@ -4,7 +4,7 @@ import { message } from 'antd'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { ROUTES } from '@/shared/config/routes'
 
-export const IDLE_TIMEOUT_MS = 60_000   // 1분 (D-04: MVP 테스트 용이성)
+export const IDLE_TIMEOUT_MS = 180_000   // 3분 (D-04: MVP 테스트 용이성)
 export const WARN_BEFORE_MS = 30_000    // 만료 30초 전 경고 (D-05)
 
 /**

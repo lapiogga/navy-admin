@@ -21,6 +21,9 @@ import CertIssueLedgerPage from './CertIssueLedgerPage'
 // 공통 기능 Phase 1 페이지 재사용 (HONOR-17 게시판)
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
+
 export default function Sys09Page() {
   return (
     <Routes>
@@ -84,6 +87,9 @@ export default function Sys09Page() {
 
       {/* sys09/3/13: 전사망자 확인증 발급대장 (HONOR-16) */}
       <Route path="3/13" element={<CertIssueLedgerPage />} />
+
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

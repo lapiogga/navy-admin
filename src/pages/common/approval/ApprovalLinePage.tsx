@@ -265,6 +265,8 @@ export default function ApprovalLinePage() {
         request={(params) => approvalLineApi.list(params) as Promise<PageResponse<ApprovalLine & Record<string, unknown>>>}
         rowKey="id"
         headerTitle="결재선 관리"
+        searchable
+        searchPlaceholder="결재선 이름으로 검색"
         toolBarRender={() => [
           <Button key="add" type="primary" icon={<PlusOutlined />} onClick={openCreateModal}>
             등록

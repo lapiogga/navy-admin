@@ -39,7 +39,7 @@ const STATUS_OPTIONS = [
 ]
 
 async function fetchNoticeDocs(params: PageRequest): Promise<PageResponse<NoticeDoc>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<NoticeDoc>>>('/api/sys15/notice-docs', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<NoticeDoc>>>('/sys15/notice-docs', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<NoticeDoc>>).data ?? (res as unknown as PageResponse<NoticeDoc>)
@@ -103,7 +103,7 @@ export default function NoticeDocPage() {
 
   const createMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/notice-docs', values),
+      apiClient.post('/sys15/notice-docs', values),
     onSuccess: () => {
       message.success('예고문이 등록되었습니다.')
       message.info('예고문 알림이 발송되었습니다.')
@@ -116,7 +116,7 @@ export default function NoticeDocPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string; values: Record<string, unknown> }) =>
-      apiClient.put(`/api/sys15/notice-docs/${id}`, values),
+      apiClient.put(`/sys15/notice-docs/${id}`, values),
     onSuccess: () => {
       message.success('수정되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-notice-docs'] })
@@ -127,7 +127,7 @@ export default function NoticeDocPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys15/notice-docs/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys15/notice-docs/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-notice-docs'] })

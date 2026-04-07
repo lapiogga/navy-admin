@@ -32,7 +32,7 @@ const EDU_TYPE_OPTIONS = [
 ]
 
 async function fetchSecurityEdu(params: PageRequest & { startDate?: string; endDate?: string; eduType?: string }): Promise<PageResponse<SecurityEduRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<SecurityEduRecord>>>('/api/sys15/security-edu', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<SecurityEduRecord>>>('/sys15/security-edu', {
     params: { page: params.page, size: params.size, startDate: params.startDate, endDate: params.endDate, eduType: params.eduType },
   })
   const data = (res as ApiResult<PageResponse<SecurityEduRecord>>).data ?? (res as unknown as PageResponse<SecurityEduRecord>)
@@ -53,9 +53,9 @@ function EduFormModal({ open, record, onClose, onSuccess }: EduFormModalProps) {
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => {
       if (record) {
-        return apiClient.put(`/api/sys15/security-edu/${record.id}`, values)
+        return apiClient.put(`/sys15/security-edu/${record.id}`, values)
       }
-      return apiClient.post('/api/sys15/security-edu', values)
+      return apiClient.post('/sys15/security-edu', values)
     },
     onSuccess: () => {
       message.success(record ? '수정되었습니다.' : '교육결과가 등록되었습니다.')
@@ -124,7 +124,7 @@ export default function SecurityEduPage() {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys15/security-edu/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys15/security-edu/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-security-edu'] })

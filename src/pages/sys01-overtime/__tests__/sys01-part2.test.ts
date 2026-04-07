@@ -165,9 +165,9 @@ describe('SYS01 OtPersonalDeptPage: 복구 버튼', () => {
 
 // index.tsx: 관리자/게시판 lazy import (7대 규칙 6, 7번)
 describe('SYS01 index.tsx: 7대 규칙 6/7번 준수', () => {
-  it('AuthGroupPage 또는 auth-group lazy import가 포함된다 (7대 규칙 7번)', () => {
+  it('AdminRoutes lazy import가 포함된다 (7대 규칙 7번)', () => {
     const content = readPage('index.tsx')
-    expect(content).toMatch(/AuthGroupPage|auth-group/)
+    expect(content).toContain('AdminRoutes')
   })
 
   it('BoardListPage 또는 board lazy import가 포함된다 (7대 규칙 6번)', () => {
@@ -180,9 +180,9 @@ describe('SYS01 index.tsx: 7대 규칙 6/7번 준수', () => {
     expect(content).toContain('sys01')
   })
 
-  it('관리자 Route(7/1)가 포함된다', () => {
+  it('관리자 Route(admin/*)가 포함된다', () => {
     const content = readPage('index.tsx')
-    expect(content).toContain('7/1')
+    expect(content).toContain('admin/*')
   })
 
   it('게시판 Route(6/1, 6/2)가 포함된다', () => {

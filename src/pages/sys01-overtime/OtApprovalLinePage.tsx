@@ -34,6 +34,18 @@ let approvalLines: ApprovalLineItem[] = [
   { id: '1', approverName: '김철수', rank: '소령', order: 1, unitName: '1함대' },
   { id: '2', approverName: '이영희', rank: '중령', order: 2, unitName: '1함대' },
   { id: '3', approverName: '박민준', rank: '대령', order: 3, unitName: '해군사령부' },
+  { id: '4', approverName: '최동훈', rank: '대위', order: 1, unitName: '2함대' },
+  { id: '5', approverName: '정수현', rank: '소령', order: 2, unitName: '2함대' },
+  { id: '6', approverName: '한상우', rank: '중령', order: 3, unitName: '2함대' },
+  { id: '7', approverName: '오지영', rank: '대위', order: 1, unitName: '3함대' },
+  { id: '8', approverName: '윤태호', rank: '소령', order: 2, unitName: '3함대' },
+  { id: '9', approverName: '임재현', rank: '대령', order: 3, unitName: '3함대' },
+  { id: '10', approverName: '서민정', rank: '중위', order: 1, unitName: '해군사령부' },
+  { id: '11', approverName: '강도윤', rank: '대위', order: 2, unitName: '해군사령부' },
+  { id: '12', approverName: '송하늘', rank: '소령', order: 1, unitName: '1함대' },
+  { id: '13', approverName: '배성진', rank: '중령', order: 2, unitName: '해군사령부' },
+  { id: '14', approverName: '조은비', rank: '대위', order: 1, unitName: '2함대' },
+  { id: '15', approverName: '문재혁', rank: '대령', order: 4, unitName: '해군사령부' },
 ]
 
 async function fetchApprovalLines(params: PageRequest): Promise<PageResponse<ApprovalLineItem>> {

@@ -30,7 +30,7 @@ describe('sys16 회의실예약관리체계 — Nyquist 테스트', () => {
     })
 
     it('예약 신청 POST API를 호출한다', () => {
-      expect(content).toContain('/api/sys16/reservations')
+      expect(content).toContain('/sys16/reservations')
     })
   })
 

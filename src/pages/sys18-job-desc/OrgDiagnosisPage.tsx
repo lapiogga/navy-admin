@@ -1,20 +1,17 @@
 import { useState, useRef } from 'react'
-import { Button, Modal, message, Tooltip, Form, Input, Select } from 'antd'
+import { Button, Modal, message, Tooltip, Form, Input, Select, DatePicker } from 'antd'
 import { PlusOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns, ActionType } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
 import dayjs from 'dayjs'
-import isBefore from 'dayjs/plugin/isBefore'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OrgDiagnosis } from '@/shared/api/mocks/handlers/sys18'
 
-dayjs.extend(isBefore)
-
-const { RangePicker } = require('antd').DatePicker
+const { RangePicker } = DatePicker
 
 const PROGRESS_STATUS_COLOR_MAP: Record<string, string> = {
   preparing: 'orange',
@@ -45,7 +42,7 @@ const USER_OPTIONS = [
 ]
 
 async function fetchOrgDiagnoses(params: PageRequest): Promise<PageResponse<OrgDiagnosis>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OrgDiagnosis>>>('/api/sys18/org-diagnosis', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OrgDiagnosis>>>('/sys18/org-diagnosis', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OrgDiagnosis>>).data ?? (res as unknown as PageResponse<OrgDiagnosis>)
@@ -60,7 +57,7 @@ export default function OrgDiagnosisPage() {
   const [form] = Form.useForm()
 
   const createMutation = useMutation({
-    mutationFn: (data: Partial<OrgDiagnosis>) => apiClient.post('/api/sys18/org-diagnosis', data),
+    mutationFn: (data: Partial<OrgDiagnosis>) => apiClient.post('/sys18/org-diagnosis', data),
     onSuccess: () => {
       message.success('등록되었습니다.')
       setCrudOpen(false)
@@ -73,7 +70,7 @@ export default function OrgDiagnosisPage() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<OrgDiagnosis> }) =>
-      apiClient.put(`/api/sys18/org-diagnosis/${id}`, data),
+      apiClient.put(`/sys18/org-diagnosis/${id}`, data),
     onSuccess: () => {
       message.success('수정되었습니다.')
       setCrudOpen(false)
@@ -85,7 +82,7 @@ export default function OrgDiagnosisPage() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys18/org-diagnosis/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys18/org-diagnosis/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       actionRef.current?.reload()

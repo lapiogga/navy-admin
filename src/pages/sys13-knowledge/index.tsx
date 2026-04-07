@@ -12,6 +12,9 @@ const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagement
 const MenuMgmtIndex = lazy(() => import('@/pages/common/system-mgr/MenuManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
+
 export default function Sys13Page() {
   return (
     <Routes>
@@ -69,6 +72,9 @@ export default function Sys13Page() {
           </Suspense>
         }
       />
+
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

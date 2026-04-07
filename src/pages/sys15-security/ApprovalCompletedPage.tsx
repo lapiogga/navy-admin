@@ -32,7 +32,7 @@ const DOC_TYPE_OPTIONS = [
 ]
 
 async function fetchCompletedApprovals(params: PageRequest & { startDate?: string; endDate?: string; docType?: string }): Promise<PageResponse<ApprovalRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalRecord>>>('/api/sys15/approvals/completed', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalRecord>>>('/sys15/approvals/completed', {
     params: { page: params.page, size: params.size, startDate: params.startDate, endDate: params.endDate, docType: params.docType },
   })
   const data = (res as ApiResult<PageResponse<ApprovalRecord>>).data ?? (res as unknown as PageResponse<ApprovalRecord>)

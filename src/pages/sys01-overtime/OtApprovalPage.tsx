@@ -42,7 +42,7 @@ function getStepCurrent(status: string): number {
 }
 
 async function fetchApprovals(params: PageRequest): Promise<PageResponse<OtApproval>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtApproval>>>('/api/sys01/approvals', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtApproval>>>('/sys01/approvals', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtApproval>>).data ?? (res as unknown as PageResponse<OtApproval>)
@@ -61,7 +61,7 @@ function ApprovalModal({ record, open, onClose }: ApprovalModalProps) {
   const [rejectReason, setRejectReason] = useState('')
 
   const approveMutation = useMutation({
-    mutationFn: () => apiClient.put(`/api/sys01/approvals/${record?.id}/approve`, {}),
+    mutationFn: () => apiClient.put(`/sys01/approvals/${record?.id}/approve`, {}),
     onSuccess: () => {
       message.success('승인 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys01-approvals'] })
@@ -70,7 +70,7 @@ function ApprovalModal({ record, open, onClose }: ApprovalModalProps) {
   })
 
   const rejectMutation = useMutation({
-    mutationFn: (reason: string) => apiClient.put(`/api/sys01/approvals/${record?.id}/reject`, { reason }),
+    mutationFn: (reason: string) => apiClient.put(`/sys01/approvals/${record?.id}/reject`, { reason }),
     onSuccess: () => {
       message.success('반려 처리되었습니다.')
       setRejectOpen(false)

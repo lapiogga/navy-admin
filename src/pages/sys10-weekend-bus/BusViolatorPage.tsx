@@ -131,7 +131,7 @@ export function BusViolatorPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/api/sys10/violators', {
+    const res = await apiClient.get('/sys10/violators', {
       params: { page: params.page, size: params.size },
     })
     const data = res.data as { content: ViolatorItem[]; totalElements: number }
@@ -156,10 +156,10 @@ export function BusViolatorPage() {
 
       setLoading(true)
       if (editRecord) {
-        await apiClient.put(`/api/sys10/violators/${editRecord.id}`, payload)
+        await apiClient.put(`/sys10/violators/${editRecord.id}`, payload)
         message.success('위규자 정보가 수정되었습니다.')
       } else {
-        await apiClient.post('/api/sys10/violators', payload)
+        await apiClient.post('/sys10/violators', payload)
         message.success('위규자가 등록되었습니다.')
       }
       setModalOpen(false)
@@ -173,7 +173,7 @@ export function BusViolatorPage() {
 
   async function handleDelete(id: string) {
     try {
-      await apiClient.delete(`/api/sys10/violators/${id}`)
+      await apiClient.delete(`/sys10/violators/${id}`)
       message.success('삭제되었습니다.')
       actionRef.current?.reload()
     } catch {

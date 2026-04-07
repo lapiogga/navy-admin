@@ -42,7 +42,7 @@ interface OfficeDailyRecord extends Record<string, unknown> {
 }
 
 async function fetchOfficeDailyHistory(params: PageRequest & { startDate?: string; endDate?: string }): Promise<PageResponse<OfficeDailyRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OfficeDailyRecord>>>('/api/sys15/office-daily', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OfficeDailyRecord>>>('/sys15/office-daily', {
     params: { page: params.page, size: params.size, startDate: params.startDate, endDate: params.endDate },
   })
   const data = (res as ApiResult<PageResponse<OfficeDailyRecord>>).data ?? (res as unknown as PageResponse<OfficeDailyRecord>)
@@ -77,7 +77,7 @@ export default function OfficeSecDailyPage() {
 
   const saveMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/office-daily', payload),
+      apiClient.post('/sys15/office-daily', payload),
     onSuccess: () => {
       message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-office-daily'] })
@@ -87,7 +87,7 @@ export default function OfficeSecDailyPage() {
 
   const submitMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/office-daily', { ...payload, status: 'submitted' }),
+      apiClient.post('/sys15/office-daily', { ...payload, status: 'submitted' }),
     onSuccess: () => {
       message.success('결재 요청이 완료되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-office-daily'] })

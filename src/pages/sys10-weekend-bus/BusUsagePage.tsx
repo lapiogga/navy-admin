@@ -36,7 +36,7 @@ export function BusUsagePage() {
       ),
     })
     const res = await apiClient.get<{ content: UsageRecord[]; totalElements: number }>(
-      `/api/sys10/usage?${qs.toString()}`
+      `/sys10/usage?${qs.toString()}`
     )
     setAllData(res.data.content)
     return {

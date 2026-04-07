@@ -1,9 +1,9 @@
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+import type { ListParams, PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { PermissionGroup, MenuPermission, GroupUser, GroupUnit } from './types'
 
 export const permissionGroupApi = {
-  list(params: PageRequest): Promise<PageResponse<PermissionGroup>> {
+  list(params: ListParams): Promise<PageResponse<PermissionGroup>> {
     return apiClient.get('/common/permission-groups', { params }) as Promise<PageResponse<PermissionGroup>>
   },
 

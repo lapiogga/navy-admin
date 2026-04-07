@@ -188,8 +188,14 @@ export const codeHandlers = [
     const page = Number(url.searchParams.get('page') ?? '0')
     const size = Number(url.searchParams.get('size') ?? '10')
     const groupId = url.searchParams.get('groupId') ?? ''
+    const keyword = url.searchParams.get('keyword') ?? ''
 
-    const filtered = groupId ? mockCodes.filter((c) => c.groupId === groupId) : mockCodes
+    let filtered = groupId ? mockCodes.filter((c) => c.groupId === groupId) : mockCodes
+    if (keyword) {
+      filtered = filtered.filter(
+        (c) => c.codeValue.includes(keyword) || c.codeName.includes(keyword),
+      )
+    }
 
     const start = page * size
     const content = filtered.slice(start, start + size)

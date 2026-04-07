@@ -37,7 +37,7 @@ export default function MyReservationPage() {
 
   // 내 예약 목록 request 함수
   const fetchMyReservations = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
-    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/api/sys16/reservations/my', {
+    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/my', {
       params: { page: params.page, size: params.size },
     })
     return res.data.data
@@ -52,7 +52,7 @@ export default function MyReservationPage() {
         startTime: values.startTime ? (values.startTime as import('dayjs').Dayjs).format('HH:mm') : undefined,
         endTime: values.endTime ? (values.endTime as import('dayjs').Dayjs).format('HH:mm') : undefined,
       }
-      const res = await axios.put<ApiResult>(`/api/sys16/reservations/${id}`, payload)
+      const res = await axios.put<ApiResult>(`/sys16/reservations/${id}`, payload)
       return res.data
     },
     onSuccess: () => {
@@ -68,7 +68,7 @@ export default function MyReservationPage() {
   // 삭제 뮤테이션
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.delete<ApiResult>(`/api/sys16/reservations/${id}`)
+      const res = await axios.delete<ApiResult>(`/sys16/reservations/${id}`)
       return res.data
     },
     onSuccess: () => {

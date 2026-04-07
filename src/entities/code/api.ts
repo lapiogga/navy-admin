@@ -1,9 +1,9 @@
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import type { ListParams, PageResponse } from '@/shared/api/types'
 import type { CodeGroup, Code, CodeOption } from './types'
 
 export const codeGroupApi = {
-  list(params: PageRequest): Promise<PageResponse<CodeGroup>> {
+  list(params: ListParams): Promise<PageResponse<CodeGroup>> {
     return apiClient.get('/common/code-groups', { params }) as Promise<PageResponse<CodeGroup>>
   },
 
@@ -21,7 +21,7 @@ export const codeGroupApi = {
 }
 
 export const codeApi = {
-  listByGroup(groupId: string, params: PageRequest): Promise<PageResponse<Code>> {
+  listByGroup(groupId: string, params: ListParams): Promise<PageResponse<Code>> {
     return apiClient.get('/common/codes', { params: { ...params, groupId } }) as Promise<PageResponse<Code>>
   },
 

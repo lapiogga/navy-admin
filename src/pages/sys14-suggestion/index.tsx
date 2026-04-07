@@ -9,6 +9,9 @@ import SuggestionAdminPage from './SuggestionAdminPage'
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
+
 export default function Sys14Page() {
   return (
     <Routes>
@@ -43,6 +46,9 @@ export default function Sys14Page() {
           </Suspense>
         }
       />
+
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

@@ -33,7 +33,7 @@ const REQUEST_TYPE_OPTIONS = [
 ]
 
 async function fetchRequests(params: PageRequest): Promise<PageResponse<OtRequest>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtRequest>>>('/api/sys01/requests', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtRequest>>>('/sys01/requests', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtRequest>>).data ?? (res as unknown as PageResponse<OtRequest>)
@@ -74,9 +74,9 @@ function OtRequestForm({ open, editRecord, onClose, onSuccess }: OtRequestFormPr
         reason: values.reason,
       }
       if (editRecord) {
-        return apiClient.put(`/api/sys01/requests/${editRecord.id}`, payload)
+        return apiClient.put(`/sys01/requests/${editRecord.id}`, payload)
       }
-      return apiClient.post('/api/sys01/requests', payload)
+      return apiClient.post('/sys01/requests', payload)
     },
     onSuccess: () => {
       message.success(editRecord ? '수정되었습니다.' : '신청서가 등록되었습니다.')
@@ -145,7 +145,7 @@ export default function OtRequestPage() {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys01/requests/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys01/requests/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       actionRef.current?.reload()

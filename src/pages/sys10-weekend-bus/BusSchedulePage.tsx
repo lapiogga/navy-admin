@@ -52,7 +52,7 @@ export function BusSchedulePage() {
 
   const fetchSchedules = async (params: PageRequest) => {
     const res = await apiClient.get<{ content: ScheduleRecord[]; totalElements: number }>(
-      `/api/sys10/schedule?page=${params.page}&size=${params.size}`
+      `/sys10/schedule?page=${params.page}&size=${params.size}`
     )
     return {
       content: res.data.content,
@@ -64,10 +64,10 @@ export function BusSchedulePage() {
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {
       if (modalMode === 'create') {
-        await apiClient.post('/api/sys10/schedule', values)
+        await apiClient.post('/sys10/schedule', values)
         message.success('등록되었습니다')
       } else {
-        await apiClient.put(`/api/sys10/schedule/${editRecord?.id}`, values)
+        await apiClient.put(`/sys10/schedule/${editRecord?.id}`, values)
         message.success('수정되었습니다')
       }
       setModalOpen(false)
@@ -80,7 +80,7 @@ export function BusSchedulePage() {
 
   const handleDelete = async (record: ScheduleRecord) => {
     try {
-      await apiClient.delete(`/api/sys10/schedule/${record.id}`)
+      await apiClient.delete(`/sys10/schedule/${record.id}`)
       message.success('삭제되었습니다')
       actionRef.current?.reload()
     } catch {

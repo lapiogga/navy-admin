@@ -107,8 +107,8 @@ describe('sys03 성과관리체계', () => {
       expect(content).toContain('BoardListPage')
     })
 
-    it('AuthGroupPage 관리자 대메뉴 (7대 규칙 7번)', () => {
-      expect(content).toContain('AuthGroupPage')
+    it('AdminRoutes 관리자 대메뉴 (7대 규칙 7번)', () => {
+      expect(content).toContain('AdminRoutes')
     })
 
     it('sys03-notice 게시판 등록', () => {

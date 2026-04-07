@@ -38,7 +38,7 @@ interface ExceptionCategory extends Record<string, unknown> {
 const YEAR_OPTIONS = [2024, 2025, 2026, 2027].map((y) => ({ label: `${y}년`, value: y }))
 
 async function fetchMaxHours(params: PageRequest): Promise<PageResponse<MaxHoursItem>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<MaxHoursItem>>>('/api/sys01/max-hours', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<MaxHoursItem>>>('/sys01/max-hours', {
     params: { page: params.page, size: params.size },
   })
   return (res as ApiResult<PageResponse<MaxHoursItem>>).data ?? (res as unknown as PageResponse<MaxHoursItem>)

@@ -41,7 +41,7 @@ export default function MeetingReservePage() {
   const { data: roomsData } = useQuery({
     queryKey: ['sys16', 'meeting-rooms'],
     queryFn: async () => {
-      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/api/sys16/meeting-rooms', {
+      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
         params: { page: 0, size: 100 },
       })
       return res.data.data.content
@@ -72,7 +72,7 @@ export default function MeetingReservePage() {
         attendeeCount: values.attendeeCount,
         attendees: values.attendees,
       }
-      const res = await axios.post<ApiResult>('/api/sys16/reservations', payload)
+      const res = await axios.post<ApiResult>('/sys16/reservations', payload)
       return res.data
     },
     onSuccess: () => {

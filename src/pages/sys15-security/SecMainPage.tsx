@@ -16,7 +16,7 @@ interface DailyStatus {
 }
 
 async function fetchDailyStatus(year: number, month: number, type: 'personal' | 'office'): Promise<DailyStatus[]> {
-  const res = await apiClient.get<never, ApiResult<DailyStatus[]>>('/api/sys15/daily-status', {
+  const res = await apiClient.get<never, ApiResult<DailyStatus[]>>('/sys15/daily-status', {
     params: { year, month, type },
   })
   const data = (res as ApiResult<DailyStatus[]>).data ?? (res as unknown as DailyStatus[])

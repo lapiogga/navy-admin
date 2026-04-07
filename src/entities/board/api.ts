@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+import type { ListParams, PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type {
   BoardConfig,
   BoardCategory,
@@ -13,7 +13,7 @@ import type {
 
 /** 게시판 설정 API */
 export const boardConfigApi = {
-  list: (params: PageRequest): Promise<PageResponse<BoardConfig>> =>
+  list: (params: ListParams): Promise<PageResponse<BoardConfig>> =>
     apiClient.get('/common/board-configs', { params }),
 
   detail: (id: string): Promise<ApiResult<BoardConfig>> =>
@@ -60,7 +60,7 @@ export const boardCategoryApi = {
 export const boardPostApi = {
   list: (
     boardId: string,
-    params: PageRequest & { categoryId?: string; keyword?: string },
+    params: ListParams & { categoryId?: string },
   ): Promise<PageResponse<BoardPost>> =>
     apiClient.get(`/common/boards/${boardId}/posts`, { params }),
 

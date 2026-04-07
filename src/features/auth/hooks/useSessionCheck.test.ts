@@ -7,7 +7,7 @@ const hookContent = readFileSync(hookPath, 'utf-8')
 
 describe('useSessionCheck - 코드 구조 검증', () => {
   it('should export IDLE_TIMEOUT_MS as 60000', () => {
-    expect(hookContent).toContain('IDLE_TIMEOUT_MS = 60_000')
+    expect(hookContent).toContain('IDLE_TIMEOUT_MS = 180_000')
   })
 
   it('should export WARN_BEFORE_MS as 30000', () => {

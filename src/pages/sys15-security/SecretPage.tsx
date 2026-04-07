@@ -28,7 +28,7 @@ function NoticeDocAutoModal({ open, secret, onClose }: NoticeDocAutoModalProps) 
 
   const createMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/notice-docs', values),
+      apiClient.post('/sys15/notice-docs', values),
     onSuccess: () => {
       message.success('예고문이 등록되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-notice-docs'] })

@@ -34,7 +34,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchAbsences(params: PageRequest): Promise<PageResponse<OtAbsence>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtAbsence>>>('/api/sys01/absences', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtAbsence>>>('/sys01/absences', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtAbsence>>).data ?? (res as unknown as PageResponse<OtAbsence>)
@@ -67,9 +67,9 @@ function AbsenceForm({ open, editRecord, onClose, onSuccess }: AbsenceFormProps)
         reason: values.reason,
       }
       if (editRecord) {
-        return apiClient.put(`/api/sys01/absences/${editRecord.id}`, payload)
+        return apiClient.put(`/sys01/absences/${editRecord.id}`, payload)
       }
-      return apiClient.post('/api/sys01/absences', payload)
+      return apiClient.post('/sys01/absences', payload)
     },
     onSuccess: () => {
       message.success(editRecord ? '수정되었습니다.' : '부재 신청이 등록되었습니다.')
@@ -114,7 +114,7 @@ export default function OtAbsencePage() {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys01/absences/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys01/absences/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       actionRef.current?.reload()

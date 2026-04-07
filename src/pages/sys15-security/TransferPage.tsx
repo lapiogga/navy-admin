@@ -39,7 +39,7 @@ function getStepCurrent(status: string): number {
 
 // ── 데이터 fetch ──
 async function fetchTransfers(params: PageRequest, type?: 'out' | 'in'): Promise<PageResponse<TransferRecord>> {
-  const url = type ? `/api/sys15/transfers?transferType=${type}` : '/api/sys15/transfers'
+  const url = type ? `/sys15/transfers?transferType=${type}` : '/sys15/transfers'
   const res = await apiClient.get<never, ApiResult<PageResponse<TransferRecord>>>(url, {
     params: { page: params.page, size: params.size },
   })
@@ -47,7 +47,7 @@ async function fetchTransfers(params: PageRequest, type?: 'out' | 'in'): Promise
 }
 
 async function fetchSecrets(params: PageRequest): Promise<PageResponse<SecretItem>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<SecretItem>>>('/api/sys15/secrets', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<SecretItem>>>('/sys15/secrets', {
     params: { page: params.page, size: params.size },
   })
   return (res as ApiResult<PageResponse<SecretItem>>).data ?? (res as unknown as PageResponse<SecretItem>)
@@ -134,7 +134,7 @@ function OutboundTab() {
   const { data: usersData } = useQuery({
     queryKey: ['sys15-users'],
     queryFn: async () => {
-      const res = await apiClient.get<never, ApiResult<UserOption[]>>('/api/sys15/users')
+      const res = await apiClient.get<never, ApiResult<UserOption[]>>('/sys15/users')
       return (res as ApiResult<UserOption[]>).data ?? (res as unknown as UserOption[])
     },
   })
@@ -145,7 +145,7 @@ function OutboundTab() {
 
   const transferMutation = useMutation({
     mutationFn: () =>
-      apiClient.post('/api/sys15/transfers', {
+      apiClient.post('/sys15/transfers', {
         items: selectedKeys,
         toUser,
         transferType: 'out',
@@ -279,7 +279,7 @@ function InboundTab() {
   const [detailRecord, setDetailRecord] = useState<TransferRecord | null>(null)
 
   const confirmMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys15/transfers/${id}/confirm`, {}),
+    mutationFn: (id: string) => apiClient.put(`/sys15/transfers/${id}/confirm`, {}),
     onSuccess: () => {
       message.success('인수 확인이 완료되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-transfers-in'] })
@@ -289,7 +289,7 @@ function InboundTab() {
   })
 
   const rejectMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys15/transfers/${id}/reject`, {}),
+    mutationFn: (id: string) => apiClient.put(`/sys15/transfers/${id}/reject`, {}),
     onSuccess: () => {
       message.success('반송 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-transfers-in'] })

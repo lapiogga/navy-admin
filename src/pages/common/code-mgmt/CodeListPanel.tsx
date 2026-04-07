@@ -7,7 +7,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import { codeApi } from '@/entities/code/api'
 import type { Code } from '@/entities/code/types'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import type { ListParams, PageResponse } from '@/shared/api/types'
 
 interface CodeListPanelProps {
   groupId: string
@@ -38,7 +38,7 @@ export function CodeListPanel({ groupId, groupCode }: CodeListPanelProps) {
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<Code | null>(null)
 
-  const fetchCodes = async (params: PageRequest): Promise<PageResponse<CodeRecord>> => {
+  const fetchCodes = async (params: ListParams): Promise<PageResponse<CodeRecord>> => {
     const res = await codeApi.listByGroup(groupId, params)
     const data = (res as unknown as { data: PageResponse<CodeRecord> }).data ?? res
     return data as PageResponse<CodeRecord>
@@ -113,6 +113,8 @@ export function CodeListPanel({ groupId, groupCode }: CodeListPanelProps) {
         headerTitle={`코드 목록 (${groupCode})`}
         rowKey="id"
         request={fetchCodes}
+        searchable
+        searchPlaceholder="코드값, 코드명으로 검색"
         toolBarRender={() => [
           <Button
             key="create"

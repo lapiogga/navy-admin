@@ -19,7 +19,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchMonthlyStatus(params: PageRequest): Promise<PageResponse<OtMonthlyClosing>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtMonthlyClosing>>>('/api/sys01/monthly-status', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtMonthlyClosing>>>('/sys01/monthly-status', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtMonthlyClosing>>).data ?? (res as unknown as PageResponse<OtMonthlyClosing>)

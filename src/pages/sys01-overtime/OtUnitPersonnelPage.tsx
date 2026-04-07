@@ -8,7 +8,7 @@ import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { OtUnitPersonnel } from '@/shared/api/mocks/handlers/sys01-overtime'
 
 async function fetchUnitPersonnel(params: PageRequest): Promise<PageResponse<OtUnitPersonnel>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtUnitPersonnel>>>('/api/sys01/unit-personnel', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtUnitPersonnel>>>('/sys01/unit-personnel', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtUnitPersonnel>>).data ?? (res as unknown as PageResponse<OtUnitPersonnel>)

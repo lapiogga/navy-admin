@@ -37,7 +37,7 @@ export function BusReservationPage() {
   // 노선 목록 조회
   const { data: routeData } = useQuery({
     queryKey: ['sys10-routes'],
-    queryFn: () => apiClient.get<{ content: Route[] }>('/api/sys10/routes').then((r) => r.data),
+    queryFn: () => apiClient.get<{ content: Route[] }>('/sys10/routes').then((r) => r.data),
   })
 
   const routes = routeData?.content ?? []
@@ -49,7 +49,7 @@ export function BusReservationPage() {
     queryFn: async () => {
       if (!selectedRouteId || !selectedDate || !selectedTime) return { content: [] }
       const res = await apiClient.get<{ content: Seat[] }>(
-        `/api/sys10/routes/${selectedRouteId}/seats?date=${selectedDate}&time=${selectedTime}`
+        `/sys10/routes/${selectedRouteId}/seats?date=${selectedDate}&time=${selectedTime}`
       )
       const fetchedSeats = res.data.content
       setSeats(fetchedSeats)
@@ -62,7 +62,7 @@ export function BusReservationPage() {
   // 예약 신청 뮤테이션
   const reservationMutation = useMutation({
     mutationFn: (data: { routeId: string; operationDate: string; departureTime: string; seatId: string }) =>
-      apiClient.post<ReservationResult>('/api/sys10/reservations', data).then((r) => r.data),
+      apiClient.post<ReservationResult>('/sys10/reservations', data).then((r) => r.data),
     onSuccess: (result) => {
       message.success('예약이 완료되었습니다')
       setReservationResult(result)

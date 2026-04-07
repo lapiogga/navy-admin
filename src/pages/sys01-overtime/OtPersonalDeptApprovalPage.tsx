@@ -22,7 +22,7 @@ const STATUS_COLOR_MAP: Record<string, string> = { pending: 'orange', approved: 
 const STATUS_LABEL_MAP: Record<string, string> = { pending: '승인대기', approved: '승인', rejected: '반려' }
 
 async function fetchApprovals(params: PageRequest): Promise<PageResponse<PersonalDeptApproval>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<PersonalDeptApproval>>>('/api/sys01/personal-dept', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<PersonalDeptApproval>>>('/sys01/personal-dept', {
     params: { page: params.page, size: params.size },
   })
   return (res as ApiResult<PageResponse<PersonalDeptApproval>>).data ?? (res as unknown as PageResponse<PersonalDeptApproval>)

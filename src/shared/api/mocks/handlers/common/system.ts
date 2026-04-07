@@ -386,14 +386,22 @@ export const systemHandlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? '0')
     const size = Number(url.searchParams.get('size') ?? '10')
+    const keyword = url.searchParams.get('keyword') ?? ''
+
+    let filtered = mockErrorLogs
+    if (keyword) {
+      filtered = mockErrorLogs.filter(
+        (l) => l.errorCode.includes(keyword) || l.errorMessage.includes(keyword),
+      )
+    }
 
     const start = page * size
     const result: ApiResult<PageResponse<ErrorLog>> = {
       success: true,
       data: {
-        content: mockErrorLogs.slice(start, start + size),
-        totalElements: mockErrorLogs.length,
-        totalPages: Math.ceil(mockErrorLogs.length / size),
+        content: filtered.slice(start, start + size),
+        totalElements: filtered.length,
+        totalPages: Math.ceil(filtered.length / size),
         size,
         number: page,
       },

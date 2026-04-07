@@ -68,7 +68,7 @@ export default function MeetingRoomMgmtPage() {
 
   // 회의실 목록 request 함수
   const fetchRooms = async (params: PageRequest): Promise<PageResponse<MeetingRoom>> => {
-    const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/api/sys16/meeting-rooms', {
+    const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
       params: { page: params.page, size: params.size },
     })
     return res.data.data
@@ -79,7 +79,7 @@ export default function MeetingRoomMgmtPage() {
     queryKey: ['sys16', 'meeting-rooms', selectedRoom?.id],
     queryFn: async () => {
       if (!selectedRoom) return null
-      const res = await axios.get<ApiResult<MeetingRoom>>(`/api/sys16/meeting-rooms/${selectedRoom.id}`)
+      const res = await axios.get<ApiResult<MeetingRoom>>(`/sys16/meeting-rooms/${selectedRoom.id}`)
       return res.data.data
     },
     enabled: !!selectedRoom,
@@ -88,7 +88,7 @@ export default function MeetingRoomMgmtPage() {
   // 회의실 등록 뮤테이션
   const createMutation = useMutation({
     mutationFn: async (values: Record<string, unknown>) => {
-      const res = await axios.post<ApiResult<MeetingRoom>>('/api/sys16/meeting-rooms', values)
+      const res = await axios.post<ApiResult<MeetingRoom>>('/sys16/meeting-rooms', values)
       return res.data.data
     },
     onSuccess: () => {
@@ -104,7 +104,7 @@ export default function MeetingRoomMgmtPage() {
   // 회의실 수정 뮤테이션
   const updateMutation = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) => {
-      const res = await axios.put<ApiResult<MeetingRoom>>(`/api/sys16/meeting-rooms/${id}`, values)
+      const res = await axios.put<ApiResult<MeetingRoom>>(`/sys16/meeting-rooms/${id}`, values)
       return res.data.data
     },
     onSuccess: (data) => {
@@ -122,7 +122,7 @@ export default function MeetingRoomMgmtPage() {
   // 회의실 삭제 뮤테이션
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      await axios.delete(`/api/sys16/meeting-rooms/${id}`)
+      await axios.delete(`/sys16/meeting-rooms/${id}`)
     },
     onSuccess: () => {
       message.success('회의실이 삭제되었습니다')
@@ -138,7 +138,7 @@ export default function MeetingRoomMgmtPage() {
   const scheduleMutation = useMutation({
     mutationFn: async ({ id, schedule }: { id: string; schedule: Schedule[] }) => {
       const res = await axios.put<ApiResult<MeetingRoom>>(
-        `/api/sys16/meeting-rooms/${id}/schedule`,
+        `/sys16/meeting-rooms/${id}/schedule`,
         schedule,
       )
       return res.data.data
@@ -156,7 +156,7 @@ export default function MeetingRoomMgmtPage() {
   const addEquipMutation = useMutation({
     mutationFn: async ({ id, values }: { id: string; values: Record<string, unknown> }) => {
       const res = await axios.post<ApiResult<Equipment>>(
-        `/api/sys16/meeting-rooms/${id}/equipment`,
+        `/sys16/meeting-rooms/${id}/equipment`,
         values,
       )
       return res.data.data
@@ -174,7 +174,7 @@ export default function MeetingRoomMgmtPage() {
   // 장비 삭제 뮤테이션
   const deleteEquipMutation = useMutation({
     mutationFn: async ({ roomId, eqId }: { roomId: string; eqId: string }) => {
-      await axios.delete(`/api/sys16/meeting-rooms/${roomId}/equipment/${eqId}`)
+      await axios.delete(`/sys16/meeting-rooms/${roomId}/equipment/${eqId}`)
     },
     onSuccess: () => {
       message.success('장비가 삭제되었습니다')
@@ -188,7 +188,7 @@ export default function MeetingRoomMgmtPage() {
   // 사진 삭제 뮤테이션
   const deletePhotoMutation = useMutation({
     mutationFn: async ({ roomId, photoId }: { roomId: string; photoId: string }) => {
-      await axios.delete(`/api/sys16/meeting-rooms/${roomId}/photos/${photoId}`)
+      await axios.delete(`/sys16/meeting-rooms/${roomId}/photos/${photoId}`)
     },
     onSuccess: () => {
       message.success('사진이 삭제되었습니다')
@@ -215,7 +215,7 @@ export default function MeetingRoomMgmtPage() {
   // 사진 업로드 props
   const getUploadProps = (roomId: string): UploadProps => ({
     name: 'file',
-    action: `/api/sys16/meeting-rooms/${roomId}/photos`,
+    action: `/sys16/meeting-rooms/${roomId}/photos`,
     listType: 'picture-card',
     maxCount: 5,
     accept: 'image/*',

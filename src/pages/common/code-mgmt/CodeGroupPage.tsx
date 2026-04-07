@@ -7,7 +7,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import { codeGroupApi } from '@/entities/code/api'
 import type { CodeGroup } from '@/entities/code/types'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import type { ListParams, PageResponse } from '@/shared/api/types'
 
 interface CodeGroupPageProps {
   onSelectGroup: (groupId: string, groupCode: string) => void
@@ -37,7 +37,7 @@ export function CodeGroupPage({ onSelectGroup, selectedGroupId }: CodeGroupPageP
   const [modalOpen, setModalOpen] = useState(false)
   const [editTarget, setEditTarget] = useState<CodeGroup | null>(null)
 
-  const fetchGroups = async (params: PageRequest): Promise<PageResponse<CodeGroupRecord>> => {
+  const fetchGroups = async (params: ListParams): Promise<PageResponse<CodeGroupRecord>> => {
     const res = await codeGroupApi.list(params)
     // apiClient interceptor가 response.data를 반환하므로 ApiResult.data를 꺼냄
     const data = (res as unknown as { data: PageResponse<CodeGroupRecord> }).data ?? res
@@ -110,6 +110,8 @@ export function CodeGroupPage({ onSelectGroup, selectedGroupId }: CodeGroupPageP
         headerTitle="코드그룹 목록"
         rowKey="id"
         request={fetchGroups}
+        searchable
+        searchPlaceholder="코드그룹코드, 코드그룹명으로 검색"
         toolBarRender={() => [
           <Button
             key="create"

@@ -53,9 +53,9 @@ describe('sys03 평가결과+게시판+라우터 (Plan 05)', () => {
       expect(content).toContain('PerfMainPage')
     })
 
-    it('기준정보관리 라우트 (path 1/x)', () => {
-      expect(content).toContain('path="1/1"')
-      expect(content).toContain('path="1/2"')
+    it('기준정보관리 라우트 (path 2/x)', () => {
+      expect(content).toContain('path="2/1"')
+      expect(content).toContain('path="2/2"')
     })
 
     it('연간과제관리 라우트 (path 2/x)', () => {
@@ -73,9 +73,8 @@ describe('sys03 평가결과+게시판+라우터 (Plan 05)', () => {
     })
 
     it('관리자 대메뉴 라우트 (7대 규칙 7번)', () => {
-      expect(content).toContain('AuthGroupPage')
-      expect(content).toContain('CodeGroupPage')
-      expect(content).toContain('admin/')
+      expect(content).toContain('AdminRoutes')
+      expect(content).toContain('admin/*')
     })
 
     it('과제검색 라우트 (path 5/x)', () => {

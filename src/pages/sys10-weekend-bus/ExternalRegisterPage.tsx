@@ -27,7 +27,7 @@ export function ExternalRegisterPage() {
     try {
       const values = await form.validateFields()
       setLoading(true)
-      await apiClient.post('/api/sys10/external-users/register', values)
+      await apiClient.post('/sys10/external-users/register', values)
       message.success('회원등록 신청이 완료되었습니다. 관리자 승인 후 로그인이 가능합니다.')
       navigate('/sys10/login')
     } catch {

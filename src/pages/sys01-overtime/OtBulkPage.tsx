@@ -27,7 +27,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchRequests(params: PageRequest): Promise<PageResponse<OtRequest>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtRequest>>>('/api/sys01/requests', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtRequest>>>('/sys01/requests', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtRequest>>).data ?? (res as unknown as PageResponse<OtRequest>)
@@ -35,7 +35,7 @@ async function fetchRequests(params: PageRequest): Promise<PageResponse<OtReques
 }
 
 async function fetchBulkRequests(params: PageRequest): Promise<PageResponse<OtBulkRequest>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtBulkRequest>>>('/api/sys01/bulk-requests', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtBulkRequest>>>('/sys01/bulk-requests', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtBulkRequest>>).data ?? (res as unknown as PageResponse<OtBulkRequest>)
@@ -60,7 +60,7 @@ export default function OtBulkPage() {
     mutationFn: async (values: BulkFormValues) => {
       const minutes = values.timeRange[1].diff(values.timeRange[0], 'minutes')
       const hours = parseFloat((minutes / 60).toFixed(1))
-      return apiClient.post('/api/sys01/bulk-requests', {
+      return apiClient.post('/sys01/bulk-requests', {
         workDate: values.workDate.format('YYYY-MM-DD'),
         startTime: values.timeRange[0].format('HH:mm'),
         endTime: values.timeRange[1].format('HH:mm'),

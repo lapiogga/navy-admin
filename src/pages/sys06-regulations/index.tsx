@@ -19,6 +19,9 @@ import DirectiveListPageBase from '@/pages/sys05-admin-rules/DirectiveListPage'
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
+
 // sysCode='sys06' 래퍼 컴포넌트 (sys05 페이지를 sys06 컨텍스트로 재사용)
 // 현재 sys05 페이지들은 API 경로가 하드코딩되어 있으므로,
 // sys06 MSW 핸들러가 동일 패턴을 /api/sys06/ 경로로 처리한다.
@@ -103,6 +106,9 @@ export default function Sys06Page() {
             </Suspense>
           }
         />
+
+        {/* 관리자 대메뉴 - 공통기능 */}
+        <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
       </Routes>
     </Suspense>
   )

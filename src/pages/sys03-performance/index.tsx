@@ -28,9 +28,8 @@ const PerfInputStatusPage = React.lazy(() => import('./PerfInputStatusPage'))
 // SYS03 페이지 - 과제검색
 const PerfTaskSearchPage = React.lazy(() => import('./PerfTaskSearchPage'))
 
-// Phase 1 공통기능 lazy import (7대 규칙 7번: 관리자 대메뉴)
-const AuthGroupPage = React.lazy(() => import('@/pages/common/auth-group/AuthGroupPage'))
-const CodeGroupPage = React.lazy(() => import('@/pages/common/code-mgmt/CodeGroupPage'))
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
 // 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys03)
 const BoardListPage = React.lazy(() =>
@@ -72,43 +71,41 @@ function BoardData() {
 export default function Sys03Page() {
   return (
     <Routes>
-      {/* 메인화면 (6) */}
-      <Route path="6/1" element={withSuspense(PerfMainPage)} />
+      {/* 메인화면 (1) - menus.ts: /sys03/1 */}
+      <Route path="1/1" element={withSuspense(PerfMainPage)} />
       <Route path="" element={withSuspense(PerfMainPage)} />
 
-      {/* 기준정보관리 (1) */}
-      <Route path="1/1" element={withSuspense(PerfBaseYearPage)} />
-      <Route path="1/2" element={withSuspense(PerfEvalOrgPage)} />
-      <Route path="1/3" element={withSuspense(PerfIndividualTargetPage)} />
-      <Route path="1/4" element={withSuspense(PerfPolicyPage)} />
-      <Route path="1/5" element={withSuspense(PerfMainTaskPage)} />
-      <Route path="1/6" element={withSuspense(PerfSubTaskPage)} />
-      <Route path="1/7" element={withSuspense(PerfDetailTaskPage)} />
+      {/* 기준정보관리 (2) - menus.ts: /sys03/2 */}
+      <Route path="2/1" element={withSuspense(PerfBaseYearPage)} />
+      <Route path="2/2" element={withSuspense(PerfEvalOrgPage)} />
+      <Route path="2/3" element={withSuspense(PerfIndividualTargetPage)} />
+      <Route path="2/4" element={withSuspense(PerfPolicyPage)} />
+      <Route path="2/5" element={withSuspense(PerfMainTaskPage)} />
+      <Route path="2/6" element={withSuspense(PerfSubTaskPage)} />
+      <Route path="2/7" element={withSuspense(PerfDetailTaskPage)} />
 
-      {/* 연간과제관리 (2) */}
-      <Route path="2/1" element={withSuspense(PerfProgressRatePage)} />
-      <Route path="2/2" element={withSuspense(PerfSubTaskPage)} />
-      <Route path="2/3" element={withSuspense(PerfDetailTaskPage)} />
-      <Route path="2/4" element={withSuspense(PerfTaskResultInputPage)} />
-      <Route path="2/5" element={withSuspense(PerfTaskResultApprovalPage)} />
-      <Route path="2/6" element={withSuspense(PerfTaskResultEvalPage)} />
-      <Route path="2/7" element={withSuspense(PerfIndividualResultEvalPage)} />
+      {/* 연간과제관리 (3) - menus.ts: /sys03/3 */}
+      <Route path="3/1" element={withSuspense(PerfProgressRatePage)} />
+      <Route path="3/2" element={withSuspense(PerfSubTaskPage)} />
+      <Route path="3/3" element={withSuspense(PerfTaskResultInputPage)} />
+      <Route path="3/4" element={withSuspense(PerfTaskResultApprovalPage)} />
+      <Route path="3/5" element={withSuspense(PerfTaskResultEvalPage)} />
+      <Route path="3/6" element={withSuspense(PerfIndividualResultEvalPage)} />
 
-      {/* 평가결과 (3) */}
-      <Route path="3/1" element={withSuspense(PerfEvalResultPage)} />
-      <Route path="3/2" element={withSuspense(PerfInputStatusPage)} />
+      {/* 평가결과 (4) - menus.ts: /sys03/4 */}
+      <Route path="4/1" element={withSuspense(PerfEvalResultPage)} />
+      <Route path="4/2" element={withSuspense(PerfInputStatusPage)} />
 
-      {/* 게시판 (4) - 7대 규칙 6번: 공통 게시판 */}
-      <Route path="4/1" element={<BoardNotice />} />
-      <Route path="4/2" element={<BoardQna />} />
-      <Route path="4/3" element={<BoardData />} />
+      {/* 게시판 (5) - menus.ts: /sys03/5, 7대 규칙 6번: 공통 게시판 */}
+      <Route path="5/1" element={<BoardNotice />} />
+      <Route path="5/2" element={<BoardQna />} />
+      <Route path="5/3" element={<BoardData />} />
 
-      {/* 과제검색 (5) */}
-      <Route path="5/1" element={withSuspense(PerfTaskSearchPage)} />
+      {/* 과제검색 (6) - menus.ts: /sys03/6 */}
+      <Route path="6/1" element={withSuspense(PerfTaskSearchPage)} />
 
-      {/* 관리자 대메뉴 - 7대 규칙 7번 */}
-      <Route path="admin/auth-group" element={withSuspense(AuthGroupPage)} />
-      <Route path="admin/code-mgmt" element={withSuspense(CodeGroupPage)} />
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

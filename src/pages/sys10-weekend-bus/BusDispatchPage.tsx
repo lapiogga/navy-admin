@@ -44,7 +44,7 @@ export function BusDispatchPage() {
 
   const fetchDispatches = async (params: PageRequest) => {
     const res = await apiClient.get<{ content: DispatchRecord[]; totalElements: number }>(
-      `/api/sys10/dispatches?page=${params.page}&size=${params.size}`
+      `/sys10/dispatches?page=${params.page}&size=${params.size}`
     )
     return {
       content: res.data.content,
@@ -55,7 +55,7 @@ export function BusDispatchPage() {
 
   const handleSeatView = async (record: DispatchRecord) => {
     try {
-      const res = await apiClient.get<{ content: Seat[] }>(`/api/sys10/dispatches/${record.id}/seats`)
+      const res = await apiClient.get<{ content: Seat[] }>(`/sys10/dispatches/${record.id}/seats`)
       setSeatModalSeats(res.data.content)
       setSeatModalOpen(true)
     } catch {
@@ -65,7 +65,7 @@ export function BusDispatchPage() {
 
   const handleAssign = async (record: DispatchRecord, assign: boolean) => {
     try {
-      await apiClient.put(`/api/sys10/dispatches/${record.id}`, {
+      await apiClient.put(`/sys10/dispatches/${record.id}`, {
         ...record,
         assignStatus: assign ? 'assigned' : 'unassigned',
       })
@@ -78,7 +78,7 @@ export function BusDispatchPage() {
 
   const handleDelete = async (record: DispatchRecord) => {
     try {
-      await apiClient.delete(`/api/sys10/dispatches/${record.id}`)
+      await apiClient.delete(`/sys10/dispatches/${record.id}`)
       message.success('삭제되었습니다')
       actionRef.current?.reload()
     } catch {
@@ -89,10 +89,10 @@ export function BusDispatchPage() {
   const handleSubmit = async (values: Record<string, unknown>) => {
     try {
       if (modalMode === 'create') {
-        await apiClient.post('/api/sys10/dispatches', values)
+        await apiClient.post('/sys10/dispatches', values)
         message.success('등록되었습니다')
       } else {
-        await apiClient.put(`/api/sys10/dispatches/${editRecord?.id}`, values)
+        await apiClient.put(`/sys10/dispatches/${editRecord?.id}`, values)
         message.success('수정되었습니다')
       }
       setModalOpen(false)

@@ -144,6 +144,7 @@ export interface ProgressRate extends Record<string, unknown> {
 // ==================== Mock 데이터 ====================
 
 const DEPT_NAMES = ['작전처', '정보처', '인사처', '군수처', '기획처', '교육훈련처', '통신처', '동원처']
+const UNIT_NAMES = ['1사단', '2사단', '6여단', '9여단', '교육훈련단', '군수단', '사령부', '해병대학교']
 const RANKS = ['대장', '중장', '소장', '준장', '대령', '중령', '소령', '대위', '중위', '소위']
 const GRADES: EvalGrade[] = ['S', 'A', 'B', 'C', 'D']
 
@@ -190,53 +191,55 @@ const mainTasks: MainTask[] = [
   { id: 'mt-5', policyId: 'pol-4', policyTitle: '행정혁신 및 효율화', title: '업무 디지털화', orderNo: 1 },
 ]
 
-const midTasks: MidTask[] = mainTasks.flatMap((mt, i) => [
-  {
-    id: `mid-${i * 2 + 1}`,
+const MID_TASK_TITLES: Record<string, string[]> = {
+  'mt-1': ['전투 준비태세 점검 체계화', '전투기술 숙달 훈련 강화', '전투근무지원 체계 정비'],
+  'mt-2': ['연합합동훈련 참가 확대', '실전적 부대훈련 강화', '교육훈련 평가체계 개선'],
+  'mt-3': ['첨단 장비 도입 추진', '노후 장비 교체 사업', '정비능력 향상 교육'],
+  'mt-4': ['병영생활 환경 개선', '급식 품질 향상', '복지시설 현대화'],
+  'mt-5': ['행정업무 전산화', '문서관리 시스템 고도화', '데이터 기반 의사결정'],
+}
+
+const midTasks: MidTask[] = mainTasks.flatMap((mt) => {
+  const titles = MID_TASK_TITLES[mt.id] ?? [`${mt.title} 세부과제 1`, `${mt.title} 세부과제 2`, `${mt.title} 세부과제 3`]
+  return titles.map((title, j) => ({
+    id: `mid-${mt.id.replace('mt-', '')}-${j + 1}`,
     mainTaskId: mt.id,
     mainTaskTitle: mt.title,
-    title: `${mt.title} 세부과제 1`,
-    deptName: faker.helpers.arrayElement(DEPT_NAMES),
-    weight: 50,
-  },
-  {
-    id: `mid-${i * 2 + 2}`,
-    mainTaskId: mt.id,
-    mainTaskTitle: mt.title,
-    title: `${mt.title} 세부과제 2`,
-    deptName: faker.helpers.arrayElement(DEPT_NAMES),
-    weight: 50,
-  },
-])
+    title,
+    deptName: DEPT_NAMES[j % DEPT_NAMES.length],
+    weight: Math.round(100 / titles.length),
+  }))
+})
 
-const subTasks: SubTask[] = midTasks.flatMap((mid, i) => [
-  {
-    id: `sub-${i * 2 + 1}`,
-    midTaskId: mid.id,
-    midTaskTitle: mid.title,
-    title: `${mid.title} 소과제 1`,
-    deptName: mid.deptName,
-    targetValue: `${faker.number.int({ min: 50, max: 200 })}건`,
-  },
-  {
-    id: `sub-${i * 2 + 2}`,
-    midTaskId: mid.id,
-    midTaskTitle: mid.title,
-    title: `${mid.title} 소과제 2`,
-    deptName: mid.deptName,
-    targetValue: `${faker.number.int({ min: 50, max: 200 })}건`,
-  },
-])
+const SUB_TASK_SUFFIXES = ['기반 구축', '실행 계획']
+let subIdCounter = 0
+const subTasks: SubTask[] = midTasks.flatMap((mid) =>
+  SUB_TASK_SUFFIXES.map((suffix) => {
+    subIdCounter += 1
+    return {
+      id: `sub-${subIdCounter}`,
+      midTaskId: mid.id,
+      midTaskTitle: mid.title,
+      title: `${mid.title} ${suffix}`,
+      deptName: mid.deptName,
+      targetValue: `${faker.number.int({ min: 50, max: 200 })}건`,
+    }
+  }),
+)
 
-const detailTasks: DetailTask[] = subTasks.slice(0, 15).map((sub, i) => ({
-  id: `dt-${i + 1}`,
-  subTaskId: sub.id,
-  subTaskTitle: sub.title,
-  title: `${sub.title} 상세과제`,
-  deptName: sub.deptName,
-  manager: faker.person.lastName() + faker.person.firstName(),
-  weight: faker.number.int({ min: 10, max: 40 }),
-}))
+let dtIdCounter = 0
+const detailTasks: DetailTask[] = subTasks.map((sub) => {
+  dtIdCounter += 1
+  return {
+    id: `dt-${dtIdCounter}`,
+    subTaskId: sub.id,
+    subTaskTitle: sub.title,
+    title: `${sub.title} 추진`,
+    deptName: sub.deptName,
+    manager: faker.person.lastName() + faker.person.firstName(),
+    weight: faker.number.int({ min: 10, max: 40 }),
+  }
+})
 
 const STATUS_LIST: TaskResultStatus[] = ['draft', 'pending', 'approved', 'rejected']
 
@@ -295,13 +298,19 @@ const inputStatuses: InputStatus[] = DEPT_NAMES.map((deptName, i) => ({
   inputRate: faker.number.int({ min: 60, max: 100 }),
 }))
 
-const progressRates: ProgressRate[] = DEPT_NAMES.map((deptName, i) => ({
-  id: `pr-${i + 1}`,
-  deptName,
-  unitName: `${faker.number.int({ min: 1, max: 5 })}사단`,
-  totalTasks: faker.number.int({ min: 5, max: 20 }),
-  progressRate: faker.number.int({ min: 40, max: 100 }),
-}))
+let prIdCounter = 0
+const progressRates: ProgressRate[] = UNIT_NAMES.flatMap((unitName) =>
+  DEPT_NAMES.slice(0, 3).map((deptName) => {
+    prIdCounter += 1
+    return {
+      id: `pr-${prIdCounter}`,
+      deptName,
+      unitName,
+      totalTasks: faker.number.int({ min: 5, max: 20 }),
+      progressRate: faker.number.int({ min: 30, max: 100 }),
+    }
+  }),
+)
 
 // ==================== 유틸리티 ====================
 
@@ -765,6 +774,9 @@ export const sys03Handlers = [
     const page = Number(url.searchParams.get('current') ?? '1')
     const pageSize = Number(url.searchParams.get('pageSize') ?? '10')
     return ok(paginate(progressRates, page, pageSize))
+  }),
+  http.post('/api/sys03/progress-rates/export', () => {
+    return ok({ message: '추진진도율 엑셀 다운로드가 준비되었습니다.' })
   }),
 
   // 과제검색

@@ -39,7 +39,7 @@ function getStepCurrent(status: string): number {
 }
 
 async function fetchPendingApprovals(params: PageRequest): Promise<PageResponse<ApprovalRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalRecord>>>('/api/sys15/approvals/pending', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalRecord>>>('/sys15/approvals/pending', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<ApprovalRecord>>).data ?? (res as unknown as PageResponse<ApprovalRecord>)
@@ -58,7 +58,7 @@ function ApprovalDetailModal({ record, open, onClose }: ApprovalDetailModalProps
   const [rejectReason, setRejectReason] = useState('')
 
   const approveMutation = useMutation({
-    mutationFn: () => apiClient.put(`/api/sys15/approvals/${record?.id}/approve`, {}),
+    mutationFn: () => apiClient.put(`/sys15/approvals/${record?.id}/approve`, {}),
     onSuccess: () => {
       message.success('승인 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-approvals-pending'] })
@@ -69,7 +69,7 @@ function ApprovalDetailModal({ record, open, onClose }: ApprovalDetailModalProps
 
   const rejectMutation = useMutation({
     mutationFn: (reason: string) =>
-      apiClient.put(`/api/sys15/approvals/${record?.id}/reject`, { reason }),
+      apiClient.put(`/sys15/approvals/${record?.id}/reject`, { reason }),
     onSuccess: () => {
       message.success('반려 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-approvals-pending'] })

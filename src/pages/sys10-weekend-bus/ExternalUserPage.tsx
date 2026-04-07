@@ -92,7 +92,7 @@ export function ExternalUserPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/api/sys10/external-users', {
+    const res = await apiClient.get('/sys10/external-users', {
       params: { page: params.page, size: params.size },
     })
     return res.data
@@ -100,7 +100,7 @@ export function ExternalUserPage() {
 
   async function handleApprove(id: string) {
     try {
-      await apiClient.put(`/api/sys10/external-users/${id}/approve`)
+      await apiClient.put(`/sys10/external-users/${id}/approve`)
       message.success('승인 처리되었습니다.')
       actionRef.current?.reload()
     } catch {
@@ -111,7 +111,7 @@ export function ExternalUserPage() {
   async function handleReject() {
     try {
       const values = await rejectForm.validateFields()
-      await apiClient.put(`/api/sys10/external-users/${rejectTargetId}/reject`, {
+      await apiClient.put(`/sys10/external-users/${rejectTargetId}/reject`, {
         rejectReason: values.rejectReason,
       })
       message.success('반려 처리되었습니다.')

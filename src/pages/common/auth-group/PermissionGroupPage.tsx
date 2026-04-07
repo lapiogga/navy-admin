@@ -125,6 +125,8 @@ export function PermissionGroupPage() {
         columns={columns}
         rowKey="id"
         request={(params) => permissionGroupApi.list(params) as Promise<PageResponse<PermissionGroupRecord>>}
+        searchable
+        searchPlaceholder="권한그룹 코드, 이름으로 검색"
         toolBarRender={() => [
           <Button
             key="add"

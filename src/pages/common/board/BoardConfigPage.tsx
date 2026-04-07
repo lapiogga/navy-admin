@@ -224,6 +224,8 @@ export function BoardConfigPage({ onSelectBoard }: BoardConfigPageProps) {
         rowKey="id"
         request={(params) => boardConfigApi.list(params) as Promise<PageResponse<BoardConfigRecord>>}
         headerTitle="게시판 목록"
+        searchable
+        searchPlaceholder="게시판명, 설명으로 검색"
         toolBarRender={() => [
           <Button
             key="add"

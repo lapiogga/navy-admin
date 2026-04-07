@@ -12,7 +12,7 @@ interface PersonalSettings {
 }
 
 async function fetchPersonalSettings(): Promise<PersonalSettings> {
-  const res = await apiClient.get<never, ApiResult<PersonalSettings>>('/api/sys01/personal-settings')
+  const res = await apiClient.get<never, ApiResult<PersonalSettings>>('/sys01/personal-settings')
   return (res as ApiResult<PersonalSettings>).data ?? (res as unknown as PersonalSettings)
 }
 

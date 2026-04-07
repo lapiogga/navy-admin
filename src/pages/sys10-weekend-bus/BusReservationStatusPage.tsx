@@ -54,7 +54,7 @@ export function BusReservationStatusPage() {
       ),
     })
     const res = await apiClient.get<{ content: ReservationRecord[]; totalElements: number }>(
-      `/api/sys10/reservations?${qs.toString()}`
+      `/sys10/reservations?${qs.toString()}`
     )
     setAllData(res.data.content)
     return {
@@ -66,7 +66,7 @@ export function BusReservationStatusPage() {
 
   const handleCancel = async (record: ReservationRecord) => {
     try {
-      await apiClient.put(`/api/sys10/reservations/${record.id}/cancel`, {})
+      await apiClient.put(`/sys10/reservations/${record.id}/cancel`, {})
       message.success('예약이 취소되었습니다')
       actionRef.current?.reload()
     } catch {

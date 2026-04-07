@@ -10,6 +10,9 @@ import DirectiveAdminPage from './DirectiveAdminPage'
 // Phase 1 공통게시판 재사용 (DRCT-02, DRCT-03, DRCT-06, DRCT-07)
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
+
 // 지시사항 통합 뷰 (추진현황 + 목록 Tabs)
 const DirectiveView = () => (
   <div>
@@ -80,6 +83,9 @@ export default function Sys12Page() {
 
       {/* 관리자 (DRCT-05) */}
       <Route path="4/1" element={<DirectiveAdminPage />} />
+
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

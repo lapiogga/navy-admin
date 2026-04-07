@@ -316,7 +316,7 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
   const [historyRange, setHistoryRange] = useState<[string, string] | null>(null)
 
   async function fetchItems(params: PageRequest): Promise<PageResponse<ItemType>> {
-    const res = await apiClient.get<never, ApiResult<PageResponse<ItemType>>>(`/api/sys15/${apiPath}`, {
+    const res = await apiClient.get<never, ApiResult<PageResponse<ItemType>>>(`/sys15/${apiPath}`, {
       params: { page: params.page, size: params.size },
     })
     const data = (res as ApiResult<PageResponse<ItemType>>).data ?? (res as unknown as PageResponse<ItemType>)
@@ -325,7 +325,7 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
 
   const createMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) =>
-      apiClient.post(`/api/sys15/${apiPath}`, values),
+      apiClient.post(`/sys15/${apiPath}`, values),
     onSuccess: (res) => {
       message.success('등록되었습니다.')
       queryClient.invalidateQueries({ queryKey: [queryKey] })
@@ -342,7 +342,7 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
 
   const updateMutation = useMutation({
     mutationFn: ({ id, values }: { id: string; values: Record<string, unknown> }) =>
-      apiClient.put(`/api/sys15/${apiPath}/${id}`, values),
+      apiClient.put(`/sys15/${apiPath}/${id}`, values),
     onSuccess: () => {
       message.success('수정되었습니다.')
       queryClient.invalidateQueries({ queryKey: [queryKey] })
@@ -353,7 +353,7 @@ export function SecretMediaPage({ type, onSecretCreated }: SecretMediaPageProps)
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys15/${apiPath}/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys15/${apiPath}/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       queryClient.invalidateQueries({ queryKey: [queryKey] })

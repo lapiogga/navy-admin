@@ -82,7 +82,7 @@ export function BusWaitlistPage() {
   ]
 
   async function fetchList(params: PageRequest) {
-    const res = await apiClient.get('/api/sys10/waitlist', {
+    const res = await apiClient.get('/sys10/waitlist', {
       params: { page: params.page, size: params.size },
     })
     return res.data
@@ -90,7 +90,7 @@ export function BusWaitlistPage() {
 
   async function handleAutoAssign() {
     try {
-      const res = await apiClient.post('/api/sys10/waitlist/auto-assign')
+      const res = await apiClient.post('/sys10/waitlist/auto-assign')
       const { assignedCount } = res.data as { assignedCount: number }
       if (assignedCount > 0) {
         message.success(`총 ${assignedCount}명이 자동 배정되었습니다.`)
@@ -107,7 +107,7 @@ export function BusWaitlistPage() {
     setSelectedWaiting(record)
     setSelectedSeatId(undefined)
     try {
-      const res = await apiClient.get(`/api/sys10/waitlist/${record.id}/available-seats`)
+      const res = await apiClient.get(`/sys10/waitlist/${record.id}/available-seats`)
       setAvailableSeats(res.data as { id: string; seatNo: string }[])
     } catch {
       setAvailableSeats([])
@@ -119,7 +119,7 @@ export function BusWaitlistPage() {
     if (!selectedWaiting || !selectedSeatId) return
     setManualLoading(true)
     try {
-      await apiClient.post(`/api/sys10/waitlist/${selectedWaiting.id}/manual-assign`, {
+      await apiClient.post(`/sys10/waitlist/${selectedWaiting.id}/manual-assign`, {
         seatId: selectedSeatId,
       })
       message.success('수동 배정이 완료되었습니다.')

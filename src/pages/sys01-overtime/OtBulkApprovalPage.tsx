@@ -26,7 +26,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchBulkApprovals(params: PageRequest): Promise<PageResponse<OtBulkRequest>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtBulkRequest>>>('/api/sys01/bulk-approvals', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtBulkRequest>>>('/sys01/bulk-approvals', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtBulkRequest>>).data ?? (res as unknown as PageResponse<OtBulkRequest>)
@@ -40,7 +40,7 @@ export default function OtBulkApprovalPage() {
   const [rejectReason, setRejectReason] = useState('')
 
   const approveMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys01/bulk-approvals/${id}/approve`, {}),
+    mutationFn: (id: string) => apiClient.put(`/sys01/bulk-approvals/${id}/approve`, {}),
     onSuccess: () => {
       message.success('승인 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys01-bulk-approvals'] })
@@ -49,7 +49,7 @@ export default function OtBulkApprovalPage() {
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      apiClient.put(`/api/sys01/bulk-approvals/${id}/reject`, { reason }),
+      apiClient.put(`/sys01/bulk-approvals/${id}/reject`, { reason }),
     onSuccess: () => {
       message.success('반려 처리되었습니다.')
       setRejectOpen(false)

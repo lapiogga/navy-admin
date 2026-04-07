@@ -54,7 +54,7 @@ export default function ReservationMgmtPage() {
 
   // 전체 예약 목록 request 함수
   const fetchReservations = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
-    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/api/sys16/reservations', {
+    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations', {
       params: { page: params.page, size: params.size },
     })
     dataRef.current = res.data.data.content
@@ -64,7 +64,7 @@ export default function ReservationMgmtPage() {
   // 승인 뮤테이션
   const approveMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.patch<ApiResult>(`/api/sys16/reservations/${id}/approve`)
+      const res = await axios.patch<ApiResult>(`/sys16/reservations/${id}/approve`)
       return res.data
     },
     onSuccess: () => {
@@ -79,7 +79,7 @@ export default function ReservationMgmtPage() {
   // 반려 뮤테이션
   const rejectMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.patch<ApiResult>(`/api/sys16/reservations/${id}/reject`)
+      const res = await axios.patch<ApiResult>(`/sys16/reservations/${id}/reject`)
       return res.data
     },
     onSuccess: () => {

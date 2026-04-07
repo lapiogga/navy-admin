@@ -6,7 +6,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import type { ProColumns } from '@ant-design/pro-components'
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+import type { ListParams, PageResponse, ApiResult } from '@/shared/api/types'
 
 // ===== 타입 =====
 interface SystemManager extends Record<string, unknown> {
@@ -46,7 +46,7 @@ const formFields: CrudFormField[] = [
 
 // ===== API 함수 =====
 const managerApi = {
-  list: (params: PageRequest): Promise<PageResponse<SystemManager>> =>
+  list: (params: ListParams): Promise<PageResponse<SystemManager>> =>
     apiClient.get('/common/system-managers', { params }) as Promise<PageResponse<SystemManager>>,
   create: (data: Omit<SystemManager, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResult<SystemManager>> =>
     apiClient.post('/common/system-managers', data) as Promise<ApiResult<SystemManager>>,
@@ -126,6 +126,8 @@ export function SystemManagerPage() {
         request={(params) => managerApi.list(params)}
         rowKey="id"
         headerTitle="체계담당자 관리"
+        searchable
+        searchPlaceholder="담당자명, 서브시스템으로 검색"
         toolBarRender={() => [
           <Button key="add" type="primary" icon={<PlusOutlined />} onClick={() => { setModalMode('create'); setEditingRecord(null); setModalOpen(true) }}>
             등록

@@ -1,5 +1,5 @@
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+import type { ListParams, PageResponse, ApiResult } from '@/shared/api/types'
 import type { ApprovalLine } from './types'
 
 interface CreateApprovalLineDto {
@@ -11,7 +11,7 @@ interface CreateApprovalLineDto {
 interface UpdateApprovalLineDto extends CreateApprovalLineDto {}
 
 export const approvalLineApi = {
-  list(params: PageRequest): Promise<PageResponse<ApprovalLine>> {
+  list(params: ListParams): Promise<PageResponse<ApprovalLine>> {
     return apiClient.get('/common/approval-lines', { params }) as Promise<
       PageResponse<ApprovalLine>
     >

@@ -27,7 +27,7 @@ const UNIT_OPTIONS = [
 ]
 
 async function fetchDutyPosts(params: PageRequest): Promise<PageResponse<DutyPost>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<DutyPost>>>('/api/sys01/duty-posts', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<DutyPost>>>('/sys01/duty-posts', {
     params: { page: params.page, size: params.size },
   })
   return (res as ApiResult<PageResponse<DutyPost>>).data ?? (res as unknown as PageResponse<DutyPost>)

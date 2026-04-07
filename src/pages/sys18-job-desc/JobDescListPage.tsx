@@ -34,7 +34,7 @@ const JD_TYPE_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchJobDescs(params: PageRequest & { type?: string }): Promise<PageResponse<JobDesc>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<JobDesc>>>('/api/sys18/job-descs', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<JobDesc>>>('/sys18/job-descs', {
     params: { page: params.page, size: params.size, type: params.type },
   })
   const data = (res as ApiResult<PageResponse<JobDesc>>).data ?? (res as unknown as PageResponse<JobDesc>)
@@ -51,7 +51,7 @@ function JobDescTabContent({ type, onWrite }: TabContentProps) {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys18/job-descs/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys18/job-descs/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       actionRef.current?.reload()
@@ -61,7 +61,7 @@ function JobDescTabContent({ type, onWrite }: TabContentProps) {
   })
 
   const copyMutation = useMutation({
-    mutationFn: (id: string) => apiClient.post(`/api/sys18/job-descs/${id}/copy`),
+    mutationFn: (id: string) => apiClient.post(`/sys18/job-descs/${id}/copy`),
     onSuccess: () => {
       message.success('복사되었습니다.')
       actionRef.current?.reload()

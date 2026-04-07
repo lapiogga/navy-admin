@@ -170,21 +170,16 @@ describe('SYS08 부대계보관리체계 파일 검증', () => {
   describe('index.tsx', () => {
     const content = read(resolve(SYS08, 'index.tsx'))
 
-    it('CodeManagementPage lazy import 포함 (7대 규칙 7번)', () => {
-      expect(content).toContain('code-mgmt/CodeManagementPage')
-    })
-
-    it('AuthGroupPage lazy import 포함 (7대 규칙 7번)', () => {
-      expect(content).toContain('auth-group/AuthGroupPage')
+    it('AdminRoutes lazy import 포함 (7대 규칙 7번)', () => {
+      expect(content).toContain('AdminRoutes')
     })
 
     it('BoardListPage lazy import 포함 (7대 규칙 6번)', () => {
       expect(content).toContain('BoardListPage')
     })
 
-    it('sys08 관리자 대메뉴 라우트 9/1, 9/2 포함', () => {
-      expect(content).toContain('9/1')
-      expect(content).toContain('9/2')
+    it('sys08 관리자 대메뉴 라우트 admin/* 포함', () => {
+      expect(content).toContain('admin/*')
     })
 
     it('12개 라우트 경로 이상 포함', () => {
@@ -197,16 +192,12 @@ describe('SYS08 부대계보관리체계 파일 검증', () => {
   describe('menus.ts', () => {
     const content = read(MENUS)
 
-    it('sys08 관리자 대메뉴 포함 (/sys08/9)', () => {
-      expect(content).toContain('/sys08/9')
+    it('sys08 관리자 대메뉴 포함 (/sys08/admin)', () => {
+      expect(content).toContain('/sys08/admin')
     })
 
-    it('sys08 관리자 하위 코드관리 포함', () => {
-      expect(content).toContain('/sys08/9/1')
-    })
-
-    it('sys08 관리자 하위 권한관리 포함', () => {
-      expect(content).toContain('/sys08/9/2')
+    it('sys08 관리자 하위 adminChildren 포함', () => {
+      expect(content).toContain("adminChildren('sys08')")
     })
   })
 

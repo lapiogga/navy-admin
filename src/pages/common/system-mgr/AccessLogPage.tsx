@@ -5,7 +5,7 @@ import { DataTable, DetailModal } from '@/shared/ui'
 import type { DetailField } from '@/shared/ui'
 import { downloadCsv } from '@/shared/lib/csv'
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import type { ListParams, PageResponse } from '@/shared/api/types'
 
 // ===== 타입 =====
 interface AccessLog extends Record<string, unknown> {
@@ -21,7 +21,7 @@ interface AccessLog extends Record<string, unknown> {
 
 // ===== API =====
 const accessLogApi = {
-  list: (params: PageRequest): Promise<PageResponse<AccessLog>> =>
+  list: (params: ListParams): Promise<PageResponse<AccessLog>> =>
     apiClient.get('/common/access-logs', { params }) as Promise<PageResponse<AccessLog>>,
 }
 
@@ -84,6 +84,8 @@ export function AccessLogPage() {
         }}
         rowKey="id"
         headerTitle="접속 로그"
+        searchable
+        searchPlaceholder="사용자명, IP 주소로 검색"
         toolBarRender={() => [
           <Button key="csv" onClick={handleCsvDownload}>
             저장(CSV)

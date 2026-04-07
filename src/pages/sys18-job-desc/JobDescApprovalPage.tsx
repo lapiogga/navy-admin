@@ -58,7 +58,7 @@ const APPROVAL_STEPS_DEF = [
 ]
 
 async function fetchApprovals(params: PageRequest): Promise<PageResponse<ApprovalItem>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalItem>>>('/api/sys18/approvals', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<ApprovalItem>>>('/sys18/approvals', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<ApprovalItem>>).data ?? (res as unknown as PageResponse<ApprovalItem>)
@@ -66,7 +66,7 @@ async function fetchApprovals(params: PageRequest): Promise<PageResponse<Approva
 }
 
 async function fetchApprovers(params: PageRequest): Promise<PageResponse<Approver>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<Approver>>>('/api/sys18/approvers', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<Approver>>>('/sys18/approvers', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<Approver>>).data ?? (res as unknown as PageResponse<Approver>)
@@ -106,7 +106,7 @@ function ApprovalPendingTab() {
   const [rejectReason, setRejectReason] = useState('')
 
   const approveMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys18/approvals/${id}/approve`),
+    mutationFn: (id: string) => apiClient.put(`/sys18/approvals/${id}/approve`),
     onSuccess: () => {
       message.success('승인되었습니다.')
       setDetailOpen(false)
@@ -118,7 +118,7 @@ function ApprovalPendingTab() {
 
   const rejectMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      apiClient.put(`/api/sys18/approvals/${id}/reject`, { rejectReason: reason }),
+      apiClient.put(`/sys18/approvals/${id}/reject`, { rejectReason: reason }),
     onSuccess: () => {
       message.success('반려되었습니다.')
       setRejectModalOpen(false)
@@ -131,7 +131,7 @@ function ApprovalPendingTab() {
   })
 
   const resubmitMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys18/approvals/${id}/resubmit`),
+    mutationFn: (id: string) => apiClient.put(`/sys18/approvals/${id}/resubmit`),
     onSuccess: () => {
       message.success('재결재 요청이 완료되었습니다.')
       actionRef.current?.reload()
@@ -292,7 +292,7 @@ function ApproverMgmtTab() {
   const [editRecord, setEditRecord] = useState<Approver | null>(null)
 
   const createMutation = useMutation({
-    mutationFn: (data: Partial<Approver>) => apiClient.post('/api/sys18/approvers', data),
+    mutationFn: (data: Partial<Approver>) => apiClient.post('/sys18/approvers', data),
     onSuccess: () => {
       message.success('등록되었습니다.')
       setCrudOpen(false)
@@ -304,7 +304,7 @@ function ApproverMgmtTab() {
 
   const updateMutation = useMutation({
     mutationFn: ({ id, data }: { id: string; data: Partial<Approver> }) =>
-      apiClient.put(`/api/sys18/approvers/${id}`, data),
+      apiClient.put(`/sys18/approvers/${id}`, data),
     onSuccess: () => {
       message.success('수정되었습니다.')
       setCrudOpen(false)
@@ -315,7 +315,7 @@ function ApproverMgmtTab() {
   })
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys18/approvers/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys18/approvers/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       actionRef.current?.reload()

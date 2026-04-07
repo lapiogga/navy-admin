@@ -7,7 +7,7 @@ import type { ApiResult } from '@/shared/api/types'
 import type { OtMyStatus } from '@/shared/api/mocks/handlers/sys01-overtime'
 
 async function fetchMyStatus(): Promise<OtMyStatus[]> {
-  const res = await apiClient.get<never, ApiResult<OtMyStatus[]>>('/api/sys01/my-status')
+  const res = await apiClient.get<never, ApiResult<OtMyStatus[]>>('/sys01/my-status')
   const data = (res as ApiResult<OtMyStatus[]>).data ?? (res as unknown as OtMyStatus[])
   return data
 }
@@ -19,15 +19,17 @@ function AnnualChart({ data }: { data: OtMyStatus[] }) {
     yField: 'hours',
     height: 300,
     label: {
-      position: 'middle' as const,
+      text: 'hours',
       style: { fill: '#fff', opacity: 0.8 },
     },
-    xAxis: { label: { autoHide: true, autoRotate: false } },
-    meta: {
+    axis: {
+      x: { label: { autoHide: true, autoRotate: false } },
+    },
+    scale: {
       month: { alias: '월' },
       hours: { alias: '초과근무 시간(h)' },
     },
-    color: '#1890ff',
+    style: { fill: '#1890ff' },
   }
   return (
     <div>
@@ -64,12 +66,14 @@ function MonthlyChart({ data }: { data: OtMyStatus[] }) {
     xField: 'month',
     yField: 'hours',
     height: 250,
-    label: { position: 'middle' as const },
-    color: '#52c41a',
-    meta: {
+    label: {
+      text: 'hours',
+    },
+    scale: {
       month: { alias: '월' },
       hours: { alias: '초과근무 시간(h)' },
     },
+    style: { fill: '#52c41a' },
   }
   return (
     <div>

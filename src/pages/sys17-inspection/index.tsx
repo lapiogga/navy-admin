@@ -14,7 +14,10 @@ import InspectionResultDataPage from './InspectionResultDataPage'
 const BoardIndex = lazy(() => import('@/pages/common/board'))
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
-const AccessLogIndex = lazy(() => import('@/pages/system-mgr/AccessLogPage'))
+const AccessLogIndex = lazy(() => import('@/pages/common/system-mgr/AccessLogPage'))
+
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 
 export default function Sys17Page() {
   return (
@@ -88,6 +91,9 @@ export default function Sys17Page() {
 
       {/* 검열결과 정보 읽기전용 (INSP-12) */}
       <Route path="3/2" element={<InspectionResultDataPage />} />
+
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

@@ -28,8 +28,8 @@ const OtPersonalSettingPage = React.lazy(() => import('./OtPersonalSettingPage')
 const OtPersonalDutyPage = React.lazy(() => import('./OtPersonalDutyPage'))
 const OtPersonalDeptPage = React.lazy(() => import('./OtPersonalDeptPage'))
 
-// Phase 1 공통기능 lazy import (7대 규칙 7번: 관리자 대메뉴)
-const AuthGroupPage = React.lazy(() => import('@/pages/common/auth-group/AuthGroupPage'))
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
 // 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys01)
 const BoardListPage = React.lazy(() =>
@@ -102,8 +102,8 @@ export default function Sys01Page() {
       <Route path="6/1" element={<BoardNotice />} />
       <Route path="6/2" element={<BoardQna />} />
 
-      {/* 관리자 (7) - Phase 1 공통기능 lazy import (7대 규칙 7번) */}
-      <Route path="7/1" element={withSuspense(AuthGroupPage)} />
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

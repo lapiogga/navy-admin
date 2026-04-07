@@ -9,7 +9,7 @@ import type { Dayjs } from 'dayjs'
 import { DatePicker } from 'antd'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
-import { PrintableReport } from '@/shared/ui/PrintableReport/PrintableReport'
+import { PrintableReport } from '@/pages/sys09-memorial/PrintableReport'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 import type { JobDesc, JobDescType } from '@/shared/api/mocks/handlers/sys18'
 

@@ -22,6 +22,19 @@ const STATUS_LABEL_MAP: Record<string, string> = { pending: '결재대기', appr
 const historyData: ApprovalHistoryItem[] = [
   { id: '1', requestedPost: '제2당직실', reason: '근무지 변경 요청', status: 'approved', createdAt: '2026-03-01', approvedAt: '2026-03-05' },
   { id: '2', requestedPost: '본부 당직실', reason: '이동 편의', status: 'pending', createdAt: '2026-04-01' },
+  { id: '3', requestedPost: '지휘통제실', reason: '보직 변경에 따른 이동 요청', status: 'approved', createdAt: '2026-02-15', approvedAt: '2026-02-20' },
+  { id: '4', requestedPost: '제1당직실', reason: '건강상 사유', status: 'rejected', createdAt: '2026-01-20' },
+  { id: '5', requestedPost: '통신당직실', reason: '부대 이전으로 인한 변경', status: 'approved', createdAt: '2026-01-10', approvedAt: '2026-01-15' },
+  { id: '6', requestedPost: '제3당직실', reason: '교대 일정 조정', status: 'pending', createdAt: '2026-04-03' },
+  { id: '7', requestedPost: '함정당직실', reason: '업무 효율화 목적', status: 'approved', createdAt: '2025-12-20', approvedAt: '2025-12-28' },
+  { id: '8', requestedPost: '본부 당직실', reason: '전문성 강화를 위한 이동', status: 'rejected', createdAt: '2025-12-05' },
+  { id: '9', requestedPost: '제2당직실', reason: '거리 이유로 이동 희망', status: 'approved', createdAt: '2025-11-15', approvedAt: '2025-11-22' },
+  { id: '10', requestedPost: '지휘통제실', reason: '부대 개편에 따른 재배치', status: 'pending', createdAt: '2026-04-05' },
+  { id: '11', requestedPost: '제1당직실', reason: '교육 파견 복귀 후 원복', status: 'approved', createdAt: '2025-11-01', approvedAt: '2025-11-08' },
+  { id: '12', requestedPost: '통신당직실', reason: '통신 전문 인력 배치', status: 'approved', createdAt: '2025-10-20', approvedAt: '2025-10-25' },
+  { id: '13', requestedPost: '제3당직실', reason: '인사 발령에 따른 이동', status: 'rejected', createdAt: '2025-10-10' },
+  { id: '14', requestedPost: '함정당직실', reason: '함정 근무 경험 축적', status: 'pending', createdAt: '2026-03-28' },
+  { id: '15', requestedPost: '본부 당직실', reason: '조직 재편에 따른 재배치', status: 'approved', createdAt: '2025-09-15', approvedAt: '2025-09-22' },
 ]
 
 async function fetchHistory(params: PageRequest): Promise<PageResponse<ApprovalHistoryItem>> {

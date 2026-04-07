@@ -39,7 +39,7 @@ interface PersonalDailyRecord extends Record<string, unknown> {
 }
 
 async function fetchPersonalDailyHistory(params: PageRequest & { startDate?: string; endDate?: string }): Promise<PageResponse<PersonalDailyRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<PersonalDailyRecord>>>('/api/sys15/personal-daily', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<PersonalDailyRecord>>>('/sys15/personal-daily', {
     params: { page: params.page, size: params.size, startDate: params.startDate, endDate: params.endDate },
   })
   const data = (res as ApiResult<PageResponse<PersonalDailyRecord>>).data ?? (res as unknown as PageResponse<PersonalDailyRecord>)
@@ -74,7 +74,7 @@ export default function PersonalSecDailyPage() {
 
   const saveMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/personal-daily', payload),
+      apiClient.post('/sys15/personal-daily', payload),
     onSuccess: () => {
       message.success('저장되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-personal-daily'] })
@@ -84,7 +84,7 @@ export default function PersonalSecDailyPage() {
 
   const submitMutation = useMutation({
     mutationFn: (payload: Record<string, unknown>) =>
-      apiClient.post('/api/sys15/personal-daily', { ...payload, status: 'submitted' }),
+      apiClient.post('/sys15/personal-daily', { ...payload, status: 'submitted' }),
     onSuccess: () => {
       message.success('결재 요청이 완료되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-personal-daily'] })

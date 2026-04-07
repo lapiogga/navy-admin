@@ -27,7 +27,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchAbsences(params: PageRequest): Promise<PageResponse<AbsenceRecord>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<AbsenceRecord>>>('/api/sys15/absences', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<AbsenceRecord>>>('/sys15/absences', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<AbsenceRecord>>).data ?? (res as unknown as PageResponse<AbsenceRecord>)
@@ -48,9 +48,9 @@ function AbsenceFormModal({ open, record, onClose, onSuccess }: AbsenceFormModal
   const saveMutation = useMutation({
     mutationFn: (values: Record<string, unknown>) => {
       if (record) {
-        return apiClient.put(`/api/sys15/absences/${record.id}`, values)
+        return apiClient.put(`/sys15/absences/${record.id}`, values)
       }
-      return apiClient.post('/api/sys15/absences', values)
+      return apiClient.post('/sys15/absences', values)
     },
     onSuccess: () => {
       message.success(record ? '수정되었습니다.' : '부재신청이 등록되었습니다.')
@@ -119,7 +119,7 @@ export default function AbsencePage() {
   const queryClient = useQueryClient()
 
   const deleteMutation = useMutation({
-    mutationFn: (id: string) => apiClient.delete(`/api/sys15/absences/${id}`),
+    mutationFn: (id: string) => apiClient.delete(`/sys15/absences/${id}`),
     onSuccess: () => {
       message.success('삭제되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys15-absences'] })

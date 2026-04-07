@@ -21,7 +21,7 @@ const STATUS_LABEL_MAP: Record<string, string> = {
 }
 
 async function fetchMonthlyClosings(params: PageRequest): Promise<PageResponse<OtMonthlyClosing>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtMonthlyClosing>>>('/api/sys01/monthly-closing', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtMonthlyClosing>>>('/sys01/monthly-closing', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtMonthlyClosing>>).data ?? (res as unknown as PageResponse<OtMonthlyClosing>)
@@ -42,7 +42,7 @@ export default function OtMonthlyClosingPage() {
   const [deadlineEditOpen, setDeadlineEditOpen] = useState(false)
 
   const closeMutation = useMutation({
-    mutationFn: (id: string) => apiClient.put(`/api/sys01/monthly-closing/${id}/close`, {}),
+    mutationFn: (id: string) => apiClient.put(`/sys01/monthly-closing/${id}/close`, {}),
     onSuccess: () => {
       message.success('마감 처리되었습니다.')
       queryClient.invalidateQueries({ queryKey: ['sys01-monthly-closing'] })
@@ -52,7 +52,7 @@ export default function OtMonthlyClosingPage() {
 
   const cancelCloseMutation = useMutation({
     mutationFn: ({ id, reason }: { id: string; reason: string }) =>
-      apiClient.put(`/api/sys01/monthly-closing/${id}/cancel-close`, { reason }),
+      apiClient.put(`/sys01/monthly-closing/${id}/cancel-close`, { reason }),
     onSuccess: () => {
       message.success('마감 취소되었습니다.')
       setCancelReasonOpen(false)

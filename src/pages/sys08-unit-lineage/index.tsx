@@ -14,9 +14,8 @@ const UnitAuthMgmtPage = React.lazy(() => import('./UnitAuthMgmtPage'))
 const UnitAuthViewPage = React.lazy(() => import('./UnitAuthViewPage'))
 const UnitStatsPage = React.lazy(() => import('./UnitStatsPage'))
 
-// Phase 1 공통기능 lazy import (7대 규칙 7번: 관리자 대메뉴)
-const CodeManagementPage = React.lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
-const AuthGroupPage = React.lazy(() => import('@/pages/common/auth-group/AuthGroupPage'))
+// 관리자 대메뉴 - 공통기능
+const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
 // 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys08)
 const BoardListPage = React.lazy(() =>
@@ -69,9 +68,8 @@ export default function Sys08Page() {
       {/* 부대기록부 */}
       <Route path="8/1" element={withSuspense(UnitRecordPage)} />
 
-      {/* 관리자 (Phase 1 공통기능 lazy import) */}
-      <Route path="9/1" element={withSuspense(CodeManagementPage)} />
-      <Route path="9/2" element={withSuspense(AuthGroupPage)} />
+      {/* 관리자 대메뉴 - 공통기능 */}
+      <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />
     </Routes>
   )
 }

@@ -32,6 +32,19 @@ const DEPT_OPTIONS = [
 const historyData: DeptHistoryItem[] = [
   { id: '1', fromDept: '작전부서', toDept: '인사부서', reason: '보직 변경', status: 'approved', createdAt: '2026-02-01', approvedAt: '2026-02-10' },
   { id: '2', fromDept: '인사부서', toDept: '군수부서', reason: '업무 이관', status: 'pending', createdAt: '2026-04-01' },
+  { id: '3', fromDept: '군수부서', toDept: '정보부서', reason: '인사 발령', status: 'approved', createdAt: '2026-01-15', approvedAt: '2026-01-22' },
+  { id: '4', fromDept: '정보부서', toDept: '통신부서', reason: '전문성 강화', status: 'rejected', createdAt: '2025-12-20' },
+  { id: '5', fromDept: '통신부서', toDept: '작전부서', reason: '부대 개편', status: 'approved', createdAt: '2025-12-01', approvedAt: '2025-12-08' },
+  { id: '6', fromDept: '의무부서', toDept: '인사부서', reason: '교육 파견 복귀', status: 'pending', createdAt: '2026-03-28' },
+  { id: '7', fromDept: '작전부서', toDept: '군수부서', reason: '조직 재편', status: 'approved', createdAt: '2025-11-15', approvedAt: '2025-11-20' },
+  { id: '8', fromDept: '정보부서', toDept: '의무부서', reason: '보직 순환', status: 'rejected', createdAt: '2025-11-01' },
+  { id: '9', fromDept: '군수부서', toDept: '통신부서', reason: '업무 효율화', status: 'approved', createdAt: '2025-10-20', approvedAt: '2025-10-28' },
+  { id: '10', fromDept: '통신부서', toDept: '정보부서', reason: '인력 재배치', status: 'pending', createdAt: '2026-04-03' },
+  { id: '11', fromDept: '인사부서', toDept: '작전부서', reason: '경력 개발', status: 'approved', createdAt: '2025-10-05', approvedAt: '2025-10-12' },
+  { id: '12', fromDept: '의무부서', toDept: '군수부서', reason: '부대 이전', status: 'approved', createdAt: '2025-09-15', approvedAt: '2025-09-22' },
+  { id: '13', fromDept: '작전부서', toDept: '정보부서', reason: '전문 교육 이수 후 재배치', status: 'rejected', createdAt: '2025-09-01' },
+  { id: '14', fromDept: '군수부서', toDept: '의무부서', reason: '건강 관련 업무 지원', status: 'pending', createdAt: '2026-03-15' },
+  { id: '15', fromDept: '통신부서', toDept: '작전부서', reason: '작전 통신 지원 강화', status: 'approved', createdAt: '2025-08-20', approvedAt: '2025-08-28' },
 ]
 
 async function fetchHistory(params: PageRequest): Promise<PageResponse<DeptHistoryItem>> {

@@ -82,9 +82,9 @@ describe('SYS15 SecMainPage: 캘린더 메인화면', () => {
     expect(content).toContain('Modal')
   })
 
-  it('/api/sys15/daily-status 엔드포인트를 사용한다', () => {
+  it('/sys15/daily-status 엔드포인트를 사용한다', () => {
     const content = readPage('SecMainPage.tsx')
-    expect(content).toContain('/api/sys15/daily-status')
+    expect(content).toContain('/sys15/daily-status')
   })
 })
 
@@ -133,9 +133,9 @@ describe('SYS15 PersonalSecDailyPage: 개인 보안일일결산', () => {
     expect(content).toContain('StatusBadge')
   })
 
-  it('/api/sys15/personal-daily 엔드포인트를 사용한다', () => {
+  it('/sys15/personal-daily 엔드포인트를 사용한다', () => {
     const content = readPage('PersonalSecDailyPage.tsx')
-    expect(content).toContain('/api/sys15/personal-daily')
+    expect(content).toContain('/sys15/personal-daily')
   })
 
   it('제출 시 status=submitted로 결재 연동된다', () => {
@@ -178,9 +178,9 @@ describe('SYS15 OfficeSecDailyPage: 사무실 보안일일결산', () => {
     expect(content).toContain('DataTable')
   })
 
-  it('/api/sys15/office-daily 엔드포인트를 사용한다', () => {
+  it('/sys15/office-daily 엔드포인트를 사용한다', () => {
     const content = readPage('OfficeSecDailyPage.tsx')
-    expect(content).toContain('/api/sys15/office-daily')
+    expect(content).toContain('/sys15/office-daily')
   })
 })
 
@@ -220,9 +220,9 @@ describe('SYS15 DutyOfficerPage: 점검관 당직표', () => {
     expect(content).toContain('officerName')
   })
 
-  it('/api/sys15/duty-officer 엔드포인트를 사용한다', () => {
+  it('/sys15/duty-officer 엔드포인트를 사용한다', () => {
     const content = readPage('DutyOfficerPage.tsx')
-    expect(content).toContain('/api/sys15/duty-officer')
+    expect(content).toContain('/sys15/duty-officer')
   })
 })
 
@@ -281,14 +281,14 @@ describe('SYS15 SecurityLevelPage: 보안수준평가', () => {
     expect(content).toContain('DataTable')
   })
 
-  it('/api/sys15/security-level 엔드포인트를 사용한다', () => {
+  it('/sys15/security-level 엔드포인트를 사용한다', () => {
     const content = readPage('SecurityLevelPage.tsx')
-    expect(content).toContain('/api/sys15/security-level')
+    expect(content).toContain('/sys15/security-level')
   })
 
-  it('/api/sys15/security-level/stats 통계 엔드포인트를 사용한다', () => {
+  it('/sys15/security-level/stats 통계 엔드포인트를 사용한다', () => {
     const content = readPage('SecurityLevelPage.tsx')
-    expect(content).toContain('/api/sys15/security-level/stats')
+    expect(content).toContain('/sys15/security-level/stats')
   })
 
   it('등급(grade) 표시 StatusBadge가 있다', () => {
@@ -326,9 +326,9 @@ describe('SYS15 AbsencePage: 부재관리', () => {
     expect(content).toContain("status === 'pending'")
   })
 
-  it('/api/sys15/absences 엔드포인트를 사용한다', () => {
+  it('/sys15/absences 엔드포인트를 사용한다', () => {
     const content = readPage('AbsencePage.tsx')
-    expect(content).toContain('/api/sys15/absences')
+    expect(content).toContain('/sys15/absences')
   })
 
   it('부대(서) 컬럼이 있다 (7대 규칙 5번)', () => {
@@ -376,9 +376,9 @@ describe('SYS15 SecurityEduPage: 보안교육관리', () => {
     expect(content).toContain('엑셀')
   })
 
-  it('/api/sys15/security-edu 엔드포인트를 사용한다', () => {
+  it('/sys15/security-edu 엔드포인트를 사용한다', () => {
     const content = readPage('SecurityEduPage.tsx')
-    expect(content).toContain('/api/sys15/security-edu')
+    expect(content).toContain('/sys15/security-edu')
   })
 })
 
@@ -417,9 +417,9 @@ describe('SYS15 ApprovalPendingPage: 결재대기', () => {
     expect(content).toContain('StatusBadge')
   })
 
-  it('/api/sys15/approvals/pending 엔드포인트를 사용한다', () => {
+  it('/sys15/approvals/pending 엔드포인트를 사용한다', () => {
     const content = readPage('ApprovalPendingPage.tsx')
-    expect(content).toContain('/api/sys15/approvals/pending')
+    expect(content).toContain('/sys15/approvals/pending')
   })
 
   it('행 클릭시 상세 Modal이 열린다', () => {
@@ -457,9 +457,9 @@ describe('SYS15 ApprovalCompletedPage: 결재완료', () => {
     expect(content).toContain('StatusBadge')
   })
 
-  it('/api/sys15/approvals/completed 엔드포인트를 사용한다', () => {
+  it('/sys15/approvals/completed 엔드포인트를 사용한다', () => {
     const content = readPage('ApprovalCompletedPage.tsx')
-    expect(content).toContain('/api/sys15/approvals/completed')
+    expect(content).toContain('/sys15/approvals/completed')
   })
 
   it('반려사유 컬럼이 있다', () => {

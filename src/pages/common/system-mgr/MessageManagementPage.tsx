@@ -6,7 +6,7 @@ import { DataTable, CrudForm, showConfirmDialog } from '@/shared/ui'
 import type { CrudFormField } from '@/shared/ui'
 import type { ProColumns } from '@ant-design/pro-components'
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
+import type { ListParams, PageResponse, ApiResult } from '@/shared/api/types'
 
 // ===== 타입 =====
 interface MessageItem extends Record<string, unknown> {
@@ -21,7 +21,7 @@ interface MessageItem extends Record<string, unknown> {
 
 // ===== API =====
 const messageApi = {
-  list: (params: PageRequest): Promise<PageResponse<MessageItem>> =>
+  list: (params: ListParams): Promise<PageResponse<MessageItem>> =>
     apiClient.get('/common/messages', { params }) as Promise<PageResponse<MessageItem>>,
   create: (data: Omit<MessageItem, 'id' | 'createdAt' | 'updatedAt'>): Promise<ApiResult<MessageItem>> =>
     apiClient.post('/common/messages', data) as Promise<ApiResult<MessageItem>>,
@@ -127,6 +127,8 @@ export function MessageManagementPage() {
         request={(params) => messageApi.list(params)}
         rowKey="id"
         headerTitle="메시지 관리"
+        searchable
+        searchPlaceholder="메시지 코드, 내용으로 검색"
         toolBarRender={() => [
           <Button key="add" type="primary" icon={<PlusOutlined />} onClick={() => { setModalMode('create'); setEditingRecord(null); setModalOpen(true) }}>
             등록

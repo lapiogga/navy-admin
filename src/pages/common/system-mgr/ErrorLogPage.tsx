@@ -1,7 +1,7 @@
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui'
 import { apiClient } from '@/shared/api/client'
-import type { PageRequest, PageResponse } from '@/shared/api/types'
+import type { ListParams, PageResponse } from '@/shared/api/types'
 
 // ===== 타입 =====
 interface ErrorLog extends Record<string, unknown> {
@@ -15,7 +15,7 @@ interface ErrorLog extends Record<string, unknown> {
 
 // ===== API =====
 const errorLogApi = {
-  list: (params: PageRequest): Promise<PageResponse<ErrorLog>> =>
+  list: (params: ListParams): Promise<PageResponse<ErrorLog>> =>
     apiClient.get('/common/error-logs', { params }) as Promise<PageResponse<ErrorLog>>,
 }
 
@@ -49,6 +49,8 @@ export function ErrorLogPage() {
       request={(params) => errorLogApi.list(params)}
       rowKey="id"
       headerTitle="장애 로그"
+      searchable
+      searchPlaceholder="오류 코드, 메시지로 검색"
     />
   )
 }

@@ -295,16 +295,10 @@ describe('SYS15 index.tsx: 전체 라우터', () => {
     expect(content).toContain('common/board')
   })
 
-  it('CodeManagementPage lazy import가 있다 (D-46, 7대 규칙 7번)', () => {
+  it('AdminRoutes lazy import가 있다 (D-46, 7대 규칙 7번)', () => {
     const content = readPage('index.tsx')
-    expect(content).toContain('CodeManagementPage')
-    expect(content).toContain('code-mgmt')
-  })
-
-  it('AuthGroupPage lazy import가 있다 (D-46, 7대 규칙 7번)', () => {
-    const content = readPage('index.tsx')
-    expect(content).toContain('AuthGroupPage')
-    expect(content).toContain('auth-group')
+    expect(content).toContain('AdminRoutes')
+    expect(content).toContain('common/AdminRoutes')
   })
 
   it('sysCode sys15 게시판 Route가 있다 (7대 규칙 6번)', () => {
@@ -313,10 +307,10 @@ describe('SYS15 index.tsx: 전체 라우터', () => {
     expect(content).toContain('sys15-qna')
   })
 
-  it('Route 30개 이상이 있다', () => {
+  it('Route 29개 이상이 있다', () => {
     const content = readPage('index.tsx')
     const routeMatches = content.match(/<Route/g) ?? []
-    expect(routeMatches.length).toBeGreaterThanOrEqual(30)
+    expect(routeMatches.length).toBeGreaterThanOrEqual(29)
   })
 
   it('결산종합현황 4종 Route가 있다 (5/1 ~ 5/4)', () => {
@@ -336,10 +330,9 @@ describe('SYS15 index.tsx: 전체 라우터', () => {
     expect(content).toContain('8/5')
   })
 
-  it('시스템 2종 Route가 있다 (9/1 ~ 9/2)', () => {
+  it('관리자 공통기능 Route가 있다 (admin/*)', () => {
     const content = readPage('index.tsx')
-    expect(content).toContain('9/1')
-    expect(content).toContain('9/2')
+    expect(content).toContain('admin/*')
   })
 
   it('Suspense fallback이 있다', () => {

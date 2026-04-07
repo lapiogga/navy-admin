@@ -19,7 +19,7 @@ const UNIT_OPTIONS = [
 ]
 
 async function fetchUnitStatus(params: PageRequest): Promise<PageResponse<OtUnitStatus>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtUnitStatus>>>('/api/sys01/unit-status', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtUnitStatus>>>('/sys01/unit-status', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtUnitStatus>>).data ?? (res as unknown as PageResponse<OtUnitStatus>)
@@ -27,7 +27,7 @@ async function fetchUnitStatus(params: PageRequest): Promise<PageResponse<OtUnit
 }
 
 async function fetchUnitAbsence(params: PageRequest): Promise<PageResponse<OtAbsence>> {
-  const res = await apiClient.get<never, ApiResult<PageResponse<OtAbsence>>>('/api/sys01/unit-absence', {
+  const res = await apiClient.get<never, ApiResult<PageResponse<OtAbsence>>>('/sys01/unit-absence', {
     params: { page: params.page, size: params.size },
   })
   const data = (res as ApiResult<PageResponse<OtAbsence>>).data ?? (res as unknown as PageResponse<OtAbsence>)
@@ -75,7 +75,7 @@ function UnitStatsTab() {
   const { data: statsRaw } = useQuery({
     queryKey: ['sys01-unit-stats'],
     queryFn: async () => {
-      const res = await apiClient.get<never, ApiResult<UnitStat[]>>('/api/sys01/unit-stats')
+      const res = await apiClient.get<never, ApiResult<UnitStat[]>>('/sys01/unit-stats')
       const data = (res as ApiResult<UnitStat[]>).data ?? (res as unknown as UnitStat[])
       return data
     },

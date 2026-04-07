@@ -68,6 +68,8 @@ export function BoardListPage({ boardId }: BoardListPageProps) {
         rowKey="id"
         request={(params) => boardPostApi.list(boardId, params) as Promise<PageResponse<BoardPostRecord>>}
         headerTitle="게시글 목록"
+        searchable
+        searchPlaceholder="제목, 내용으로 검색"
         toolBarRender={() => [
           <Button
             key="add"

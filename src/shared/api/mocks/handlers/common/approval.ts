@@ -58,16 +58,24 @@ export const approvalHandlers = [
     const url = new URL(request.url)
     const page = Number(url.searchParams.get('page') ?? '0')
     const size = Number(url.searchParams.get('size') ?? '10')
+    const keyword = url.searchParams.get('keyword') ?? ''
+
+    let filtered = mockLines
+    if (keyword) {
+      filtered = mockLines.filter(
+        (l) => l.lineName.includes(keyword) || l.description.includes(keyword),
+      )
+    }
 
     const start = page * size
-    const content = mockLines.slice(start, start + size)
+    const content = filtered.slice(start, start + size)
 
     const result: ApiResult<PageResponse<ApprovalLine>> = {
       success: true,
       data: {
         content,
-        totalElements: mockLines.length,
-        totalPages: Math.ceil(mockLines.length / size),
+        totalElements: filtered.length,
+        totalPages: Math.ceil(filtered.length / size),
         size,
         number: page,
       },

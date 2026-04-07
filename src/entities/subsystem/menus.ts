@@ -3,7 +3,20 @@ import type { MenuDataItem } from '@ant-design/pro-components'
 /**
  * 서브시스템별 메뉴 구조.
  * 대메뉴 > 소메뉴 2단 구조. ProLayout route 형식.
+ * 모든 서브시스템에 "관리자" 대메뉴 포함 (99_공통기능 전체 연결).
  */
+
+/** 공통 관리자 하위메뉴 생성 헬퍼 */
+function adminChildren(sys: string): MenuDataItem[] {
+  return [
+    { name: '시스템관리', path: `/${sys}/admin/system-mgr` },
+    { name: '코드관리', path: `/${sys}/admin/code-mgmt` },
+    { name: '권한관리', path: `/${sys}/admin/auth-group` },
+    { name: '결재선 관리', path: `/${sys}/admin/approval-line` },
+    { name: '게시판 설정', path: `/${sys}/admin/board` },
+  ]
+}
+
 export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
   sys01: [
     {
@@ -71,10 +84,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys01/7',
-      children: [
-        { name: '권한관리', path: '/sys01/7/1' },
-      ],
+      path: '/sys01/admin',
+      children: adminChildren('sys01'),
     },
   ],
   sys02: [
@@ -90,12 +101,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys02/2',
-      children: [
-        { name: '공통코드관리', path: '/sys02/2/1' },
-        { name: '권한관리', path: '/sys02/2/2' },
-      ],
+      name: '관리자',
+      path: '/sys02/admin',
+      children: adminChildren('sys02'),
     },
   ],
   sys03: [
@@ -152,6 +160,11 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '과제검색', path: '/sys03/6/1' },
       ],
     },
+    {
+      name: '관리자',
+      path: '/sys03/admin',
+      children: adminChildren('sys03'),
+    },
   ],
   sys04: [
     {
@@ -165,12 +178,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys04/2',
-      children: [
-        { name: '공통코드관리', path: '/sys04/2/1' },
-        { name: '사용자별권한등록', path: '/sys04/2/2' },
-      ],
+      name: '관리자',
+      path: '/sys04/admin',
+      children: adminChildren('sys04'),
     },
   ],
   sys05: [
@@ -195,6 +205,11 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       children: [
         { name: '지시문서', path: '/sys05/3/1' },
       ],
+    },
+    {
+      name: '관리자',
+      path: '/sys05/admin',
+      children: adminChildren('sys05'),
     },
   ],
   sys06: [
@@ -231,10 +246,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys06/5',
-      children: [
-        { name: '권한관리', path: '/sys06/5/1' },
-      ],
+      path: '/sys06/admin',
+      children: adminChildren('sys06'),
     },
   ],
   sys07: [
@@ -256,11 +269,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys07/3',
-      children: [
-        { name: '코드관리', path: '/sys07/3/1' },
-        { name: '권한관리', path: '/sys07/3/2' },
-      ],
+      path: '/sys07/admin',
+      children: adminChildren('sys07'),
     },
   ],
   sys08: [
@@ -325,11 +335,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys08/9',
-      children: [
-        { name: '코드관리', path: '/sys08/9/1' },
-        { name: '권한관리', path: '/sys08/9/2' },
-      ],
+      path: '/sys08/admin',
+      children: adminChildren('sys08'),
     },
   ],
   sys09: [
@@ -368,6 +375,11 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '전사망자 확인증 발급대장', path: '/sys09/3/13' },
       ],
     },
+    {
+      name: '관리자',
+      path: '/sys09/admin',
+      children: adminChildren('sys09'),
+    },
   ],
   sys10: [
     {
@@ -387,11 +399,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys10/2',
-      children: [
-        { name: '코드관리', path: '/sys10/2/1' },
-        { name: '권한관리', path: '/sys10/2/2' },
-      ],
+      path: '/sys10/admin',
+      children: adminChildren('sys10'),
     },
   ],
   sys11: [
@@ -407,11 +416,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys11/2',
-      children: [
-        { name: '사용자별권한등록', path: '/sys11/2/1' },
-      ],
+      name: '관리자',
+      path: '/sys11/admin',
+      children: adminChildren('sys11'),
     },
   ],
   sys12: [
@@ -441,10 +448,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys12/4',
-      children: [
-        { name: '관리자', path: '/sys12/4/1' },
-      ],
+      path: '/sys12/admin',
+      children: adminChildren('sys12'),
     },
   ],
   sys13: [
@@ -479,12 +484,8 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys13/5',
-      children: [
-        { name: '코드관리', path: '/sys13/5/1' },
-        { name: '메뉴관리', path: '/sys13/5/2' },
-        { name: '권한관리', path: '/sys13/5/3' },
-      ],
+      path: '/sys13/admin',
+      children: adminChildren('sys13'),
     },
   ],
   sys14: [
@@ -499,11 +500,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys14/2',
-      children: [
-        { name: '사용자별권한등록', path: '/sys14/2/1' },
-      ],
+      name: '관리자',
+      path: '/sys14/admin',
+      children: adminChildren('sys14'),
     },
   ],
   sys15: [
@@ -571,7 +570,7 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '관리자',
+      name: '보안관리자',
       path: '/sys15/8',
       children: [
         { name: '점검항목관리', path: '/sys15/8/1' },
@@ -582,12 +581,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys15/9',
-      children: [
-        { name: '공통코드관리', path: '/sys15/9/1' },
-        { name: '권한관리', path: '/sys15/9/2' },
-      ],
+      name: '관리자',
+      path: '/sys15/admin',
+      children: adminChildren('sys15'),
     },
   ],
   sys16: [
@@ -604,11 +600,9 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys16/2',
-      children: [
-        { name: '공통코드관리', path: '/sys16/2/1' },
-      ],
+      name: '관리자',
+      path: '/sys16/admin',
+      children: adminChildren('sys16'),
     },
   ],
   sys17: [
@@ -625,12 +619,11 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '시스템',
-      path: '/sys17/2',
+      name: '관리자',
+      path: '/sys17/admin',
       children: [
-        { name: '공통코드관리', path: '/sys17/2/1' },
+        ...adminChildren('sys17'),
         { name: '부대관리', path: '/sys17/2/2' },
-        { name: '사용자별권한등록', path: '/sys17/2/3' },
         { name: '접속로그', path: '/sys17/2/4' },
       ],
     },
@@ -656,11 +649,10 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
     {
       name: '관리자',
-      path: '/sys18/2',
+      path: '/sys18/admin',
       children: [
-        { name: '공통코드관리', path: '/sys18/2/1' },
+        ...adminChildren('sys18'),
         { name: '표준업무시간관리', path: '/sys18/2/2' },
-        { name: '사용자권한관리', path: '/sys18/2/3' },
       ],
     },
   ],
