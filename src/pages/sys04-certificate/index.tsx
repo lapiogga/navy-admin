@@ -1,13 +1,12 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
-import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SubsystemHomePage, SimpleBoardPage } from '@/shared/ui'
 import CertificateApplyPage from './CertificateApplyPage'
 import CertificateApprovalPage from './CertificateApprovalPage'
 import CertificateRegisterPage from './CertificateRegisterPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (CERT-04, CERT-05, CERT-06)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
+// 공통 기능 Phase 1 페이지 재사용 (CERT-05, CERT-06)
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
@@ -28,14 +27,7 @@ export default function Sys04Page() {
       } />
 
       {/* 게시판 (공통 페이지 재사용 - CERT-04) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys04-notice" title="공지사항" />} />
 
       {/* 인증서 신청 (고유 페이지 - CERT-01) */}
       <Route path="1/2" element={<CertificateApplyPage />} />

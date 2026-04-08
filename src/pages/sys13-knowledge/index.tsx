@@ -2,13 +2,13 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import KnowledgeListPage from './KnowledgeListPage'
 import MyKnowledgePage from './MyKnowledgePage'
 import KnowledgeAdminPage from './KnowledgeAdminPage'
 import KnowledgeStatsPage from './KnowledgeStatsPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (KNOW-05, KNOW-06, KNOW-07, KNOW-08)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
+// 공통 기능 Phase 1 페이지 재사용 (KNOW-06, KNOW-07, KNOW-08)
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const MenuMgmtIndex = lazy(() => import('@/pages/common/system-mgr/MenuManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
@@ -30,14 +30,7 @@ export default function Sys13Page() {
       } />
 
       {/* 게시판 (공통 페이지 재사용 - KNOW-05) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys13-notice" title="공지사항" />} />
 
       {/* 나의 지식 관리 (고유 페이지 - KNOW-02) */}
       <Route path="2/1" element={<MyKnowledgePage />} />

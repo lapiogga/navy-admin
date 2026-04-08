@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import DeceasedPage from './DeceasedPage'
 import InjuredPage from './InjuredPage'
 import ReviewPage from './ReviewPage'
@@ -19,9 +20,6 @@ import CertMeritInjuredPage from './CertMeritInjuredPage'
 import CertReviewResultPage from './CertReviewResultPage'
 import CertIssueLedgerPage from './CertIssueLedgerPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (HONOR-17 게시판)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
-
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
 
@@ -38,15 +36,8 @@ export default function Sys09Page() {
         />
       } />
 
-      {/* sys09/1/1: 게시판 (공통 페이지 재사용 - HONOR-17) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      {/* sys09/1/1: 게시판 (HONOR-17) */}
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys09-notice" title="공지사항" />} />
 
       {/* sys09/2/1: 사망자 관리 (HONOR-01) */}
       <Route path="2/1" element={<DeceasedPage />} />

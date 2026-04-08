@@ -108,13 +108,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
   ],
   sys03: [
     {
-      name: '메인화면',
-      path: '/sys03/1',
-      children: [
-        { name: '메인화면', path: '/sys03/1/1' },
-      ],
-    },
-    {
       name: '기준정보관리',
       path: '/sys03/2',
       children: [
@@ -408,7 +401,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '연구자료종합관리',
       path: '/sys11/1',
       children: [
-        { name: '메인화면', path: '/sys11/1/1' },
         { name: '연구자료', path: '/sys11/1/2' },
         { name: '자료실', path: '/sys11/1/3' },
         { name: '공지사항', path: '/sys11/1/4' },
@@ -493,7 +485,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '나의제언',
       path: '/sys14/1',
       children: [
-        { name: '메인화면', path: '/sys14/1/1' },
         { name: '공지사항', path: '/sys14/1/2' },
         { name: '제언확인', path: '/sys14/1/3' },
         { name: '관리자', path: '/sys14/1/4' },
@@ -506,13 +497,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
   ],
   sys15: [
-    {
-      name: '메인화면',
-      path: '/sys15/1',
-      children: [
-        { name: '메인화면', path: '/sys15/1/1' },
-      ],
-    },
     {
       name: '비밀/매체관리',
       path: '/sys15/2',

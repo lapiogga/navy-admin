@@ -3,6 +3,7 @@ import { Routes, Route } from 'react-router-dom'
 import { Spin } from 'antd'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import { BusReservationPage } from './BusReservationPage'
 import { BusReservationStatusPage } from './BusReservationStatusPage'
 import { BusDispatchPage } from './BusDispatchPage'
@@ -11,11 +12,6 @@ import { BusUsagePage } from './BusUsagePage'
 import { BusWaitlistPage } from './BusWaitlistPage'
 import { BusViolatorPage } from './BusViolatorPage'
 import { ExternalUserPage } from './ExternalUserPage'
-
-// 공통 게시판 lazy import (sysCode=sys10)
-const BoardListPage = lazy(() =>
-  import('@/pages/common/board/BoardListPage').then((m) => ({ default: m.BoardListPage }))
-)
 
 // 관리자 대메뉴 - lazy import (Phase 1 공통 기능 재사용)
 const CodeGroupPage = lazy(() =>
@@ -59,7 +55,7 @@ export default function Page() {
         } />
 
         {/* /sys10/1/1 - 게시판 (공지+질의응답) */}
-        <Route path="1/1" element={<BoardListPage boardId="sys10-notice" />} />
+        <Route path="1/1" element={<SimpleBoardPage boardId="sys10-notice" title="공지사항" />} />
 
         {/* /sys10/1/2 - 주말버스 예약 */}
         <Route path="1/2" element={<BusReservationPage />} />

@@ -2,14 +2,14 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import MeetingReservePage from './MeetingReservePage'
 import MyReservationPage from './MyReservationPage'
 import MeetingStatusPage from './MeetingStatusPage'
 import ReservationMgmtPage from './ReservationMgmtPage'
 import MeetingRoomMgmtPage from './MeetingRoomMgmtPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (ROOM-06, ROOM-07, ROOM-08)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
+// 공통 기능 Phase 1 페이지 재사용 (ROOM-07, ROOM-08)
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
@@ -30,14 +30,7 @@ export default function Sys16Page() {
       } />
 
       {/* 공지사항 (공통 게시판 재사용 - ROOM-06) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys16-notice" title="공지사항" />} />
 
       {/* 회의예약신청 (고유 페이지 - ROOM-01) */}
       <Route path="1/2" element={<MeetingReservePage />} />

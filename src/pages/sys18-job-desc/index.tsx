@@ -2,14 +2,14 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import JobDescListPage from './JobDescListPage'
 import JobDescApprovalPage from './JobDescApprovalPage'
 import OrgDiagnosisPage from './OrgDiagnosisPage'
 import JobDescAdminPage from './JobDescAdminPage'
 import StandardWorkTimePage from './StandardWorkTimePage'
 
-// 공통 기능 Phase 1 페이지 재사용 (규칙 6, 7)
-const BoardListPage = lazy(() => import('@/pages/common/board/BoardListPage'))
+// 공통 기능 Phase 1 페이지 재사용 (규칙 7)
 const CodeMgmtPage = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupPage = lazy(() => import('@/pages/common/auth-group'))
 
@@ -31,14 +31,7 @@ export default function Sys18Page() {
 
       {/* 직무기술서 관리 */}
       {/* /sys18/1/1 — 게시판 (공통 기능, 규칙 6): sysCode=sys18 */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardListPage boardId="sys18" />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys18-notice" title="공지사항" />} />
 
       {/* /sys18/1/2 — 조직진단 대상 관리 (JOB-04) */}
       <Route path="1/2" element={<OrgDiagnosisPage />} />

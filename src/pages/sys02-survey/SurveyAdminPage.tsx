@@ -15,7 +15,7 @@ import {
   message,
 } from 'antd'
 import { useQuery, useMutation, useQueryClient } from '@tanstack/react-query'
-import { Bar } from '@ant-design/charts'
+import { Column } from '@ant-design/charts'
 import type { ProColumns } from '@ant-design/pro-components'
 import { PageContainer } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable'
@@ -454,12 +454,12 @@ function StatsTab() {
         </Col>
       </Row>
       <Card title="월별 설문 통계" style={{ marginBottom: 16 }}>
-        <Bar
+        <Column
           data={barData}
-          xField="value"
-          yField="month"
+          xField="month"
+          yField="value"
           colorField="type"
-          stack={false}
+          group={true}
           height={300}
         />
       </Card>

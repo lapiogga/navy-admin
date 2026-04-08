@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import InspectionUnitPage from './InspectionUnitPage'
 import InspectionPlanPage from './InspectionPlanPage'
 import InspectionResultPage from './InspectionResultPage'
@@ -12,7 +13,6 @@ import InspectionPlanDataPage from './InspectionPlanDataPage'
 import InspectionResultDataPage from './InspectionResultDataPage'
 
 // 공통 기능 Phase 1 페이지 재사용 (per D-26, D-27)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 const AccessLogIndex = lazy(() => import('@/pages/common/system-mgr/AccessLogPage'))
@@ -35,14 +35,7 @@ export default function Sys17Page() {
 
       {/* 검열결과 관리 */}
       {/* 공지사항 (공통 재사용 - INSP-06) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys17-notice" title="공지사항" />} />
 
       {/* 검열부대 지정 (INSP-02) */}
       <Route path="1/2" element={<InspectionUnitPage />} />

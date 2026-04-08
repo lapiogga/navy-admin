@@ -2,14 +2,12 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import DirectiveProgressPage from './DirectiveProgressPage'
 import DirectiveListPage from './DirectiveListPage'
 import ProposalProgressPage from './ProposalProgressPage'
 import ProposalListPage from './ProposalListPage'
 import DirectiveAdminPage from './DirectiveAdminPage'
-
-// Phase 1 공통게시판 재사용 (DRCT-02, DRCT-03, DRCT-06, DRCT-07)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
 
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = lazy(() => import('@/pages/common/AdminRoutes'))
@@ -45,25 +43,11 @@ export default function Sys12Page() {
         />
       } />
 
-      {/* 게시판 - 공지사항 (DRCT-06, 공통게시판 재사용) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      {/* 게시판 - 공지사항 (DRCT-06) */}
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys12-notice" title="공지사항" />} />
 
-      {/* 게시판 - 질의응답 (DRCT-07, 공통게시판 재사용) */}
-      <Route
-        path="1/2"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      {/* 게시판 - 질의응답 (DRCT-07) */}
+      <Route path="1/2" element={<SimpleBoardPage boardId="sys12-qna" title="질의응답" />} />
 
       {/* 대통령 지시사항 (DRCT-02, 추진현황 + 목록) */}
       <Route path="2/1" element={<DirectiveView category="president" />} />

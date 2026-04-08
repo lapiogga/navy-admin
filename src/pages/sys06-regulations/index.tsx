@@ -12,7 +12,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
-import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SubsystemHomePage, SimpleBoardPage } from '@/shared/ui'
 
 // SYS06 전용 페이지 (API 경로 /api/sys06/ 사용)
 const RegulationListPage = lazy(() => import('./RegulationListPage'))
@@ -21,7 +21,6 @@ const PrecedentUnitPage = lazy(() => import('./PrecedentUnitPage'))
 const DirectiveListPage = lazy(() => import('./DirectiveListPage'))
 
 // Phase 1 공통 기능 재사용
-const BoardIndex = lazy(() => import('@/pages/common/board'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
 // 관리자 대메뉴 - 공통기능
@@ -71,35 +70,14 @@ export default function Sys06Page() {
           </Suspense>
         } />
 
-        {/* MREG-05: 공지사항 (Phase 1 공통게시판 재사용, boardType='notice') */}
-        <Route
-          path="4/1"
-          element={
-            <Suspense fallback={<PageSpinner />}>
-              <BoardIndex sysCode={sysCode} boardType="notice" />
-            </Suspense>
-          }
-        />
+        {/* MREG-05: 공지사항 */}
+        <Route path="4/1" element={<SimpleBoardPage boardId="sys06-notice" title="공지사항" />} />
 
-        {/* MREG-06: 규정예고 (Phase 1 공통게시판 재사용, boardType='regulation-notice') */}
-        <Route
-          path="4/2"
-          element={
-            <Suspense fallback={<PageSpinner />}>
-              <BoardIndex sysCode={sysCode} boardType="regulation-notice" />
-            </Suspense>
-          }
-        />
+        {/* MREG-06: 규정예고 */}
+        <Route path="4/2" element={<SimpleBoardPage boardId="sys06-regulation" title="규정예고" />} />
 
-        {/* MREG-07: 자료실 (Phase 1 공통게시판 재사용, boardType='archive') */}
-        <Route
-          path="4/3"
-          element={
-            <Suspense fallback={<PageSpinner />}>
-              <BoardIndex sysCode={sysCode} boardType="archive" />
-            </Suspense>
-          }
-        />
+        {/* MREG-07: 자료실 */}
+        <Route path="4/3" element={<SimpleBoardPage boardId="sys06-data" title="자료실" />} />
 
         {/* MREG-08: 권한관리 (Phase 1 auth-group 재사용) */}
         <Route

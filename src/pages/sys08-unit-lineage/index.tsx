@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 
 // SYS08 페이지
 const UnitRecordPage = React.lazy(() => import('./UnitRecordPage'))
@@ -18,23 +19,10 @@ const UnitStatsPage = React.lazy(() => import('./UnitStatsPage'))
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
-// 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys08)
-const BoardListPage = React.lazy(() =>
-  import('@/pages/common/board/BoardListPage').then((m) => ({ default: m.BoardListPage })),
-)
-
 function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   return (
     <Suspense fallback={<PageSpinner />}>
       <Component />
-    </Suspense>
-  )
-}
-
-function BoardNotice() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys08-notice" />
     </Suspense>
   )
 }
@@ -52,7 +40,7 @@ export default function Sys08Page() {
       } />
 
       {/* 게시판 */}
-      <Route path="1/1" element={<BoardNotice />} />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys08-notice" title="공지사항" />} />
 
       {/* 권한신청 */}
       <Route path="2/1" element={withSuspense(UnitAuthRequestPage)} />

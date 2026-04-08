@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
-import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SubsystemHomePage, SimpleBoardPage } from '@/shared/ui'
 
 // SYS03 페이지 - 메인
 const PerfMainPage = React.lazy(() => import('./PerfMainPage'))
@@ -32,10 +32,6 @@ const PerfTaskSearchPage = React.lazy(() => import('./PerfTaskSearchPage'))
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
-// 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys03)
-const BoardListPage = React.lazy(() =>
-  import('@/pages/common/board/BoardListPage').then((m) => ({ default: m.BoardListPage })),
-)
 
 function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   return (
@@ -45,29 +41,6 @@ function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   )
 }
 
-function BoardNotice() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys03-notice" />
-    </Suspense>
-  )
-}
-
-function BoardQna() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys03-qna" />
-    </Suspense>
-  )
-}
-
-function BoardData() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys03-data" />
-    </Suspense>
-  )
-}
 
 export default function Sys03Page() {
   return (
@@ -106,9 +79,9 @@ export default function Sys03Page() {
       <Route path="4/2" element={withSuspense(PerfInputStatusPage)} />
 
       {/* 게시판 (5) - menus.ts: /sys03/5, 7대 규칙 6번: 공통 게시판 */}
-      <Route path="5/1" element={<BoardNotice />} />
-      <Route path="5/2" element={<BoardQna />} />
-      <Route path="5/3" element={<BoardData />} />
+      <Route path="5/1" element={<SimpleBoardPage boardId="sys03-notice" title="공지사항" />} />
+      <Route path="5/2" element={<SimpleBoardPage boardId="sys03-qna" title="질의응답" />} />
+      <Route path="5/3" element={<SimpleBoardPage boardId="sys03-data" title="자료실" />} />
 
       {/* 과제검색 (6) - menus.ts: /sys03/6 */}
       <Route path="6/1" element={withSuspense(PerfTaskSearchPage)} />

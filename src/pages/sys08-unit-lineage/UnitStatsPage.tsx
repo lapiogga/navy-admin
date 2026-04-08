@@ -87,8 +87,8 @@ export default function UnitStatsPage() {
       }
     : {
         data: data?.chart ?? [],
-        xField: 'unit',
-        yField: 'value',
+        xField: 'value',
+        yField: 'unit',
         colorField: 'unit',
         height: 280,
         legend: false as const,

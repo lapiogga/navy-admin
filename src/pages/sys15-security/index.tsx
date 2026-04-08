@@ -2,6 +2,7 @@ import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 
 // SYS15 Wave 1: 비밀/매체/보안자재 CRUD
 const SecretPage = React.lazy(() => import('./SecretPage'))
@@ -40,31 +41,10 @@ const ExceptionMgmtPage = React.lazy(() => import('./ExceptionMgmtPage'))
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
-// 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys15)
-const BoardListPage = React.lazy(() =>
-  import('@/pages/common/board/BoardListPage').then((m) => ({ default: m.BoardListPage })),
-)
-
 function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   return (
     <Suspense fallback={<PageSpinner />}>
       <Component />
-    </Suspense>
-  )
-}
-
-function BoardNotice() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys15-notice" />
-    </Suspense>
-  )
-}
-
-function BoardQna() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys15-qna" />
     </Suspense>
   )
 }
@@ -112,9 +92,9 @@ export default function Sys15Page() {
       {/* 개인설정 (6) */}
       <Route path="6/1" element={withSuspense(PersonalSettingPage)} />
 
-      {/* 게시판 (7) - 7대 규칙 6번: 공통 게시판 lazy import */}
-      <Route path="7/1" element={<BoardNotice />} />
-      <Route path="7/2" element={<BoardQna />} />
+      {/* 게시판 (7) */}
+      <Route path="7/1" element={<SimpleBoardPage boardId="sys15-notice" title="공지사항" />} />
+      <Route path="7/2" element={<SimpleBoardPage boardId="sys15-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 (8) - 7대 규칙 7번 */}
       <Route path="8/1" element={withSuspense(CheckItemMgmtPage)} />

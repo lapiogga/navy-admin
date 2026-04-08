@@ -2,7 +2,7 @@ import { Outlet, useNavigate, useLocation } from 'react-router-dom'
 import { ProLayout } from '@ant-design/pro-components'
 import type { MenuDataItem } from '@ant-design/pro-components'
 import { LogoutOutlined, UserOutlined, HomeOutlined } from '@ant-design/icons'
-import { Dropdown } from 'antd'
+import { Dropdown, Breadcrumb } from 'antd'
 import { useAuthStore } from '@/features/auth/store/authStore'
 import { useUiStore } from '@/features/auth/store/uiStore'
 import { ROUTES } from '@/shared/config/routes'
@@ -46,6 +46,26 @@ export function SubsystemProLayout() {
     }
   }
 
+  // 현재 경로에서 대메뉴/소메뉴 이름 추출
+  const findCurrentMenu = (): { mainMenu: string | null; subMenu: string | null } => {
+    for (const menu of menuData) {
+      if (menu.children) {
+        for (const child of menu.children) {
+          if (child.path === location.pathname) {
+            return { mainMenu: menu.name ?? null, subMenu: child.name ?? null }
+          }
+        }
+      }
+      if (menu.path === location.pathname) {
+        return { mainMenu: menu.name ?? null, subMenu: null }
+      }
+    }
+    return { mainMenu: null, subMenu: null }
+  }
+
+  const { mainMenu, subMenu } = findCurrentMenu()
+  const isHomePage = location.pathname === `/${sysCode}` || location.pathname === `/${sysCode}/`
+
   return (
     <ProLayout
       title={sysMeta?.name ?? '서브시스템'}
@@ -62,6 +82,7 @@ export function SubsystemProLayout() {
         <div onClick={() => item.path && navigate(item.path)}>{dom}</div>
       )}
       subMenuItemRender={(_item: MenuDataItem, dom: React.ReactNode) => dom}
+      onMenuHeaderClick={() => navigate(`/${sysCode}`)}
       avatarProps={{
         src: undefined,
         icon: <UserOutlined />,
@@ -80,6 +101,16 @@ export function SubsystemProLayout() {
         ),
       }}
     >
+      {!isHomePage && (mainMenu || subMenu) && (
+        <div className="page-header-breadcrumb">
+          <Breadcrumb
+            items={[
+              ...(mainMenu ? [{ title: mainMenu }] : []),
+              ...(subMenu ? [{ title: subMenu }] : []),
+            ]}
+          />
+        </div>
+      )}
       <Outlet />
     </ProLayout>
   )

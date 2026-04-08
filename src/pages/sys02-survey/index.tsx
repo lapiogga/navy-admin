@@ -1,7 +1,7 @@
 import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
-import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SubsystemHomePage, SimpleBoardPage } from '@/shared/ui'
 import MySurveyPage from './MySurveyPage'
 import SurveyQuestionEditor from './SurveyQuestionEditor'
 import SurveyParticipationPage from './SurveyParticipationPage'
@@ -9,8 +9,7 @@ import SurveyFormPage from './SurveyFormPage'
 import PastSurveyPage from './PastSurveyPage'
 import SurveyAdminPage from './SurveyAdminPage'
 
-// 공통 기능 Phase 1 페이지 재사용 (SURV-05, SURV-06, SURV-07)
-const BoardIndex = lazy(() => import('@/pages/common/board'))
+// 공통 기능 Phase 1 페이지 재사용 (SURV-06, SURV-07)
 const CodeMgmtIndex = lazy(() => import('@/pages/common/code-mgmt/CodeManagementPage'))
 const AuthGroupIndex = lazy(() => import('@/pages/common/auth-group'))
 
@@ -31,14 +30,7 @@ export default function Sys02Page() {
       } />
 
       {/* 게시판 (공통 페이지 재사용 - SURV-05) */}
-      <Route
-        path="1/1"
-        element={
-          <Suspense fallback={<PageSpinner />}>
-            <BoardIndex />
-          </Suspense>
-        }
-      />
+      <Route path="1/1" element={<SimpleBoardPage boardId="sys02-notice" title="공지사항" />} />
 
       {/* 나의 설문관리 (SURV-02) */}
       <Route path="1/2" element={<MySurveyPage />} />

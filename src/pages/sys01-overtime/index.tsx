@@ -1,7 +1,7 @@
 import React, { Suspense } from 'react'
 import { Routes, Route } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
-import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SubsystemHomePage, SimpleBoardPage } from '@/shared/ui'
 
 // SYS01 Part 1 페이지 (신청서 관리 + 현황조회 + 부대관리 일부)
 const OtRequestPage = React.lazy(() => import('./OtRequestPage'))
@@ -32,10 +32,6 @@ const OtPersonalDeptPage = React.lazy(() => import('./OtPersonalDeptPage'))
 // 관리자 대메뉴 - 공통기능
 const AdminRoutes = React.lazy(() => import('@/pages/common/AdminRoutes'))
 
-// 공통 게시판 lazy import (7대 규칙 6번: sysCode=sys01)
-const BoardListPage = React.lazy(() =>
-  import('@/pages/common/board/BoardListPage').then((m) => ({ default: m.BoardListPage })),
-)
 
 function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   return (
@@ -45,21 +41,6 @@ function withSuspense(Component: React.LazyExoticComponent<() => JSX.Element>) {
   )
 }
 
-function BoardNotice() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys01-notice" />
-    </Suspense>
-  )
-}
-
-function BoardQna() {
-  return (
-    <Suspense fallback={<PageSpinner />}>
-      <BoardListPage boardId="sys01-qna" />
-    </Suspense>
-  )
-}
 
 export default function Sys01Page() {
   return (
@@ -109,8 +90,8 @@ export default function Sys01Page() {
       <Route path="5/3" element={withSuspense(OtPersonalDeptPage)} />
 
       {/* 게시판 (6) - Phase 1 공통게시판 재사용 (7대 규칙 6번) */}
-      <Route path="6/1" element={<BoardNotice />} />
-      <Route path="6/2" element={<BoardQna />} />
+      <Route path="6/1" element={<SimpleBoardPage boardId="sys01-notice" title="공지사항" />} />
+      <Route path="6/2" element={<SimpleBoardPage boardId="sys01-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

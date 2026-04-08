@@ -10,6 +10,7 @@ export interface SearchField {
   type: 'text' | 'select' | 'date' | 'dateRange'
   options?: { label: string; value: string | number }[]
   placeholder?: string
+  span?: { xs?: number; sm?: number; md?: number; lg?: number }
 }
 
 export interface SearchFormProps {
@@ -44,13 +45,19 @@ export function SearchForm({ fields, onSearch, onReset }: SearchFormProps) {
     <div className="search-form-container">
       <Form form={form} onFinish={onSearch} layout="inline" style={{ width: '100%' }}>
         <Row gutter={[16, 8]} style={{ width: '100%' }}>
-          {fields.map((field) => (
-            <Col key={field.name} xs={24} sm={12} md={8} lg={6}>
-              <Form.Item name={field.name} label={field.label} style={{ marginBottom: 0 }}>
-                {renderField(field)}
-              </Form.Item>
-            </Col>
-          ))}
+          {fields.map((field) => {
+            const defaultSpan = field.type === 'dateRange'
+              ? { xs: 24, sm: 24, md: 12, lg: 8 }
+              : { xs: 24, sm: 12, md: 8, lg: 6 }
+            const colSpan = { ...defaultSpan, ...field.span }
+            return (
+              <Col key={field.name} {...colSpan}>
+                <Form.Item name={field.name} label={field.label} style={{ marginBottom: 0 }}>
+                  {renderField(field)}
+                </Form.Item>
+              </Col>
+            )
+          })}
           <Col>
             <Space>
               <Button type="primary" htmlType="submit" icon={<SearchOutlined />}>

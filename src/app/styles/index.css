@@ -86,12 +86,83 @@
   transition: all 0.2s ease;
 }
 
-/* 테이블 날짜 컬럼: 1줄 표시 강제 */
+/* 테이블 날짜 컬럼: 1줄 표시 강제 + 여백 통일 */
 .navy-bordered-table .ant-table-cell {
   white-space: nowrap;
+  padding: 8px 12px !important;
 }
 
-/* 테이블 여백: 좁은 여백 통일 (compact) */
-.navy-bordered-table .ant-table-cell {
-  padding: 8px 12px !important;
+/* 테이블 내 링크 버튼: 라운드 박스 + 3D 효과 */
+.navy-bordered-table .ant-table-cell .ant-btn-link {
+  border: 1px solid #d9d9d9;
+  border-radius: 14px;
+  padding: 2px 12px;
+  height: 26px;
+  line-height: 20px;
+  font-size: 12px;
+  background: linear-gradient(180deg, #ffffff 0%, #f5f5f5 100%);
+  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.12), 0 1px 2px rgba(0, 0, 0, 0.06);
+  color: #003366;
+  text-decoration: none;
+  transition: all 0.2s ease;
+}
+.navy-bordered-table .ant-table-cell .ant-btn-link:hover {
+  background: linear-gradient(180deg, #e6f0ff 0%, #d9e8ff 100%);
+  border-color: #003366;
+  box-shadow: 0 2px 6px rgba(0, 51, 102, 0.25);
+  transform: translateY(-1px);
+  color: #003366;
+}
+.navy-bordered-table .ant-table-cell .ant-btn-link.ant-btn-dangerous {
+  color: #ff4d4f;
+  border-color: #ffa39e;
+}
+.navy-bordered-table .ant-table-cell .ant-btn-link.ant-btn-dangerous:hover {
+  background: linear-gradient(180deg, #fff1f0 0%, #ffe7e6 100%);
+  border-color: #ff4d4f;
+  box-shadow: 0 2px 6px rgba(255, 77, 79, 0.25);
+}
+
+/* 탭 디자인: 명확한 테두리 + 카드형 */
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab,
+.ant-tabs > .ant-tabs-nav .ant-tabs-tab {
+  border: 1px solid #d9d9d9 !important;
+  border-bottom: none !important;
+  border-radius: 6px 6px 0 0 !important;
+  margin-right: 2px !important;
+  padding: 8px 20px !important;
+  background: #f5f7fa;
+  transition: all 0.2s ease;
+}
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active,
+.ant-tabs > .ant-tabs-nav .ant-tabs-tab-active {
+  background: #ffffff !important;
+  border-color: #003366 !important;
+  border-bottom: 1px solid #ffffff !important;
+  font-weight: 600;
+  position: relative;
+  z-index: 1;
+}
+.ant-tabs-card > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn,
+.ant-tabs > .ant-tabs-nav .ant-tabs-tab-active .ant-tabs-tab-btn {
+  color: #003366 !important;
+}
+.ant-tabs > .ant-tabs-nav::before {
+  border-bottom: 1px solid #003366 !important;
+}
+
+/* 브레드크럼: 우측 정렬 */
+.page-header-breadcrumb {
+  display: flex;
+  justify-content: flex-end;
+  margin-bottom: 8px;
+}
+.page-header-breadcrumb .ant-breadcrumb {
+  font-size: 13px;
+  color: #8c8c8c;
+}
+
+/* PageContainer 헤더: 타이틀과 브레드크럼 같은 행 */
+.ant-pro-page-container .ant-pro-page-container-warp {
+  position: relative;
 }
