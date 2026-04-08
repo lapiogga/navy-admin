@@ -22,8 +22,8 @@ export default function Sys11Page() {
         <SubsystemHomePage
           sysCode="sys11"
           title="연구자료종합관리체계"
-          noticeBoardPath="/sys11/1/4"
-          qnaBoardPath="/sys11/1/4"
+          noticeBoardPath="/sys11/board/1"
+          qnaBoardPath="/sys11/board/2"
           dashboard={<ResearchMainPage />}
         />
       } />
@@ -52,6 +52,10 @@ export default function Sys11Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys11-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys11-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

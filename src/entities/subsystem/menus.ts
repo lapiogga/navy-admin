@@ -93,11 +93,18 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '설문관리',
       path: '/sys02/1',
       children: [
-        { name: '게시판', path: '/sys02/1/1' },
         { name: '나의 설문관리', path: '/sys02/1/2' },
         { name: '설문참여', path: '/sys02/1/3' },
         { name: '지난 설문보기', path: '/sys02/1/4' },
         { name: '체계관리', path: '/sys02/1/5' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys02/board',
+      children: [
+        { name: '공지사항', path: '/sys02/board/1' },
+        { name: '질의응답', path: '/sys02/board/2' },
       ],
     },
     {
@@ -164,10 +171,17 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '인증서발급신청',
       path: '/sys04/1',
       children: [
-        { name: '게시판', path: '/sys04/1/1' },
         { name: '인증서 신청', path: '/sys04/1/2' },
         { name: '인증서 승인/관리', path: '/sys04/1/3' },
         { name: '인증서 등록대장', path: '/sys04/1/4' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys04/board',
+      children: [
+        { name: '공지사항', path: '/sys04/board/1' },
+        { name: '질의응답', path: '/sys04/board/2' },
       ],
     },
     {
@@ -197,6 +211,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       path: '/sys05/3',
       children: [
         { name: '지시문서', path: '/sys05/3/1' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys05/board',
+      children: [
+        { name: '공지사항', path: '/sys05/board/1' },
+        { name: '질의응답', path: '/sys05/board/2' },
       ],
     },
     {
@@ -261,19 +283,20 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
+      name: '게시판',
+      path: '/sys07/board',
+      children: [
+        { name: '공지사항', path: '/sys07/board/1' },
+        { name: '질의응답', path: '/sys07/board/2' },
+      ],
+    },
+    {
       name: '관리자',
       path: '/sys07/admin',
       children: adminChildren('sys07'),
     },
   ],
   sys08: [
-    {
-      name: '게시판',
-      path: '/sys08/1',
-      children: [
-        { name: '게시판', path: '/sys08/1/1' },
-      ],
-    },
     {
       name: '권한신청',
       path: '/sys08/2',
@@ -327,19 +350,20 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
+      name: '게시판',
+      path: '/sys08/board',
+      children: [
+        { name: '공지사항', path: '/sys08/board/1' },
+        { name: '질의응답', path: '/sys08/board/2' },
+      ],
+    },
+    {
       name: '관리자',
       path: '/sys08/admin',
       children: adminChildren('sys08'),
     },
   ],
   sys09: [
-    {
-      name: '게시판',
-      path: '/sys09/1',
-      children: [
-        { name: '게시판', path: '/sys09/1/1' },
-      ],
-    },
     {
       name: '자료입력',
       path: '/sys09/2',
@@ -369,6 +393,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
+      name: '게시판',
+      path: '/sys09/board',
+      children: [
+        { name: '공지사항', path: '/sys09/board/1' },
+        { name: '질의응답', path: '/sys09/board/2' },
+      ],
+    },
+    {
       name: '관리자',
       path: '/sys09/admin',
       children: adminChildren('sys09'),
@@ -376,18 +408,37 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
   ],
   sys10: [
     {
-      name: '주말버스',
+      name: '주말버스 예약',
       path: '/sys10/1',
       children: [
-        { name: '게시판', path: '/sys10/1/1' },
         { name: '주말버스 예약', path: '/sys10/1/2' },
         { name: '주말버스 대기자관리', path: '/sys10/1/3' },
         { name: '주말버스 예약현황', path: '/sys10/1/4' },
+      ],
+    },
+    {
+      name: '주말버스 배차',
+      path: '/sys10/2',
+      children: [
         { name: '주말버스 배차관리', path: '/sys10/1/5' },
         { name: '예약시간관리', path: '/sys10/1/6' },
         { name: '주말버스 사용현황', path: '/sys10/1/7' },
+      ],
+    },
+    {
+      name: '주말버스 기타관리',
+      path: '/sys10/3',
+      children: [
         { name: '주말버스 위규자관리', path: '/sys10/1/8' },
         { name: '타군 사용자 관리', path: '/sys10/1/9' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys10/board',
+      children: [
+        { name: '공지사항', path: '/sys10/board/1' },
+        { name: '질의응답', path: '/sys10/board/2' },
       ],
     },
     {
@@ -402,9 +453,15 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       path: '/sys11/1',
       children: [
         { name: '연구자료', path: '/sys11/1/2' },
-        { name: '자료실', path: '/sys11/1/3' },
-        { name: '공지사항', path: '/sys11/1/4' },
         { name: '관리자', path: '/sys11/1/5' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys11/board',
+      children: [
+        { name: '공지사항', path: '/sys11/board/1' },
+        { name: '질의응답', path: '/sys11/board/2' },
       ],
     },
     {
@@ -414,14 +471,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
     },
   ],
   sys12: [
-    {
-      name: '게시판',
-      path: '/sys12/1',
-      children: [
-        { name: '공지사항', path: '/sys12/1/1' },
-        { name: '질의응답', path: '/sys12/1/2' },
-      ],
-    },
     {
       name: '지시사항',
       path: '/sys12/2',
@@ -439,19 +488,20 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
+      name: '게시판',
+      path: '/sys12/board',
+      children: [
+        { name: '공지사항', path: '/sys12/board/1' },
+        { name: '질의응답', path: '/sys12/board/2' },
+      ],
+    },
+    {
       name: '관리자',
       path: '/sys12/admin',
       children: adminChildren('sys12'),
     },
   ],
   sys13: [
-    {
-      name: '게시판',
-      path: '/sys13/1',
-      children: [
-        { name: '게시판', path: '/sys13/1/1' },
-      ],
-    },
     {
       name: '지식관리',
       path: '/sys13/2',
@@ -475,6 +525,14 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
+      name: '게시판',
+      path: '/sys13/board',
+      children: [
+        { name: '공지사항', path: '/sys13/board/1' },
+        { name: '질의응답', path: '/sys13/board/2' },
+      ],
+    },
+    {
       name: '관리자',
       path: '/sys13/admin',
       children: adminChildren('sys13'),
@@ -485,9 +543,15 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '나의제언',
       path: '/sys14/1',
       children: [
-        { name: '공지사항', path: '/sys14/1/2' },
         { name: '제언확인', path: '/sys14/1/3' },
-        { name: '관리자', path: '/sys14/1/4' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys14/board',
+      children: [
+        { name: '공지사항', path: '/sys14/board/1' },
+        { name: '질의응답', path: '/sys14/board/2' },
       ],
     },
     {
@@ -539,10 +603,15 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       ],
     },
     {
-      name: '개인설정 관리',
+      name: '결산체계 관리',
       path: '/sys15/6',
       children: [
         { name: '개인설정 관리', path: '/sys15/6/1' },
+        { name: '점검항목관리', path: '/sys15/8/1' },
+        { name: '휴무일 관리', path: '/sys15/8/2' },
+        { name: '알림시간 관리', path: '/sys15/8/3' },
+        { name: '로그이력 관리', path: '/sys15/8/4' },
+        { name: '예외처리 관리', path: '/sys15/8/5' },
       ],
     },
     {
@@ -551,17 +620,6 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       children: [
         { name: '공지사항', path: '/sys15/7/1' },
         { name: '질의응답', path: '/sys15/7/2' },
-      ],
-    },
-    {
-      name: '보안관리자',
-      path: '/sys15/8',
-      children: [
-        { name: '점검항목관리', path: '/sys15/8/1' },
-        { name: '휴무일 관리', path: '/sys15/8/2' },
-        { name: '알림시간 관리', path: '/sys15/8/3' },
-        { name: '로그이력 관리', path: '/sys15/8/4' },
-        { name: '예외처리 관리', path: '/sys15/8/5' },
       ],
     },
     {
@@ -575,12 +633,19 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '회의실 예약관리',
       path: '/sys16/1',
       children: [
-        { name: '공지사항', path: '/sys16/1/1' },
         { name: '회의예약신청', path: '/sys16/1/2' },
         { name: '내예약확인', path: '/sys16/1/3' },
         { name: '회의현황', path: '/sys16/1/4' },
         { name: '회의예약관리', path: '/sys16/1/5' },
         { name: '회의실 관리', path: '/sys16/1/6' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys16/board',
+      children: [
+        { name: '공지사항', path: '/sys16/board/1' },
+        { name: '질의응답', path: '/sys16/board/2' },
       ],
     },
     {
@@ -594,12 +659,19 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
       name: '검열결과 관리',
       path: '/sys17/1',
       children: [
-        { name: '공지사항', path: '/sys17/1/1' },
         { name: '검열부대 지정', path: '/sys17/1/2' },
         { name: '검열계획', path: '/sys17/1/3' },
         { name: '검열결과', path: '/sys17/1/4' },
         { name: '결재', path: '/sys17/1/5' },
         { name: '추진현황', path: '/sys17/1/6' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys17/board',
+      children: [
+        { name: '공지사항', path: '/sys17/board/1' },
+        { name: '질의응답', path: '/sys17/board/2' },
       ],
     },
     {
@@ -611,33 +683,32 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '접속로그', path: '/sys17/2/4' },
       ],
     },
-    {
-      name: '데이터',
-      path: '/sys17/3',
-      children: [
-        { name: '검열계획 정보', path: '/sys17/3/1' },
-      ],
-    },
   ],
   sys18: [
     {
       name: '직무기술서 관리',
       path: '/sys18/1',
       children: [
-        { name: '게시판', path: '/sys18/1/1' },
         { name: '조직진단 대상 관리', path: '/sys18/1/2' },
         { name: '직무기술서 작성', path: '/sys18/1/3' },
         { name: '결재', path: '/sys18/1/4' },
         { name: '직무기술서 조회(관리자)', path: '/sys18/1/5' },
+        { name: '표준업무시간관리', path: '/sys18/2/2' },
+      ],
+    },
+    {
+      name: '게시판',
+      path: '/sys18/board',
+      children: [
+        { name: '공지사항', path: '/sys18/board/1' },
+        { name: '질의응답', path: '/sys18/board/2' },
+        { name: '자료실', path: '/sys18/board/3' },
       ],
     },
     {
       name: '관리자',
       path: '/sys18/admin',
-      children: [
-        ...adminChildren('sys18'),
-        { name: '표준업무시간관리', path: '/sys18/2/2' },
-      ],
+      children: adminChildren('sys18'),
     },
   ],
   common: [

@@ -21,8 +21,8 @@ export default function Sys14Page() {
         <SubsystemHomePage
           sysCode="sys14"
           title="나의 제언"
-          noticeBoardPath="/sys14/1/2"
-          qnaBoardPath="/sys14/1/2"
+          noticeBoardPath="/sys14/board/1"
+          qnaBoardPath="/sys14/board/2"
           dashboard={<SuggestionMainPage />}
         />
       } />
@@ -48,6 +48,10 @@ export default function Sys14Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys14-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys14-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

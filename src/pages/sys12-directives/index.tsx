@@ -38,8 +38,8 @@ export default function Sys12Page() {
         <SubsystemHomePage
           sysCode="sys12"
           title="지시건의사항관리체계"
-          noticeBoardPath="/sys12/1/1"
-          qnaBoardPath="/sys12/1/2"
+          noticeBoardPath="/sys12/board/1"
+          qnaBoardPath="/sys12/board/2"
         />
       } />
 
@@ -63,6 +63,10 @@ export default function Sys12Page() {
 
       {/* 관리자 (DRCT-05) */}
       <Route path="4/1" element={<DirectiveAdminPage />} />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys12-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys12-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

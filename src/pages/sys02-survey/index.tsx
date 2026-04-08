@@ -24,8 +24,8 @@ export default function Sys02Page() {
         <SubsystemHomePage
           sysCode="sys02"
           title="설문종합관리체계"
-          noticeBoardPath="/sys02/1/1"
-          qnaBoardPath="/sys02/1/1"
+          noticeBoardPath="/sys02/board/1"
+          qnaBoardPath="/sys02/board/2"
         />
       } />
 
@@ -69,6 +69,10 @@ export default function Sys02Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys02-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys02-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

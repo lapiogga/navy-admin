@@ -24,8 +24,8 @@ export default function Sys18Page() {
         <SubsystemHomePage
           sysCode="sys18"
           title="직무기술서관리체계"
-          noticeBoardPath="/sys18/1/1"
-          qnaBoardPath="/sys18/1/1"
+          noticeBoardPath="/sys18/board/1"
+          qnaBoardPath="/sys18/board/2"
         />
       } />
 
@@ -68,6 +68,11 @@ export default function Sys18Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys18-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys18-qna" title="질의응답" />} />
+      <Route path="board/3" element={<SimpleBoardPage boardId="sys18-archive" title="자료실" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

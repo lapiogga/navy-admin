@@ -34,8 +34,8 @@ export default function Sys08Page() {
         <SubsystemHomePage
           sysCode="sys08"
           title="부대계보관리체계"
-          noticeBoardPath="/sys08/1/1"
-          qnaBoardPath="/sys08/1/1"
+          noticeBoardPath="/sys08/board/1"
+          qnaBoardPath="/sys08/board/2"
         />
       } />
 
@@ -65,6 +65,10 @@ export default function Sys08Page() {
 
       {/* 부대기록부 */}
       <Route path="8/1" element={withSuspense(UnitRecordPage)} />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys08-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys08-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

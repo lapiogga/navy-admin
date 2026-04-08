@@ -2,6 +2,7 @@ import { lazy, Suspense } from 'react'
 import { Routes, Route, Navigate } from 'react-router-dom'
 import { PageSpinner } from '@/app/components/PageSpinner'
 import { SubsystemHomePage } from '@/shared/ui/SubsystemHomePage'
+import { SimpleBoardPage } from '@/shared/ui'
 import MilDataListPage from './MilDataListPage'
 import MilDataUsagePage from './MilDataUsagePage'
 import MilDataStatsPage from './MilDataStatsPage'
@@ -22,8 +23,8 @@ export default function Sys07Page() {
         <SubsystemHomePage
           sysCode="sys07"
           title="군사자료관리체계"
-          noticeBoardPath="/sys07/1/1"
-          qnaBoardPath="/sys07/1/1"
+          noticeBoardPath="/sys07/board/1"
+          qnaBoardPath="/sys07/board/2"
         />
       } />
 
@@ -60,6 +61,10 @@ export default function Sys07Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys07-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys07-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

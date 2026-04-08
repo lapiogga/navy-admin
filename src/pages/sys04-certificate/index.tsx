@@ -21,8 +21,8 @@ export default function Sys04Page() {
         <SubsystemHomePage
           sysCode="sys04"
           title="인증서발급신청체계"
-          noticeBoardPath="/sys04/1/1"
-          qnaBoardPath="/sys04/1/1"
+          noticeBoardPath="/sys04/board/1"
+          qnaBoardPath="/sys04/board/2"
         />
       } />
 
@@ -57,6 +57,10 @@ export default function Sys04Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys04-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys04-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

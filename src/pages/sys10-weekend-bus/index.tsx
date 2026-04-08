@@ -49,8 +49,8 @@ export default function Page() {
           <SubsystemHomePage
             sysCode="sys10"
             title="주말버스예약관리체계"
-            noticeBoardPath="/sys10/1/1"
-            qnaBoardPath="/sys10/1/1"
+            noticeBoardPath="/sys10/board/1"
+            qnaBoardPath="/sys10/board/2"
           />
         } />
 
@@ -84,6 +84,10 @@ export default function Page() {
         {/* 관리자 대메뉴 [규칙 7] */}
         <Route path="2/1" element={<CodeGroupPage />} />
         <Route path="2/2" element={<PermissionGroupPage />} />
+
+        {/* 게시판 */}
+        <Route path="board/1" element={<SimpleBoardPage boardId="sys10-notice" title="공지사항" />} />
+        <Route path="board/2" element={<SimpleBoardPage boardId="sys10-qna" title="질의응답" />} />
 
         {/* 관리자 대메뉴 - 공통기능 */}
         <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

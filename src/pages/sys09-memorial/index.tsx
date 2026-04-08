@@ -31,8 +31,8 @@ export default function Sys09Page() {
         <SubsystemHomePage
           sysCode="sys09"
           title="영현보훈체계"
-          noticeBoardPath="/sys09/1/1"
-          qnaBoardPath="/sys09/1/1"
+          noticeBoardPath="/sys09/board/1"
+          qnaBoardPath="/sys09/board/2"
         />
       } />
 
@@ -86,6 +86,10 @@ export default function Sys09Page() {
 
       {/* sys09/3/13: 전사망자 확인증 발급대장 (HONOR-16) */}
       <Route path="3/13" element={<CertIssueLedgerPage />} />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys09-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys09-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

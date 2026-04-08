@@ -1,5 +1,5 @@
 import { useLocation } from 'react-router-dom'
-import { Card, Typography, Breadcrumb } from 'antd'
+import { Card, Typography } from 'antd'
 import { SUBSYSTEM_MENUS } from '@/entities/subsystem/menus'
 import { SUBSYSTEM_META } from '@/entities/subsystem/config'
 import type { MenuDataItem } from '@ant-design/pro-components'
@@ -20,14 +20,6 @@ export function SubsystemPage() {
 
   return (
     <div>
-      <Breadcrumb
-        items={[
-          { title: sysMeta?.name ?? sysCode },
-          ...(mainMenu ? [{ title: mainMenu }] : []),
-          ...(subMenu ? [{ title: subMenu }] : []),
-        ]}
-        style={{ marginBottom: 16 }}
-      />
       <Card>
         <Title level={4}>{subMenu ?? mainMenu ?? sysMeta?.name ?? '대시보드'}</Title>
         <Text type="secondary">해당 화면은 추후 개발 예정입니다.</Text>

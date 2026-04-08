@@ -24,8 +24,8 @@ export default function Sys13Page() {
         <SubsystemHomePage
           sysCode="sys13"
           title="지식관리체계"
-          noticeBoardPath="/sys13/1/1"
-          qnaBoardPath="/sys13/1/1"
+          noticeBoardPath="/sys13/board/1"
+          qnaBoardPath="/sys13/board/2"
         />
       } />
 
@@ -73,6 +73,10 @@ export default function Sys13Page() {
           </Suspense>
         }
       />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys13-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys13-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

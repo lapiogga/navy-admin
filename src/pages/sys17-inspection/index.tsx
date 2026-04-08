@@ -28,8 +28,8 @@ export default function Sys17Page() {
         <SubsystemHomePage
           sysCode="sys17"
           title="검열결과관리체계"
-          noticeBoardPath="/sys17/1/1"
-          qnaBoardPath="/sys17/1/1"
+          noticeBoardPath="/sys17/board/1"
+          qnaBoardPath="/sys17/board/2"
         />
       } />
 
@@ -92,6 +92,10 @@ export default function Sys17Page() {
 
       {/* 검열결과 정보 읽기전용 (INSP-12) */}
       <Route path="3/2" element={<InspectionResultDataPage />} />
+
+      {/* 게시판 */}
+      <Route path="board/1" element={<SimpleBoardPage boardId="sys17-notice" title="공지사항" />} />
+      <Route path="board/2" element={<SimpleBoardPage boardId="sys17-qna" title="질의응답" />} />
 
       {/* 관리자 대메뉴 - 공통기능 */}
       <Route path="admin/*" element={<Suspense fallback={<PageSpinner />}><AdminRoutes /></Suspense>} />

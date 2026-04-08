@@ -22,15 +22,15 @@
   border-bottom: 1px solid #003366;
 }
 
-/* 검색영역 컨테이너: 최소 100px, 최대 150px 가변 */
+/* 검색영역 컨테이너: 컴팩트 */
 .search-form-container {
-  min-height: 100px;
-  max-height: 150px;
+  min-height: 56px;
+  max-height: 120px;
   background: #fafafa;
   border: 1px solid #d9d9d9;
   border-radius: 6px;
-  padding: 12px 16px;
-  margin-bottom: 16px;
+  padding: 8px 12px;
+  margin-bottom: 8px;
   display: flex;
   align-items: center;
   overflow-y: auto;
@@ -51,13 +51,26 @@
   font-weight: 700 !important;
 }
 
-/* 좌측 사이드바: 옅은 바탕색 (시인성 확보) */
+/* 좌측 사이드바: 밝은 바탕색 + 진한 텍스트 (시인성 확보) */
 .ant-pro-sider,
 .ant-layout-sider {
-  background: #f5f7fa !important;
+  background: #ffffff !important;
+  border-right: 1px solid #e8e8e8;
 }
 .ant-pro-sider .ant-menu {
-  background: #f5f7fa !important;
+  background: #ffffff !important;
+}
+.ant-pro-sider .ant-menu-item,
+.ant-pro-sider .ant-menu-submenu-title {
+  color: #1a1a1a !important;
+}
+.ant-pro-sider .ant-menu-item-selected {
+  background: #e6f0ff !important;
+  color: #003366 !important;
+  font-weight: 600;
+}
+.ant-pro-sider .ant-menu-item:hover {
+  background: #f0f5ff !important;
 }
 
 /* 상태 태그: 외곽선 제거, 배경색만 표시 */
@@ -129,8 +142,8 @@
   border: 1px solid #d9d9d9 !important;
   border-bottom: none !important;
   border-radius: 6px 6px 0 0 !important;
-  margin-right: 2px !important;
-  padding: 8px 20px !important;
+  margin-right: -5px !important;
+  padding: 6px 16px !important;
   background: #f5f7fa;
   transition: all 0.2s ease;
 }
@@ -151,18 +164,25 @@
   border-bottom: 1px solid #003366 !important;
 }
 
-/* 브레드크럼: 우측 정렬 */
-.page-header-breadcrumb {
-  display: flex;
-  justify-content: flex-end;
-  margin-bottom: 8px;
-}
-.page-header-breadcrumb .ant-breadcrumb {
-  font-size: 13px;
-  color: #8c8c8c;
-}
-
-/* PageContainer 헤더: 타이틀과 브레드크럼 같은 행 */
+/* Body 영역 컴팩트: 줄간격 최소화 */
 .ant-pro-page-container .ant-pro-page-container-warp {
   position: relative;
+}
+.ant-pro-page-container-children-content {
+  padding: 12px !important;
+}
+.ant-card {
+  margin-bottom: 8px !important;
+}
+.ant-card-body {
+  padding: 12px !important;
+}
+.ant-row {
+  margin-bottom: 0 !important;
+}
+.ant-form-item {
+  margin-bottom: 8px !important;
+}
+.ant-table-wrapper {
+  margin-top: 4px;
 }
