@@ -62,6 +62,7 @@ export function SubsystemProLayout() {
         <div onClick={() => item.path && navigate(item.path)}>{dom}</div>
       )}
       subMenuItemRender={(_item: MenuDataItem, dom: React.ReactNode) => dom}
+      breadcrumbRender={() => null}
       onMenuHeaderClick={() => navigate(`/${sysCode}`)}
       avatarProps={{
         src: undefined,
