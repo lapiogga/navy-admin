@@ -260,9 +260,10 @@ export default function DeceasedPage() {
       {/* R2: CSV 검색조건 반영 SearchForm */}
       <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<Deceased>
-        queryKey="sys09/deceased"
-        requestFn={(params) => fetchDeceased({ ...params, ...searchParams })}
+        key={JSON.stringify(searchParams)}
+        request={(params) => fetchDeceased({ ...params, ...searchParams })}
         columns={columns}
+        rowKey="id"
         toolBarRender={() => [
           <Button
             key="create"

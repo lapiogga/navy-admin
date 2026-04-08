@@ -1,3 +1,4 @@
+import type React from 'react'
 import { Form, Input, Select, DatePicker, Button, Row, Col, Space } from 'antd'
 import { SearchOutlined, ReloadOutlined } from '@ant-design/icons'
 import { useEnterSubmit } from '@/shared/lib/ime'
@@ -17,9 +18,10 @@ export interface SearchFormProps {
   fields: SearchField[]
   onSearch: (values: Record<string, unknown>) => void
   onReset?: () => void
+  containerStyle?: React.CSSProperties
 }
 
-export function SearchForm({ fields, onSearch, onReset }: SearchFormProps) {
+export function SearchForm({ fields, onSearch, onReset, containerStyle }: SearchFormProps) {
   const [form] = Form.useForm()
   const handleEnter = useEnterSubmit(() => form.submit())
 
@@ -42,7 +44,7 @@ export function SearchForm({ fields, onSearch, onReset }: SearchFormProps) {
   }
 
   return (
-    <div className="search-form-container">
+    <div className="search-form-container" style={containerStyle}>
       <Form form={form} onFinish={onSearch} layout="inline" style={{ width: '100%' }}>
         <Row gutter={[16, 8]} style={{ width: '100%' }}>
           {fields.map((field) => {

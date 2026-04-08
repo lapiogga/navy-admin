@@ -4,7 +4,7 @@ import { DownloadOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
-import { Bar, Pie } from '@ant-design/charts'
+import { Column, Pie } from '@ant-design/charts'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { apiClient } from '@/shared/api/client'
@@ -87,8 +87,8 @@ export default function UnitStatsPage() {
       }
     : {
         data: data?.chart ?? [],
-        xField: 'value',
-        yField: 'unit',
+        xField: 'unit',
+        yField: 'value',
         colorField: 'unit',
         height: 280,
         legend: false as const,
@@ -116,7 +116,7 @@ export default function UnitStatsPage() {
         {isPie ? (
           <Pie {...chartConfig} />
         ) : (
-          <Bar {...chartConfig} />
+          <Column {...chartConfig} />
         )}
       </div>
 

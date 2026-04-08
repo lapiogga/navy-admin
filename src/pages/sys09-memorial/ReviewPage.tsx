@@ -270,9 +270,10 @@ export default function ReviewPage() {
       {/* R2: CSV 검색조건 반영 SearchForm */}
       <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<CombatReview>
-        queryKey="sys09/reviews"
-        requestFn={(params) => fetchReviews({ ...params, ...searchParams })}
+        key={JSON.stringify(searchParams)}
+        request={(params) => fetchReviews({ ...params, ...searchParams })}
         columns={columns}
+        rowKey="id"
         toolBarRender={() => [
           <Button
             key="create"

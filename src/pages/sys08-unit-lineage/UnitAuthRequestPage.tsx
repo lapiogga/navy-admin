@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { Button, Form, Input, Select, Upload, message, Card } from 'antd'
+import { Button, Form, Input, Select, Upload, message, Card, Row, Col } from 'antd'
 import { UploadOutlined } from '@ant-design/icons'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -90,42 +90,55 @@ export default function UnitAuthRequestPage() {
           form={form}
           layout="vertical"
           onFinish={(values) => requestMutation.mutate(values)}
-          style={{ maxWidth: 500 }}
         >
-          <Form.Item
-            name="requestUnit"
-            label="관리부대"
-            rules={[{ required: true, message: '관리부대를 선택하세요' }]}
-          >
-            <Select options={UNIT_OPTIONS} placeholder="관리부대 선택" />
-          </Form.Item>
-          <Form.Item
-            name="requestRole"
-            label="요청권한"
-            rules={[{ required: true, message: '요청권한을 선택하세요' }]}
-          >
-            <Select options={ROLE_OPTIONS} placeholder="요청권한 선택" />
-          </Form.Item>
-          <Form.Item
-            name="milPhone"
-            label="군 전화번호"
-            rules={[{ required: true, message: '군 전화번호를 입력하세요' }]}
-          >
-            <Input placeholder="예: 123-4567" />
-          </Form.Item>
-          <Form.Item
-            name="reason"
-            label="사유"
-            rules={[{ required: true, message: '사유를 입력하세요' }]}
-          >
-            <TextArea rows={4} placeholder="권한 신청 사유를 입력하세요" />
-          </Form.Item>
-          <Form.Item label="인사명령 근거(첨부파일)">
-            <Upload beforeUpload={() => false} maxCount={1}>
-              <Button icon={<UploadOutlined />}>파일 선택</Button>
-            </Upload>
-          </Form.Item>
-          <Form.Item>
+          <Row gutter={16}>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="requestUnit"
+                label="관리부대"
+                rules={[{ required: true, message: '관리부대를 선택하세요' }]}
+              >
+                <Select options={UNIT_OPTIONS} placeholder="관리부대 선택" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="requestRole"
+                label="요청권한"
+                rules={[{ required: true, message: '요청권한을 선택하세요' }]}
+              >
+                <Select options={ROLE_OPTIONS} placeholder="요청권한 선택" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} sm={12} md={8}>
+              <Form.Item
+                name="milPhone"
+                label="군 전화번호"
+                rules={[{ required: true, message: '군 전화번호를 입력하세요' }]}
+              >
+                <Input placeholder="예: 123-4567" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col xs={24} md={16}>
+              <Form.Item
+                name="reason"
+                label="사유"
+                rules={[{ required: true, message: '사유를 입력하세요' }]}
+              >
+                <TextArea rows={2} placeholder="권한 신청 사유를 입력하세요" />
+              </Form.Item>
+            </Col>
+            <Col xs={24} md={8}>
+              <Form.Item label="인사명령 근거(첨부파일)">
+                <Upload beforeUpload={() => false} maxCount={1}>
+                  <Button icon={<UploadOutlined />}>파일 선택</Button>
+                </Upload>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item style={{ marginBottom: 0 }}>
             <Button type="primary" htmlType="submit" loading={requestMutation.isPending}>
               신청
             </Button>

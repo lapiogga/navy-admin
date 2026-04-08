@@ -121,7 +121,17 @@ export const SUBSYSTEM_MENUS: Record<string, MenuDataItem[]> = {
         { name: '시스템관리', path: '/sys03/2/1' },
         { name: '평가조직 관리', path: '/sys03/2/2' },
         { name: '업무실적(개인)', path: '/sys03/2/3' },
-        { name: '과제관리', path: '/sys03/2/4' },
+        {
+          name: '과제관리',
+          path: '/sys03/2/4',
+          children: [
+            { name: '지휘방침 관리', path: '/sys03/2/4' },
+            { name: '추진중점과제 관리', path: '/sys03/2/5' },
+            { name: '중과제 관리', path: '/sys03/2/8' },
+            { name: '소과제 관리', path: '/sys03/2/6' },
+            { name: '상세과제 관리', path: '/sys03/2/7' },
+          ],
+        },
       ],
     },
     {

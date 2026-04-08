@@ -273,9 +273,10 @@ export default function InjuredPage() {
       {/* R2: CSV 검색조건 반영 SearchForm */}
       <SearchForm fields={searchFields} onSearch={handleSearch} onReset={handleSearchReset} />
       <DataTable<Injured>
-        queryKey="sys09/injured"
-        requestFn={(params) => fetchInjured({ ...params, ...searchParams })}
+        key={JSON.stringify(searchParams)}
+        request={(params) => fetchInjured({ ...params, ...searchParams })}
         columns={columns}
+        rowKey="id"
         toolBarRender={() => [
           <Button
             key="create"

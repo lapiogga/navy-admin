@@ -13,6 +13,7 @@ const PerfIndividualTargetPage = React.lazy(() => import('./PerfIndividualTarget
 const PerfPolicyPage = React.lazy(() => import('./PerfPolicyPage'))
 const PerfMainTaskPage = React.lazy(() => import('./PerfMainTaskPage'))
 const PerfSubTaskPage = React.lazy(() => import('./PerfSubTaskPage'))
+const PerfMidTaskPage = React.lazy(() => import('./PerfMidTaskPage'))
 const PerfDetailTaskPage = React.lazy(() => import('./PerfDetailTaskPage'))
 
 // SYS03 페이지 - 연간과제관리
@@ -65,6 +66,7 @@ export default function Sys03Page() {
       <Route path="2/5" element={withSuspense(PerfMainTaskPage)} />
       <Route path="2/6" element={withSuspense(PerfSubTaskPage)} />
       <Route path="2/7" element={withSuspense(PerfDetailTaskPage)} />
+      <Route path="2/8" element={withSuspense(PerfMidTaskPage)} />
 
       {/* 연간과제관리 (3) - menus.ts: /sys03/3 */}
       <Route path="3/1" element={withSuspense(PerfProgressRatePage)} />

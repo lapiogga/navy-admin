@@ -14,7 +14,9 @@ const NAVY_TABLE_CLASS = 'navy-bordered-table'
 
 export interface DataTableProps<T extends Record<string, unknown>> {
   columns: ProColumns<T>[]
-  request: (params: ListParams) => Promise<PageResponse<T>>
+  request?: (params: ListParams) => Promise<PageResponse<T>>
+  dataSource?: T[]
+  loading?: boolean
   rowKey: keyof T & string
   toolBarRender?: ProTableProps<T, ListParams>['toolBarRender']
   rowSelection?: ProTableProps<T, ListParams>['rowSelection']
@@ -28,6 +30,8 @@ export interface DataTableProps<T extends Record<string, unknown>> {
 export function DataTable<T extends Record<string, unknown>>({
   columns,
   request,
+  dataSource,
+  loading,
   rowKey,
   toolBarRender,
   rowSelection,
@@ -39,11 +43,8 @@ export function DataTable<T extends Record<string, unknown>>({
 }: DataTableProps<T>) {
   const [keyword, setKeyword] = useState('')
 
-  return (
-    <ProTable<T, ListParams>
-      columns={columns}
-      params={{ keyword } as ListParams}
-      request={async (params) => {
+  const requestHandler = request
+    ? async (params: ListParams & { current?: number; pageSize?: number }) => {
         const raw = await request({
           page: (params.current ?? 1) - 1,
           size: params.pageSize ?? 10,
@@ -54,7 +55,16 @@ export function DataTable<T extends Record<string, unknown>>({
           ? (raw as unknown as { data: PageResponse<T> }).data
           : raw
         return { data: res.content ?? [], success: true, total: res.totalElements ?? 0 }
-      }}
+      }
+    : undefined
+
+  return (
+    <ProTable<T, ListParams>
+      columns={columns}
+      params={request ? ({ keyword } as ListParams) : undefined}
+      request={requestHandler}
+      dataSource={dataSource}
+      loading={loading}
       rowKey={rowKey}
       toolBarRender={(...args) => {
         const custom = toolBarRender?.(...args) ?? []

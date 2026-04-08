@@ -137,6 +137,26 @@
 | 49 | 2026-04-07 | 19:30 | 2026-04-07 | 20:00 | 30m | - | 부대 조직도 적용 | 해군/해병대 조직도 기반 mockUnits.ts 생성, 14개 핸들러 부대명 교체 | 15개 파일 수정 |
 | 50 | 2026-04-07 | 20:00 | 2026-04-07 | 20:15 | 15m | - | 문서 현행화 + GitHub 배포 | WORK-LOG/TERMINAL-LOG/CLAUDE.md 업데이트, git push | GitHub 배포 |
 
+## 2026-04-08 (Day 6) - 세션 10~11
+
+| # | 시작일자 | 시작시간 | 종료일자 | 종료시간 | Duration | Phase | 작업명 | 내용 | 결과 |
+|---|---------|---------|---------|---------|----------|-------|--------|------|------|
+| 52 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS03 과제관리 메뉴/화면 수정 | 과제관리 단일메뉴→5개 children 확장, 중과제 관리 페이지 신규 생성 | menus.ts, PerfMidTaskPage.tsx, index.tsx |
+| 53 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS02 DataTable 수정 | DataTable에 dataSource/loading props 추가, SYS02 설문 데이터 표시 복구 | DataTable.tsx |
+| 54 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS07 검색영역 높이 예외처리 | SearchForm에 containerStyle prop 추가, MilDataListPage maxHeight:240 적용 | SearchForm.tsx, MilDataListPage.tsx |
+| 55 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS08 권한신청 폼 콤팩트화 | 세로 나열 → Row/Col 3열 그리드 배치 | UnitAuthRequestPage.tsx |
+| 56 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS08 입력통계 차트 수정 | Bar(가로막대) → Column(세로막대) 컴포넌트 교체 | UnitStatsPage.tsx |
+| 57 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS09 자료입력 데이터 미표시 수정 | DataTable queryKey/requestFn → request/rowKey 변경 (3개 페이지) | DeceasedPage, InjuredPage, ReviewPage |
+| 58 | 2026-04-08 | - | 2026-04-08 | - | - | - | SYS09 확인서 4개 페이지 재구성 | Select→DataTable 목록+Modal 팝업 미리보기 구조로 전면 재작성 | CertMerit*, CertReview*, CertDeath* |
+
+### Day 6 세션 10~11 통계
+
+| 항목 | 값 |
+|------|-----|
+| 총 작업 수 | 7 |
+| 변경 파일 | 15개 (신규 1, 수정 14) |
+| 수정 서브시스템 | SYS02, SYS03, SYS07, SYS08, SYS09 + 공통(DataTable, SearchForm) |
+
 ### Day 5 누적 통계
 
 | 항목 | 값 |
@@ -163,9 +183,9 @@
 
 | 항목 | 값 |
 |------|-----|
-| 총 작업 수 | 50 |
-| 총 소요 시간 | ~1547분 (~25.8시간) |
-| Phase 진행 | **Phase 0~7 전체 완료 + GAP 수정 + Mock 데이터 현행화** |
+| 총 작업 수 | 58 |
+| 총 소요 시간 | ~1547분+ (~25.8시간+) |
+| Phase 진행 | **Phase 0~7 전체 완료 + GAP 수정 + Mock 데이터 현행화 + 버그 수정 2차** |
 | GAP 수정 | 18개 서브시스템 x 6 규칙 = 120+ 파일 수정 |
 | Mock 데이터 | 해군 군번 규칙 + 부대 조직도 반영 완료 |
 | UI 공통 | 7개 항목 개선 (검색영역/헤더/사이드바/태그/버튼/여백) |

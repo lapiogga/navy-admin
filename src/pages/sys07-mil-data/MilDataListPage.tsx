@@ -262,7 +262,7 @@ export default function MilDataListPage() {
       label: '군사자료 목록',
       children: (
         <>
-          <SearchForm fields={searchFields} onSearch={setSearchValues} onReset={() => setSearchValues({})} />
+          <SearchForm fields={searchFields} onSearch={setSearchValues} onReset={() => setSearchValues({})} containerStyle={{ maxHeight: 240 }} />
           <DataTable<MilDocument>
             columns={columns}
             request={async (params) => fetchDocuments({ ...params, ...searchValues })}
