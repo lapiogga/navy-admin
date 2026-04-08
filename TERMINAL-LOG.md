@@ -724,6 +724,21 @@ TERMINAL-LOG.md 업데이트
 CLAUDE.md 진행 기록 업데이트
 
 git add → git commit → git push origin master
+## 2026-04-06 (Session 4-5)
+
+### #22 빌드 에러 수정 (10:40)
+
+```
+Phase 3 패치 + Phase 4 SYS13 누락분 + 공통 타입에러 수정
+
+Record<string,unknown> 누락, 미사용 변수/import 수정
+빌드 에러 61 → 28 → 0
+```
+
+**Git Commits:**
+```
+83d27cc - fix: Phase 3 패치 + Phase 4 SYS13 누락분 + 공통 타입에러 수정
+c5c7ad6 - fix(test): board/code 핸들러 테스트 timeout 15초로 확장
 ```
 
 ---
@@ -738,6 +753,311 @@ UI 공통: 7개 항목 개선
 spec-doc: 6개 문서 + PPT 18개
 마크다운: 80+ 파일 최신 업데이트
 
+### #23 Phase 3 패치 실행 (10:45)
+
+```
+03-06~10 (SYS04/05/11/14/16) 5개 병렬 에이전트 실행
+
+결과:
+  SYS04, SYS11, SYS16: 이미 완료 (패치 불필요)
+  SYS05: CRUD 보강
+  SYS14: 반려모달/엑셀/검색 패치
+```
+
+---
+
+### #24 common/ 타입 에러 수정 + 빌드/테스트 (10:59)
+
+```bash
+$ npx tsc --noEmit
+# 28개 에러 → 0개
+$ npx vitest run
+# 328/328 tests passed ✓
+```
+
+---
+
+### #25 Phase 4 Execute (11:10)
+
+```
+/gsd:execute-phase 4 --auto
+
+Phase 04: 중복잡도 서브시스템 A 6개 — 6 plans across 1 wave
+
+Wave 1 (6 agents parallel, worktree isolation):
+  04-01: SYS13 지식관리 — MSW 핸들러 + 5개 페이지 + 테스트
+  04-02: SYS17 검열결과관리 — MSW 핸들러(19) + 검열부대지정(Tree) + 검열계획(CRUD)
+  04-03: SYS06 해병대규정관리 — MSW 핸들러(8) + 라우트 매핑
+  04-04: SYS02 설문종합관리 — 7페이지 + 라우트 완성 (SURV-01~07)
+  04-05: SYS12 지시건의사항 — MSW 핸들러(19) + 지시사항 추진현황/목록 + 건의사항 + 관리자
+  04-06: SYS09 영현보훈 — MSW 핸들러(27) + CRUD 3종 + PrintableReport + Print CSS + 현황 6종 + 보고서/확인서 7종
+
+Regression: 574/574 tests passed
+```
+
+**Git Commits:**
+```
+3fcd914 - feat(04-03): SYS06 MSW 핸들러 8개 엔드포인트 + 테스트 스캐폴드
+e4b60d6 - feat(04-03): SYS06 해병대규정관리체계 라우트 매핑 완성
+b82d4fa - feat(04-06): SYS09 영현보훈 - MSW 핸들러(27엔드포인트) + CRUD 3종 + PrintableReport + Print CSS
+814298e - feat(04-a-6-05): SYS12 MSW 핸들러(19 엔드포인트) + 지시사항 추진현황/목록 + 테스트
+89a9b08 - feat(04-a-6-05): SYS12 건의사항 + 관리자 + 라우트 완성
+4ed87dc - feat(04-02): SYS17 MSW 핸들러(19 엔드포인트) + 테스트 스캐폴드 + 검열부대지정(Tree) + 검열계획(CRUD)
+f30750b - feat(04-06): SYS09 영현보훈 - 현황 6종 + 보고서/확인서 7종 + 라우트
+5137654 - feat(04-04): SYS02 설문종합관리체계 7페이지 + 라우트 완성 (SURV-01~07)
+```
+
+---
+
+### #26 Phase 4 Verify + 완료 (12:04)
+
+```
+gsd-verifier: Phase 04 goal verification
+  Must-haves verified → PASSED
+  REQUIREMENTS.md 업데이트 완료
+
+Phase complete:
+  ROADMAP.md → Phase 4 [x] (completed 2026-04-06)
+  STATE.md → Phase 5 ready
+```
+
+---
+
+### #27 Phase 5 Discuss (12:25)
+
+```
+/gsd:discuss-phase 5 --auto
+
+Phase 05: 중복잡도 서브시스템 B 3개 — 12 gray areas auto-selected
+
+[auto] SYS07 좌석UI: Canvas vs DOM Grid
+[auto] SYS07 보안등급: 등급별 접근제어 범위
+[auto] SYS07 열람대출: 오프라인 워크플로우
+[auto] SYS10 JD폼: 다단계 입력 위자드 vs 단일 폼
+[auto] SYS10 타군인증: 별도 인증 체계
+[auto] SYS18 평가심의: 심의 워크플로우
+[auto] SYS10 대기자: 대기열 관리 전략
+[auto] SYS10 위규자: 위규 처리 워크플로우
+[auto] SYS18 표준시간: CRUD 방식
+... 등 12개
+
+38 decisions captured
+Created: .planning/phases/05-b-3/05-CONTEXT.md
+Created: .planning/phases/05-b-3/05-DISCUSSION-LOG.md
+```
+
+---
+
+### #28 문서 현행화 + Push (13:00)
+
+```bash
+$ git push origin master
+To https://github.com/lapiogga/navy-admin.git
+   ...  master -> master
+
+WORK-LOG/STATE 현행화 완료
+```
+
+---
+
+## 2026-04-06 (Session 6)
+
+### #29 Phase 5 Plan + Execute (13:10)
+
+```
+/gsd:plan-phase 5 --auto + /gsd:execute-phase 5 --auto
+
+Research → Plan(5) → Execute Wave1 + Wave2
+
+Wave 1 (3 agents parallel):
+  05-01: SYS07 군사자료관리 — MSW 핸들러 + 목록/등록/상세/평가심의/해기단 + 대출/열람 Steps 워크플로우 + 통계 차트 4종
+  05-02: SYS10 주말버스예약 — SeatGrid 컴포넌트 + 예약 페이지 + MSW + 예약현황/배차관리/시간관리/사용현황
+  05-04: SYS18 직무기술서 — MSW 핸들러 + 직무기술서 목록/5단계 폼 + 결재 Steps + 조직진단 관리
+
+Wave 2 (2 agents parallel):
+  05-03: SYS10 타군 전용 — 로그인/회원등록/사용자관리 + 대기자관리/위규자관리
+  05-05: SYS18 관리자 — 조회/검토결과/통계 + 표준업무시간 CRUD + index.tsx 완성
+
+Bug fix: SYS10 apiClient import 경로 수정 + SYS07 부대(서) 표기 통일
+
+Regression: 173 new tests added
+Phase 5 완료
+```
+
+**Git Commits:**
+```
+219bb27 - feat(05-02): SYS10 SeatGrid 컴포넌트 + 예약 페이지 + MSW 핸들러 구현
+faa9f98 - feat(05-04): SYS18 MSW 핸들러 + 직무기술서 목록/5단계 폼 (Task 1)
+306f0ac - feat(05-01): SYS07 Task1 - MSW 핸들러 + 라우트 + 목록/등록/상세/평가심의/해기단 페이지
+65b935a - feat(05-02): SYS10 예약현황/배차관리/예약시간관리/사용현황 페이지 구현
+53b3beb - feat(05-04): SYS18 결재 Steps 워크플로우 + 결재자 CRUD + 조직진단 관리 (Task 2)
+9762511 - feat(05-01): SYS07 Task2 - 대출/열람 Steps 워크플로우 + 통계 차트 4종
+dee412e - feat(05-03): SYS10 대기자관리 + 위규자관리 + MSW 확장
+0c94709 - feat(05-05): SYS18 관리자 조회/검토결과/통계 페이지 구현
+5830fb4 - feat(05-03): SYS10 타군 전용 로그인 + 회원등록 + 사용자 관리 + router 경로
+e6486ba - feat(05-05): SYS18 표준업무시간 CRUD + index.tsx 완성 (Phase 1 재사용)
+bb558f1 - fix(05): SYS10 apiClient import 경로 수정 + SYS07 부대(서) 표기 통일
+```
+
+---
+
+### #30 Phase 6 Discuss + Plan (14:30)
+
+```
+/gsd:discuss-phase 6 --auto + /gsd:plan-phase 6 --auto
+
+7개 gray area 자동 결정, 42 decisions
+Research → Plan(3) → 2 waves
+
+Wave 1: 06-01 SYS08 부대계보관리 (59 프로세스)
+Wave 2: 06-02/03 SYS01 초과근무관리 Part1 + Part2 (99 프로세스)
+
+Created: 06-CONTEXT.md, 06-01~03-PLAN.md
+```
+
+---
+
+### #31 Phase 6 Execute (15:00)
+
+```
+/gsd:execute-phase 6 --auto
+
+Wave 1:
+  06-01: SYS08 부대계보관리체계 59개 프로세스 완전 구현
+
+Wave 2 (2 agents parallel):
+  06-02: SYS01 초과근무관리 Part1 - 11개 페이지 + MSW 핸들러 + 테스트
+  06-03: SYS01 초과근무 Part2 - 12개 페이지 + index.tsx 업데이트 + 테스트 42개
+
+Regression: 871 tests total
+Phase 6 완료
+```
+
+**Git Commits:**
+```
+e8734c7 - feat(06-01): SYS08 부대계보관리체계 59개 프로세스 완전 구현
+7292306 - feat(06-2): SYS01 초과근무관리 Part1 - 11개 페이지 + MSW 핸들러 + 테스트
+30acb6e - feat(06-2-03): SYS01 초과근무 Part2 12개 페이지 + index.tsx 업데이트
+6b79d13 - test(06-2-03): SYS01 Part2 테스트 42개 추가
+9390422 - docs: Phase 6 완료 정리 — 문서 업데이트
+```
+
+---
+
+### #32 Phase 7 Discuss + Plan (17:00)
+
+```
+/gsd:discuss-phase 7 --auto + /gsd:plan-phase 7 --auto
+
+10개 gray area 자동 결정, 49 decisions
+Research → Plan(6) → 3 waves
+
+Wave 1: 07-01 SYS03 성과관리 (76 프로세스)
+         07-02 SYS15 보안일일결산 Part1 - 비밀매체/보안자재
+Wave 2: 07-03/04 SYS15 Part2 - 일일결산/보안수준평가/부재/교육/결재
+Wave 3: 07-05/06 SYS15 Part3 - 관리자/종합현황/개인설정
+
+Created: 07-CONTEXT.md, 07-RESEARCH.md, 07-01~06-PLAN.md
+```
+
+---
+
+## 2026-04-06 (Session 7)
+
+### #33 Phase 7 Execute Wave 1+2 (20:00)
+
+```
+/gsd:execute-phase 7 --auto
+
+Wave 1 (2 agents parallel):
+  07-01: SYS03 성과관리체계 — 기준정보+메인+과제계층+평가+라우터 구현 (17페이지)
+  07-02: SYS15 보안일일결산 Part1 — MSW handlers + SecretMediaPage 공통 컴포넌트 + 비밀/매체/보안자재 3종
+         + 예고문 관리 + 인계/인수 워크플로우 + 테스트 54개
+
+Wave 2 (1 agent):
+  07-04: SYS15 Part2 — 메인캘린더+개인/사무실결산+당직관 4페이지 + MSW 확장
+         + 보안수준평가+부재+교육+결재 5페이지 + 테스트 + 라우터
+
+Regression: 1092 tests
+```
+
+**Git Commits:**
+```
+08a9224 - feat(07-01): SYS03 성과관리체계 기준정보+메인+과제계층+평가+라우터 구현
+50b5728 - feat(07-2-02): SYS15 MSW handlers + SecretMediaPage 공통 컴포넌트 + 비밀/매체/보안자재 3종
+3ab79e9 - feat(07-2-02): 예고문 관리 + 인계/인수 워크플로우 + 테스트 54개
+3e2726e - feat(07-2-04): SYS15 Wave 2 Task1 - 메인캘린더+개인/사무실결산+당직관 4페이지 + MSW 확장
+5013474 - feat(07-2-04): SYS15 Wave 2 Task2 - 보안수준평가+부재+교육+결재 5페이지 + 테스트 + 라우터
+```
+
+---
+
+### #34 Phase 7 Execute Wave 3 (21:00)
+
+```
+Wave 3 (1 agent):
+  07-06: SYS15 Part3 — 결산종합현황 4종 + 관리자 5종 (점검항목Tabs/휴무일/알림시간/로그이력/예외처리Tree)
+         + 개인설정 + 전체 라우터 + 테스트 67개
+
+UI-SPEC 병렬 생성
+
+Regression: 1159 tests
+```
+
+**Git Commits:**
+```
+5e071a0 - feat(07-2-06): SYS15 Wave3 - 결산종합현황 4종 + 관리자 5종
+1d1388c - feat(07-2-06): SYS15 Wave3 - 개인설정 + 전체 라우터 + 테스트 67개
+```
+
+---
+
+### #35 Phase 7 Verify + Gap Fix (21:40)
+
+```
+gsd-verifier: Phase 07 goal verification
+
+4 gaps 발견 → 즉시 수정:
+  1. Gauge + Bar 차트 컴포넌트 미구현 → 추가
+  2. Steps 워크플로우 누락 → 추가
+  3. 인쇄 기능 미구현 → Print CSS 추가
+  4. 테스트 미비 → 보강
+
+결과: 14/14 must-haves PASSED
+Regression: 1195 tests
+```
+
+**Git Commits:**
+```
+d6f3d30 - fix(07): SYS03 검증 갭 4개 수정
+```
+
+---
+
+### #36 Push + 로그 업데이트 (22:10)
+
+```bash
+$ git push origin master
+To https://github.com/lapiogga/navy-admin.git
+   ...  master -> master
+
+WORK-LOG/TERMINAL-LOG/STATE 현행화
+Phase 0~7 전체 완료 (845개 프로세스, 18개 서브시스템)
+```
+
+---
+
+### 전체 최종 통계
+
+```
+Phase 0~7 전체 완료
+
+총 작업 수: 36
+총 소요 시간: ~1162분 (~19.4시간)
+총 테스트: 1195/1195 passed (42 test files)
+총 커밋: ~135
+서브시스템: 18개 전체 구현
+프로세스: 845개 전체 커버
 GitHub: https://github.com/lapiogga/navy-admin.git (master)
 ```
 
@@ -777,6 +1097,47 @@ git diff --stat HEAD    # 24 files changed, +538 insertions, -149 deletions
 ```
 10개 버그/개선 수정 완료 (24개 파일)
 TypeScript 빌드: 에러 0건
+## 2026-04-07 (Session 8)
+
+### #37 TERMINAL-LOG 보충 (00:00)
+
+```
+세션 4~7 누락 터미널 로그 추가 (#22~#36)
+```
+
+---
+
+### #38 관리자 메뉴 통합 (00:10)
+
+```
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+ 관리자 대메뉴 표준화 — 18개 서브시스템
+━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━━
+
+분석 결과:
+  관리자 메뉴 누락: SYS03, SYS05, SYS09
+  라우트 미연결(BROKEN): SYS01(/7/1), SYS08(/9/1,9/2)
+  공통기능 일부만 연결: 나머지 13개
+  Mock 데이터 누락: 없음 (18개 전체 완비)
+
+수정:
+  1. AdminRoutes.tsx: board 라우트 추가
+  2. menus.ts: adminChildren() 헬퍼 → 6개 공통화면 표준화
+     - 시스템관리, 코드관리, 코드그룹, 권한관리, 결재선, 게시판설정
+  3. 18개 전체 admin/* 경로 통일
+  4. SYS15 보안관리자(8) 유지 + 관리자(admin) 별도
+  5. SYS17/18 고유항목 유지 + 공통 6개 추가
+  6. 테스트 7개 파일 경로 업데이트
+
+$ npx tsc --noEmit
+# 0 에러
+
+$ npx vite build
+# ✓ built in 1m 1s
+
+$ npx vitest run
+# Test Files  42 passed (42)
+# Tests       1192 passed (1192)
 ```
 
 ---
