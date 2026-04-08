@@ -3,6 +3,8 @@ import { PageContainer } from '@ant-design/pro-components'
 import { Descriptions, Select, Button } from 'antd'
 import { useQuery } from '@tanstack/react-query'
 import { PrintableReport } from './PrintableReport'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
+import type { SearchField } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult } from '@/shared/api/types'
 import type { Deceased } from '@/shared/api/mocks/handlers/sys09'
@@ -14,6 +16,17 @@ const DEATH_TYPE_LABEL: Record<string, string> = {
   accident: '사고사',
 }
 
+const RANK_OPTIONS = [
+  '이병', '일병', '상병', '병장', '하사', '중사', '상사', '원사',
+  '소위', '중위', '대위', '소령', '중령', '대령',
+].map((r) => ({ label: r, value: r }))
+
+const certSearchFields: SearchField[] = [
+  { name: 'unit', label: '부대', type: 'text', placeholder: '부대명 입력' },
+  { name: 'rank', label: '계급', type: 'select', options: RANK_OPTIONS },
+  { name: 'keyword', label: '성명/군번', type: 'text', placeholder: '성명 또는 군번 검색' },
+]
+
 async function fetchDeathCert(id: string): Promise<Deceased> {
   const res = await apiClient.get<never, ApiResult<Deceased>>(`/sys09/reports/death-cert/${id}`)
   return (res as ApiResult<Deceased>).data ?? (res as unknown as Deceased)
@@ -21,6 +34,7 @@ async function fetchDeathCert(id: string): Promise<Deceased> {
 
 export default function CertDeathPage() {
   const [selectedId, setSelectedId] = useState<string>('deceased-1')
+  const [filters, setFilters] = useState<Record<string, unknown>>({})
 
   const { data: listData } = useQuery({
     queryKey: ['sys09/deceased-list'],
@@ -29,6 +43,16 @@ export default function CertDeathPage() {
       const d = (res as ApiResult<{ content: Deceased[] }>).data
       return d?.content ?? []
     },
+  })
+
+  const filteredList = (listData ?? []).filter((d) => {
+    if (filters.unit && !d.unit?.includes(filters.unit as string)) return false
+    if (filters.rank && d.rank !== filters.rank) return false
+    if (filters.keyword) {
+      const kw = filters.keyword as string
+      if (!d.name?.includes(kw) && !d.serviceNumber?.includes(kw)) return false
+    }
+    return true
   })
 
   const { data } = useQuery({
@@ -41,6 +65,7 @@ export default function CertDeathPage() {
 
   return (
     <PageContainer title="순직/사망확인서">
+      <SearchForm fields={certSearchFields} onSearch={setFilters} onReset={() => setFilters({})} />
       <div style={{ marginBottom: 16, display: 'flex', gap: 8, alignItems: 'center' }}>
         <span>대상자:</span>
         <Select
@@ -49,7 +74,7 @@ export default function CertDeathPage() {
           style={{ width: 350 }}
           showSearch
           optionFilterProp="label"
-          options={(listData ?? []).map((d) => ({
+          options={filteredList.map((d) => ({
             label: `${d.serviceNumber} / ${d.rank} / ${d.name}`,
             value: d.id,
           }))}

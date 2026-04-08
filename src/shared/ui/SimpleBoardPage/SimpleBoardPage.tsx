@@ -2,7 +2,7 @@ import { useState } from 'react'
 import { Button, Tag, Modal, Input, Space, message } from 'antd'
 import { PlusOutlined, DeleteOutlined } from '@ant-design/icons'
 import type { ProColumns } from '@ant-design/pro-components'
-import { DataTable } from '@/shared/ui'
+import { DataTable } from '@/shared/ui/DataTable'
 import { boardPostApi } from '@/entities/board/api'
 import { useMutation } from '@tanstack/react-query'
 import type { BoardPost } from '@/entities/board/types'
@@ -169,10 +169,11 @@ export function SimpleBoardPage({ boardId, title }: SimpleBoardPageProps) {
       <DataTable<BoardPostRecord>
         columns={columns}
         rowKey="id"
-        request={
-          (params) =>
-            boardPostApi.list(boardId, params) as Promise<PageResponse<BoardPostRecord>>
-        }
+        request={async (params) => {
+          const raw = await boardPostApi.list(boardId, params)
+          const res = (raw as unknown as { data?: { content: BoardPostRecord[] } }).data ?? raw
+          return res as unknown as PageResponse<BoardPostRecord>
+        }}
         headerTitle={title}
         searchable
         searchPlaceholder="제목, 내용으로 검색"

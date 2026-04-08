@@ -92,7 +92,7 @@ export default function SuggestionMainPage() {
   })
 
   return (
-    <PageContainer title="나의 제언">
+    <PageContainer title={false}>
       {/* 통계 카드 4개 */}
       <Row gutter={16} style={{ marginBottom: 24 }}>
         <Col span={6}>
@@ -154,23 +154,17 @@ export default function SuggestionMainPage() {
             <List
               dataSource={recent?.content ?? []}
               renderItem={(item) => (
-                <List.Item
-                  extra={
+                <List.Item style={{ padding: '8px 0' }}>
+                  <div style={{ display: 'flex', alignItems: 'center', width: '100%', gap: 8 }}>
+                    <Text ellipsis style={{ flex: 1, minWidth: 0 }}>{item.title}</Text>
+                    <Text type="secondary" style={{ whiteSpace: 'nowrap', fontSize: 12 }}>{item.authorName}</Text>
+                    <Text type="secondary" style={{ whiteSpace: 'nowrap', fontSize: 12 }}>{item.createdAt}</Text>
                     <StatusBadge
                       status={item.status}
                       colorMap={STATUS_COLOR_MAP}
                       labelMap={STATUS_LABEL_MAP}
                     />
-                  }
-                >
-                  <List.Item.Meta
-                    title={item.title}
-                    description={
-                      <Text type="secondary">
-                        {item.authorName} · {item.createdAt}
-                      </Text>
-                    }
-                  />
+                  </div>
                 </List.Item>
               )}
             />

@@ -3,7 +3,7 @@ import { Tabs, Button, Select, message } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
-import { Pie, Bar } from '@ant-design/charts'
+import { Pie, Column } from '@ant-design/charts'
 import dayjs from 'dayjs'
 import type { Dayjs } from 'dayjs'
 import { DatePicker } from 'antd'
@@ -105,13 +105,13 @@ export default function KnowledgeStatsPage() {
     height: 300,
   }
 
-  // Bar 차트 config
-  const barCfg = {
+  // Column 차트 config
+  const colCfg = {
     data: unitStats || [],
-    xField: 'count',
-    yField: 'unit',
+    xField: 'unit',
+    yField: 'count',
     height: 300,
-    label: { position: 'right' as const },
+    label: { position: 'top' as const },
   }
 
   // 유형별 테이블 컬럼
@@ -206,7 +206,7 @@ export default function KnowledgeStatsPage() {
             label: '부대별 작성 통계',
             children: (
               <div>
-                <Bar {...barCfg} />
+                <Column {...colCfg} />
                 <div style={{ marginTop: 16 }}>
                   <DataTable<UnitStat & Record<string, unknown>>
                     columns={unitColumns}

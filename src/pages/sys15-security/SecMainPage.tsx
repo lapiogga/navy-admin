@@ -98,9 +98,11 @@ function CalendarTab({ type }: CalendarTabProps) {
       )}
       <Spin spinning={isLoading}>
         <Calendar
+          fullscreen={false}
           cellRender={cellRender}
           onSelect={handleSelect}
           onPanelChange={handlePanelChange}
+          style={{ maxWidth: 480 }}
         />
       </Spin>
       <Modal
@@ -139,7 +141,7 @@ export default function SecMainPage() {
   ]
 
   return (
-    <PageContainer title="보안일일결산 메인">
+    <PageContainer title={false}>
       <Tabs defaultActiveKey="personal" items={tabItems} />
     </PageContainer>
   )

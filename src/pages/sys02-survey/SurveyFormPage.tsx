@@ -53,8 +53,8 @@ export default function SurveyFormPage() {
     onError: () => message.error('제출에 실패했습니다'),
   })
 
-  const surveyData = survey as Survey | undefined
-  const questions = ((questionsData as SurveyQuestion[] | undefined) || []).sort(
+  const surveyData = (survey as { data?: Survey } | undefined)?.data ?? (survey as Survey | undefined)
+  const questions = ((questionsData as { data?: SurveyQuestion[] } | undefined)?.data ?? (questionsData as SurveyQuestion[] | undefined) ?? []).sort(
     (a, b) => a.orderIndex - b.orderIndex
   )
 

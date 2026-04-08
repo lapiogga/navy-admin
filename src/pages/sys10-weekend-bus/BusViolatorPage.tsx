@@ -47,7 +47,7 @@ function getSanctionStatus(start: string, end: string): { key: string } {
   const s = dayjs(start)
   const e = dayjs(end)
   if (today.isAfter(e)) return { key: 'sanction_expired' }
-  if (today.isSameOrAfter(s) && today.isSameOrBefore(e)) return { key: 'sanctioned' }
+  if ((today.isAfter(s) || today.isSame(s, 'day')) && (today.isBefore(e) || today.isSame(e, 'day'))) return { key: 'sanctioned' }
   return { key: 'pending_sanction' }
 }
 

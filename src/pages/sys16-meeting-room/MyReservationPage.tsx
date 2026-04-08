@@ -3,7 +3,7 @@ import { Modal, Popconfirm, Button, Form, DatePicker, TimePicker, Input, message
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
-import axios from 'axios'
+import { apiClient } from '@/shared/api/client'
 import dayjs from 'dayjs'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
@@ -41,10 +41,10 @@ export default function MyReservationPage() {
 
   // 내 예약 목록 request 함수
   const fetchMyReservations = async (params: PageRequest): Promise<PageResponse<Reservation>> => {
-    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/my', {
+    const res = await apiClient.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/my', {
       params: { page: params.page, size: params.size },
     })
-    return res.data.data
+    return (res as ApiResult<any>).data
   }
 
   // 수정 뮤테이션
@@ -56,8 +56,8 @@ export default function MyReservationPage() {
         startTime: values.startTime ? (values.startTime as import('dayjs').Dayjs).format('HH:mm') : undefined,
         endTime: values.endTime ? (values.endTime as import('dayjs').Dayjs).format('HH:mm') : undefined,
       }
-      const res = await axios.put<ApiResult>(`/sys16/reservations/${id}`, payload)
-      return res.data
+      const res = await apiClient.put<ApiResult>(`/sys16/reservations/${id}`, payload)
+      return res
     },
     onSuccess: () => {
       message.success('예약이 수정되었습니다')
@@ -72,8 +72,8 @@ export default function MyReservationPage() {
   // 삭제 뮤테이션
   const deleteMutation = useMutation({
     mutationFn: async (id: string) => {
-      const res = await axios.delete<ApiResult>(`/sys16/reservations/${id}`)
-      return res.data
+      const res = await apiClient.delete<ApiResult>(`/sys16/reservations/${id}`)
+      return res
     },
     onSuccess: () => {
       message.success('예약이 삭제되었습니다')

@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom'
 import { Form, Select, DatePicker, TimePicker, Input, InputNumber, Button, message, Card } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { apiClient } from '@/shared/api/client'
 import type { ApiResult, PageResponse } from '@/shared/api/types'
 
 interface MeetingRoom {
@@ -44,10 +44,10 @@ export default function MeetingReservePage() {
   const { data: roomsData } = useQuery({
     queryKey: ['sys16', 'meeting-rooms'],
     queryFn: async () => {
-      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
+      const res = await apiClient.get<never, ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
         params: { page: 0, size: 100 },
       })
-      return res.data.data.content
+      return (res as ApiResult<PageResponse<MeetingRoom>>).data.content
     },
   })
 
@@ -78,8 +78,8 @@ export default function MeetingReservePage() {
         attendeeCount: values.attendeeCount,
         attendees: values.attendees,
       }
-      const res = await axios.post<ApiResult>('/sys16/reservations', payload)
-      return res.data
+      const res = await apiClient.post('/sys16/reservations', payload)
+      return res
     },
     onSuccess: () => {
       message.success('예약이 신청되었습니다')

@@ -129,7 +129,8 @@ export default function MySurveyPage() {
     onError: () => message.error('상태 변경에 실패했습니다'),
   })
 
-  const surveys = (data as { content: Survey[]; totalElements: number } | undefined)?.content || []
+  const rawData = (data as { data?: { content: Survey[] } } | undefined)?.data
+  const surveys = rawData?.content ?? (data as { content?: Survey[] } | undefined)?.content ?? []
 
   const columns: ProColumns<Survey>[] = [
     {

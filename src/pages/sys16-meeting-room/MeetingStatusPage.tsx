@@ -2,7 +2,7 @@ import { useState, useCallback } from 'react'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
-import axios from 'axios'
+import { apiClient } from '@/shared/api/client'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
 import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
@@ -50,10 +50,10 @@ export default function MeetingStatusPage() {
   const { data: roomsData } = useQuery({
     queryKey: ['sys16', 'meeting-rooms', 'list'],
     queryFn: async () => {
-      const res = await axios.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
+      const res = await apiClient.get<ApiResult<PageResponse<MeetingRoom>>>('/sys16/meeting-rooms', {
         params: { page: 0, size: 100 },
       })
-      return res.data.data.content
+      return (res as ApiResult<any>).data.content
     },
   })
   const rooms = roomsData ?? []
@@ -96,10 +96,10 @@ export default function MeetingStatusPage() {
       const dateVal = searchParams.meetingDate as import('dayjs').Dayjs
       queryParams.meetingDate = dateVal.format('YYYY-MM-DD')
     }
-    const res = await axios.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/status', {
+    const res = await apiClient.get<ApiResult<PageResponse<Reservation>>>('/sys16/reservations/status', {
       params: queryParams,
     })
-    return res.data.data
+    return (res as ApiResult<any>).data
   }
 
   const columns: ProColumns<Reservation>[] = [

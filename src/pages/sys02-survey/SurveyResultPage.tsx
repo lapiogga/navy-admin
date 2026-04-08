@@ -44,7 +44,7 @@ export default function SurveyResultPage({ surveyId: propSurveyId }: SurveyResul
     enabled: !!id,
   })
 
-  const result = data as SurveyResultData | undefined
+  const result = (data as { data?: SurveyResultData } | undefined)?.data ?? (data as SurveyResultData | undefined)
 
   if (isLoading) {
     return <PageContainer title="설문 결과 분석" loading />

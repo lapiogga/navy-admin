@@ -1,7 +1,7 @@
 import { Card, Row, Col, Statistic, Progress, Spin } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useQuery } from '@tanstack/react-query'
-import { Bar, Gauge } from '@ant-design/charts'
+import { Column, Gauge } from '@ant-design/charts'
 import { apiClient } from '@/shared/api/client'
 import type { ApiResult } from '@/shared/api/types'
 
@@ -111,24 +111,24 @@ export default function PerfMainPage() {
         </Col>
         <Col span={8}>
           <Card title="지휘방침별 업무추진율">
-            <Bar
+            <Column
               data={stats.policyRates.map((r) => ({ name: r.policyTitle, value: r.rate }))}
-              xField="value"
-              yField="name"
+              xField="name"
+              yField="value"
               height={200}
-              label={{ position: 'right' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
+              label={{ position: 'top' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
               color="#1890ff"
             />
           </Card>
         </Col>
         <Col span={8}>
           <Card title="부/실/단별 업무추진율">
-            <Bar
+            <Column
               data={stats.deptRates.map((r) => ({ name: r.deptName, value: r.rate }))}
-              xField="value"
-              yField="name"
+              xField="name"
+              yField="value"
               height={200}
-              label={{ position: 'right' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
+              label={{ position: 'top' as const, formatter: (d: { value?: number }) => `${d.value ?? 0}%` }}
               color="#faad14"
             />
           </Card>

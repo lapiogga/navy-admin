@@ -221,7 +221,8 @@ function AllSurveysTab() {
     queryFn: () => apiClient.get<{ content: Survey[] }>('/sys02/surveys/all'),
   })
 
-  const surveys = (data as { content: Survey[] } | undefined)?.content || []
+  const rawAll = (data as { data?: { content: Survey[] } } | undefined)?.data
+  const surveys = rawAll?.content ?? (data as { content?: Survey[] } | undefined)?.content ?? []
 
   // 검색 필터링 (클라이언트 사이드)
   const filteredSurveys = surveys.filter((s) => {
@@ -322,7 +323,7 @@ function CategoryTab() {
     },
   })
 
-  const categories = (data as SurveyCategory[] | undefined) || []
+  const categories = (data as { data?: SurveyCategory[] } | undefined)?.data ?? (data as SurveyCategory[] | undefined) ?? []
 
   const columns: ProColumns<SurveyCategory>[] = [
     {
@@ -412,14 +413,15 @@ function StatsTab() {
     queryFn: () => apiClient.get('/sys02/stats'),
   })
 
-  const stats = data as {
+  type StatsData = {
     totalSurveys: number
     activeSurveys: number
     closedSurveys: number
     averageResponseRate: number
     monthlyStats: { month: string; registered: number; closed: number; responded: number }[]
     categoryStats: { categoryName: string; surveyCount: number; responseRate: number }[]
-  } | undefined
+  }
+  const stats = (data as { data?: StatsData } | undefined)?.data ?? (data as StatsData | undefined)
 
   if (isLoading) return <div>로딩 중...</div>
 
@@ -482,8 +484,10 @@ function TargetTab() {
     enabled: !!selectedSurveyId,
   })
 
-  const surveys = (surveysData as { content: Survey[] } | undefined)?.content || []
-  const targets = (targetsData as SurveyTarget[] | undefined) || []
+  const rawSurveys = (surveysData as { data?: { content: Survey[] } } | undefined)?.data
+  const surveys = rawSurveys?.content ?? (surveysData as { content?: Survey[] } | undefined)?.content ?? []
+  const rawTargets = (targetsData as { data?: SurveyTarget[] } | undefined)?.data
+  const targets = rawTargets ?? (targetsData as SurveyTarget[] | undefined) ?? []
 
   const columns: ProColumns<SurveyTarget>[] = [
     // 군번/계급/성명 통합 컬럼
@@ -565,8 +569,8 @@ function TemplateTab() {
     },
   })
 
-  const templates = (data as SurveyTemplate[] | undefined) || []
-  const categories = (categoriesData as SurveyCategory[] | undefined) || []
+  const templates = (data as { data?: SurveyTemplate[] } | undefined)?.data ?? (data as SurveyTemplate[] | undefined) ?? []
+  const categories = (categoriesData as { data?: SurveyCategory[] } | undefined)?.data ?? (categoriesData as SurveyCategory[] | undefined) ?? []
 
   const columns: ProColumns<SurveyTemplate>[] = [
     {

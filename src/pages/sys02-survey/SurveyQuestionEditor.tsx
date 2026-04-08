@@ -139,7 +139,8 @@ export default function SurveyQuestionEditor() {
 
   useEffect(() => {
     if (data) {
-      const sorted = [...(data as SurveyQuestion[])].sort((a, b) => a.orderIndex - b.orderIndex)
+      const rawQs = (data as { data?: SurveyQuestion[] } | undefined)?.data ?? (data as SurveyQuestion[])
+      const sorted = [...rawQs].sort((a, b) => a.orderIndex - b.orderIndex)
       setQuestions(sorted)
     }
   }, [data])

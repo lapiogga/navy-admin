@@ -36,8 +36,8 @@ export default function InspectionUnitPage() {
   const { data, isLoading } = useQuery({
     queryKey: ['sys17', 'units'],
     queryFn: async () => {
-      const res = await apiClient.get<ApiResult<UnitData>>('/sys17/units')
-      const unitData = res.data.data
+      const res = await apiClient.get<never, ApiResult<UnitData>>('/sys17/units')
+      const unitData = (res as ApiResult<UnitData>).data
       setCheckedKeys(unitData.selectedIds)
       return unitData
     },
