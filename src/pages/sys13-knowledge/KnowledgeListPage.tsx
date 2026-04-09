@@ -138,9 +138,7 @@ export default function KnowledgeListPage() {
       dataIndex: 'title',
       width: 300,
       render: (_, record) => (
-        <Button type="link" style={{ padding: 0 }} onClick={() => handleTitleClick(record)}>
-          {record.title}
-        </Button>
+        <a onClick={() => handleTitleClick(record)}>{record.title}</a>
       ),
     },
     {

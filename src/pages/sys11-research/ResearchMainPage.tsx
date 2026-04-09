@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { useQuery } from '@tanstack/react-query'
 import { PageContainer } from '@ant-design/pro-components'
-import { Row, Col, Card, Statistic, List, Button, Typography, Select, Table } from 'antd'
+import { Row, Col, Card, Statistic, List, Button, Typography, Select } from 'antd'
 import { useNavigate } from 'react-router-dom'
 
 const { Text } = Typography
@@ -107,104 +107,75 @@ export default function ResearchMainPage() {
   })
 
   return (
-    <PageContainer title="연구자료종합관리">
-      {/* 년도 선택 */}
-      <Select
-        value={selectedYear}
-        onChange={setSelectedYear}
-        style={{ width: 120, marginBottom: 16 }}
-        options={[
-          { label: '2026', value: 2026 },
-          { label: '2025', value: 2025 },
-          { label: '2024', value: 2024 },
-        ]}
-      />
-
-      {/* 통계 카드 4개 */}
-      <Row gutter={16} style={{ marginBottom: 24 }}>
-        <Col span={6}>
-          <Card>
-            <Statistic title="전체 자료" value={stats?.total ?? 0} suffix="건" />
-          </Card>
+    <PageContainer title={false}>
+      {/* 통계 카드 4개 + 년도 선택 (1행) */}
+      <Row gutter={8} style={{ marginBottom: 8 }}>
+        <Col span={1}>
+          <Select
+            value={selectedYear}
+            onChange={setSelectedYear}
+            size="small"
+            style={{ width: '100%' }}
+            options={[
+              { label: '2026', value: 2026 },
+              { label: '2025', value: 2025 },
+              { label: '2024', value: 2024 },
+            ]}
+          />
         </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic title="이번달 등록" value={stats?.thisMonth ?? 0} suffix="건" />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic title="인기 분야" value={stats?.topCategory ?? '-'} />
-          </Card>
-        </Col>
-        <Col span={6}>
-          <Card>
-            <Statistic title="총 다운로드" value={stats?.totalDownloads ?? 0} suffix="회" />
-          </Card>
-        </Col>
+        <Col span={5}><Card size="small" bodyStyle={{ padding: '8px 12px' }}><Statistic title="전체 자료" value={stats?.total ?? 0} suffix="건" valueStyle={{ fontSize: 20 }} /></Card></Col>
+        <Col span={5}><Card size="small" bodyStyle={{ padding: '8px 12px' }}><Statistic title="이번달 등록" value={stats?.thisMonth ?? 0} suffix="건" valueStyle={{ fontSize: 20 }} /></Card></Col>
+        <Col span={5}><Card size="small" bodyStyle={{ padding: '8px 12px' }}><Statistic title="인기 분야" value={stats?.topCategory ?? '-'} valueStyle={{ fontSize: 20 }} /></Card></Col>
+        <Col span={5}><Card size="small" bodyStyle={{ padding: '8px 12px' }}><Statistic title="총 다운로드" value={stats?.totalDownloads ?? 0} suffix="회" valueStyle={{ fontSize: 20 }} /></Card></Col>
       </Row>
 
-      {/* 카테고리별 통계 테이블 */}
-      <Card title={`${selectedYear}년 카테고리별 현황`} size="small" style={{ marginBottom: 16 }}>
-        <Table
-          dataSource={categoryStats}
-          pagination={false}
-          columns={[
-            { title: '카테고리', dataIndex: 'category' },
-            { title: '총 과제수', dataIndex: 'totalCount' },
-            { title: '총 예산액', dataIndex: 'totalBudget', render: (v: number) => `${v?.toLocaleString()}원` },
-          ]}
-          rowKey="category"
-          size="small"
-        />
+      {/* 카테고리별 현황 (한 줄에 2개씩, 간격 축소) */}
+      <Card title={`${selectedYear}년 카테고리별 현황`} size="small" bodyStyle={{ padding: '8px 12px' }} style={{ marginBottom: 8 }}>
+        <Row gutter={[8, 4]}>
+          {categoryStats.map((cat) => (
+            <Col span={12} key={cat.category}>
+              <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', padding: '4px 8px', background: '#fafafa', borderRadius: 4 }}>
+                <Text strong style={{ fontSize: 13 }}>{cat.category}</Text>
+                <div>
+                  <Text type="secondary" style={{ marginRight: 12, fontSize: 12 }}>과제수: {cat.totalCount}</Text>
+                  <Text type="secondary" style={{ fontSize: 12 }}>예산액: {cat.totalBudget?.toLocaleString()}원</Text>
+                </div>
+              </div>
+            </Col>
+          ))}
+        </Row>
       </Card>
 
-      {/* 최신/인기 자료 목록 */}
-      <Row gutter={16}>
+      {/* 최신/인기 자료 목록 (3건만, 콤팩트) */}
+      <Row gutter={8} style={{ marginBottom: 8 }}>
         <Col span={12}>
-          <Card
-            title="최신 자료"
-            extra={
-              <Button type="link" onClick={() => navigate('/sys11/1/2')}>
-                전체보기
-              </Button>
-            }
-          >
+          <Card size="small" bodyStyle={{ padding: '4px 12px' }} title="최신 자료" extra={<Button type="link" size="small" onClick={() => navigate('/sys11/1/2')}>전체보기</Button>}>
             <List
-              dataSource={recentItems}
+              size="small"
+              dataSource={recentItems.slice(0, 3)}
               renderItem={(item) => (
-                <List.Item>
-                  <List.Item.Meta
-                    title={item.title}
-                    description={
-                      <Text type="secondary">
-                        {item.category} · {item.createdAt}
-                      </Text>
-                    }
-                  />
+                <List.Item style={{ padding: '4px 0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <Text ellipsis style={{ flex: 1, fontSize: 13 }}>{item.title}</Text>
+                    <Text type="secondary" style={{ whiteSpace: 'nowrap', marginLeft: 12, fontSize: 12 }}>{item.category} · {item.createdAt}</Text>
+                  </div>
                 </List.Item>
               )}
             />
           </Card>
         </Col>
         <Col span={12}>
-          <Card
-            title="인기 자료"
-            extra={
-              <Button type="link" onClick={() => navigate('/sys11/1/2')}>
-                전체보기
-              </Button>
-            }
-          >
+          <Card size="small" bodyStyle={{ padding: '4px 12px' }} title="인기 자료" extra={<Button type="link" size="small" onClick={() => navigate('/sys11/1/2')}>전체보기</Button>}>
             <List
-              dataSource={popularItems}
+              size="small"
+              dataSource={popularItems.slice(0, 3)}
               renderItem={(item) => (
-                <List.Item
-                  extra={
-                    <Text type="secondary">다운로드 {item.downloadCount}회</Text>
-                  }
-                >
-                  <List.Item.Meta title={item.title} description={item.category} />
+                <List.Item style={{ padding: '4px 0' }}>
+                  <div style={{ display: 'flex', justifyContent: 'space-between', width: '100%', alignItems: 'center' }}>
+                    <Text ellipsis style={{ flex: 1, fontSize: 13 }}>{item.title}</Text>
+                    <Text type="secondary" style={{ whiteSpace: 'nowrap', marginLeft: 12, fontSize: 12 }}>{item.category}</Text>
+                    <Text type="secondary" style={{ whiteSpace: 'nowrap', marginLeft: 8, fontSize: 12 }}>다운로드 {item.downloadCount}회</Text>
+                  </div>
                 </List.Item>
               )}
             />
@@ -212,20 +183,18 @@ export default function ResearchMainPage() {
         </Col>
       </Row>
 
-      {/* 소개자료 카드 그리드 (10개 카테고리, 5열x2행) */}
-      <Row gutter={[16, 16]} style={{ marginTop: 16 }}>
+      {/* 소개자료 카드 그리드 (10개 카테고리, 5열x2행, 콤팩트) */}
+      <Row gutter={[8, 8]}>
         {INTRO_DATA.map((item) => (
-          <Col xs={24} sm={12} md={8} lg={6} xl={4} key={item.category}>
+          <Col span={4} key={item.category}>
             <Card
-              title={item.category}
               size="small"
+              bodyStyle={{ padding: '8px' }}
               hoverable
               onClick={() => navigate(`/sys11/1/2?category=${item.category}`)}
             >
-              <Text>{item.description}</Text>
-              <div style={{ marginTop: 8 }}>
-                <Button type="link" size="small">자료 보기</Button>
-              </div>
+              <Text strong style={{ fontSize: 13 }}>{item.category}</Text>
+              <div><Button type="link" size="small" style={{ padding: 0, fontSize: 12 }}>자료 보기</Button></div>
             </Card>
           </Col>
         ))}

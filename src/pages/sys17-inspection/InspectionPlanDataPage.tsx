@@ -25,16 +25,7 @@ export default function InspectionPlanDataPage() {
       dataIndex: 'planName',
       width: 250,
       render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => {
-            setSelectedPlan(record)
-            setDetailOpen(true)
-          }}
-          style={{ padding: 0 }}
-        >
-          {text}
-        </Button>
+        <a onClick={() => { setSelectedPlan(record); setDetailOpen(true) }}>{text}</a>
       ),
     },
     {
@@ -79,8 +70,7 @@ export default function InspectionPlanDataPage() {
   return (
     <PageContainer title="검열계획 정보">
       <DataTable<InspectionPlan>
-        queryKey={['sys17', 'plan-data']}
-        requestFn={fetchPlans}
+        request={fetchPlans}
         columns={columns}
         rowKey="id"
       />

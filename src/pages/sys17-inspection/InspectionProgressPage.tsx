@@ -1,7 +1,7 @@
 import { useState } from 'react'
 import { Card, Row, Col, Statistic, Progress, Select, Tabs } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
-import { Bar } from '@ant-design/charts'
+import { Column } from '@ant-design/charts'
 import { useQuery } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
@@ -69,10 +69,10 @@ export default function InspectionProgressPage() {
     { unitName: unit.unitName, count: unit.notStarted, status: '미조치' },
   ])
 
-  const barConfig = {
+  const columnConfig = {
     data: chartData,
-    xField: 'count' as const,
-    yField: 'unitName' as const,
+    xField: 'unitName' as const,
+    yField: 'count' as const,
     seriesField: 'status' as const,
     isStack: true,
     height: 300,
@@ -187,7 +187,7 @@ export default function InspectionProgressPage() {
 
           {!isLoading && chartData.length > 0 && (
             <Card title="대상부대별 추진현황" style={{ marginBottom: 24 }}>
-              <Bar {...barConfig} />
+              <Column {...columnConfig} />
             </Card>
           )}
 
@@ -220,33 +220,15 @@ export default function InspectionProgressPage() {
 
           {!isLoading && stats && (
             <DataTable<UnitStat>
-              queryKey={['sys17', 'stats', 'detail']}
-              requestFn={async () => ({
-                content: stats.unitStats,
-                totalElements: stats.unitStats.length,
-                totalPages: 1,
-                size: stats.unitStats.length,
-                number: 0,
-              })}
               columns={detailColumns}
+              dataSource={stats.unitStats as Array<UnitStat & Record<string, unknown>>}
               rowKey="unitName"
-              onSearch={(values) => setSearchParams(values)}
-              expandable={{
-                expandedRowRender: (record: UnitStat) => (
-                  <DataTable<InspectionTask>
-                    queryKey={['sys17', 'tasks', record.unitName]}
-                    requestFn={(params) => fetchTasksByUnit(record.unitName, params)}
-                    columns={subTaskColumns}
-                    rowKey="id"
-                  />
-                ),
-              }}
             />
           )}
 
           {!isLoading && chartData.length > 0 && (
             <Card title="부대별 추진현황 그래프" style={{ marginTop: 16 }}>
-              <Bar {...barConfig} />
+              <Column {...columnConfig} />
             </Card>
           )}
         </div>

@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
-import { Form, Select, DatePicker, TimePicker, Input, InputNumber, Button, message, Card } from 'antd'
+import { Form, Select, DatePicker, TimePicker, Input, InputNumber, Button, message, Card, Row, Col } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import { useMutation, useQuery } from '@tanstack/react-query'
 import { apiClient } from '@/shared/api/client'
@@ -97,132 +97,82 @@ export default function MeetingReservePage() {
 
   return (
     <PageContainer title="회의예약신청">
-      <Card style={{ maxWidth: 600 }}>
+      <Card bodyStyle={{ padding: '16px 24px 8px' }}>
         <Form
           form={form}
-          layout="vertical"
+          layout="horizontal"
+          labelCol={{ span: 6 }}
+          wrapperCol={{ span: 18 }}
           onFinish={handleFinish}
+          size="small"
         >
-          <Form.Item
-            name="managingUnit"
-            label="회의실 관리 부대"
-            rules={[{ required: true, message: '관리 부대를 선택하세요' }]}
-          >
-            <Select
-              placeholder="부대 선택"
-              onChange={handleUnitChange}
-              options={UNIT_OPTIONS}
-              allowClear
-            />
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item name="managingUnit" label="관리부대" rules={[{ required: true, message: '관리 부대를 선택하세요' }]}>
+                <Select placeholder="부대 선택" onChange={handleUnitChange} options={UNIT_OPTIONS} allowClear />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="roomId" label="회의실" rules={[{ required: true, message: '회의실을 선택하세요' }]}>
+                <Select placeholder="회의실 선택">
+                  {rooms.map((room) => (
+                    <Select.Option key={room.id} value={room.id}>
+                      {room.name} ({room.location}, {room.capacity}명)
+                    </Select.Option>
+                  ))}
+                </Select>
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item name="meetingName" label="회의명" rules={[{ required: true, message: '회의명을 입력하세요' }]}>
+                <Input placeholder="회의명" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="meetingGrade" label="회의등급" rules={[{ required: true, message: '회의등급을 선택하세요' }]}>
+                <Select placeholder="등급 선택" options={[{ label: '일반', value: '일반' }, { label: '비밀', value: '비밀' }, { label: '대외비', value: '대외비' }]} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col span={8}>
+              <Form.Item name="date" label="예약일" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} rules={[{ required: true, message: '예약일을 선택하세요' }]}>
+                <DatePicker style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="startTime" label="시작" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} rules={[{ required: true, message: '시작 시간을 선택하세요' }]}>
+                <TimePicker format="HH:mm" minuteStep={30} style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+            <Col span={8}>
+              <Form.Item name="endTime" label="종료" labelCol={{ span: 9 }} wrapperCol={{ span: 15 }} rules={[{ required: true, message: '종료 시간을 선택하세요' }]}>
+                <TimePicker format="HH:mm" minuteStep={30} style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={24}>
+            <Col span={12}>
+              <Form.Item name="hostDepartment" label="주관부서" rules={[{ required: true, message: '주관부서를 선택하세요' }]}>
+                <Select placeholder="주관부서 선택" options={[{ label: '작전과', value: '작전과' }, { label: '인사과', value: '인사과' }, { label: '군수과', value: '군수과' }, { label: '정보통신과', value: '정보통신과' }]} />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="attendeeCount" label="참석인원" rules={[{ required: true, message: '참석 인원을 입력하세요' }]}>
+                <InputNumber min={1} max={200} placeholder="인원 수" style={{ width: '100%' }} />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Form.Item name="purpose" label="회의목적" labelCol={{ span: 3 }} wrapperCol={{ span: 21 }} rules={[{ required: true, message: '회의 목적을 입력하세요' }]}>
+            <Input.TextArea rows={2} placeholder="회의 목적을 입력하세요" />
           </Form.Item>
-
-          <Form.Item
-            name="roomId"
-            label="회의실 선택"
-            rules={[{ required: true, message: '회의실을 선택하세요' }]}
-          >
-            <Select placeholder="회의실을 선택하세요">
-              {rooms.map((room) => (
-                <Select.Option key={room.id} value={room.id}>
-                  {room.name} ({room.location}, 수용 {room.capacity}명)
-                </Select.Option>
-              ))}
-            </Select>
-          </Form.Item>
-
-          <Form.Item
-            name="meetingName"
-            label="회의명"
-            rules={[{ required: true, message: '회의명을 입력하세요' }]}
-          >
-            <Input placeholder="회의명을 입력하세요" />
-          </Form.Item>
-
-          <Form.Item
-            name="date"
-            label="예약일"
-            rules={[{ required: true, message: '예약일을 선택하세요' }]}
-          >
-            <DatePicker style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="startTime"
-            label="시작 시간"
-            rules={[{ required: true, message: '시작 시간을 선택하세요' }]}
-          >
-            <TimePicker format="HH:mm" minuteStep={30} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="endTime"
-            label="종료 시간"
-            rules={[{ required: true, message: '종료 시간을 선택하세요' }]}
-          >
-            <TimePicker format="HH:mm" minuteStep={30} style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="meetingGrade"
-            label="회의등급"
-            rules={[{ required: true, message: '회의등급을 선택하세요' }]}
-          >
-            <Select
-              placeholder="회의등급 선택"
-              options={[
-                { label: '일반', value: '일반' },
-                { label: '비밀', value: '비밀' },
-                { label: '대외비', value: '대외비' },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="hostDepartment"
-            label="주관부서"
-            rules={[{ required: true, message: '주관부서를 선택하세요' }]}
-          >
-            <Select
-              placeholder="주관부서 선택"
-              options={[
-                { label: '작전과', value: '작전과' },
-                { label: '인사과', value: '인사과' },
-                { label: '군수과', value: '군수과' },
-                { label: '정보통신과', value: '정보통신과' },
-              ]}
-            />
-          </Form.Item>
-
-          <Form.Item
-            name="purpose"
-            label="회의 목적"
-            rules={[{ required: true, message: '회의 목적을 입력하세요' }]}
-          >
-            <Input.TextArea rows={3} placeholder="회의 목적을 입력하세요" />
-          </Form.Item>
-
-          <Form.Item
-            name="attendeeCount"
-            label="참석 인원"
-            rules={[{ required: true, message: '참석 인원을 입력하세요' }]}
-          >
-            <InputNumber min={1} max={200} placeholder="인원 수" style={{ width: '100%' }} />
-          </Form.Item>
-
-          <Form.Item
-            name="attendees"
-            label="참석자 정보"
-          >
+          <Form.Item name="attendees" label="참석자" labelCol={{ span: 3 }} wrapperCol={{ span: 21 }}>
             <Input.TextArea rows={2} placeholder="참석자 목록 (성명, 소속 등)" />
           </Form.Item>
-
-          <Form.Item>
-            <Button
-              type="primary"
-              htmlType="submit"
-              loading={reserveMutation.isPending}
-              block
-            >
+          <Form.Item wrapperCol={{ span: 24 }} style={{ marginBottom: 0 }}>
+            <Button type="primary" htmlType="submit" loading={reserveMutation.isPending} block>
               예약 신청
             </Button>
           </Form.Item>

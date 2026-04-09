@@ -184,17 +184,7 @@ export default function KnowledgeStatsPage() {
                 <div style={{ marginTop: 16 }}>
                   <DataTable<CategoryStat & Record<string, unknown>>
                     columns={categoryColumns}
-                    request={async (params) => {
-                      const data = (categoryStats || []) as Array<CategoryStat & Record<string, unknown>>
-                      const start = params.page * params.size
-                      return {
-                        content: data.slice(start, start + params.size),
-                        totalElements: data.length,
-                        totalPages: Math.ceil(data.length / params.size),
-                        size: params.size,
-                        number: params.page,
-                      }
-                    }}
+                    dataSource={(categoryStats || []) as Array<CategoryStat & Record<string, unknown>>}
                     rowKey="category"
                   />
                 </div>
@@ -210,17 +200,7 @@ export default function KnowledgeStatsPage() {
                 <div style={{ marginTop: 16 }}>
                   <DataTable<UnitStat & Record<string, unknown>>
                     columns={unitColumns}
-                    request={async (params) => {
-                      const data = (unitStats || []) as Array<UnitStat & Record<string, unknown>>
-                      const start = params.page * params.size
-                      return {
-                        content: data.slice(start, start + params.size),
-                        totalElements: data.length,
-                        totalPages: Math.ceil(data.length / params.size),
-                        size: params.size,
-                        number: params.page,
-                      }
-                    }}
+                    dataSource={(unitStats || []) as Array<UnitStat & Record<string, unknown>>}
                     rowKey="unit"
                   />
                 </div>
@@ -262,17 +242,7 @@ export default function KnowledgeStatsPage() {
 
                 <DataTable<AuthorStat>
                   columns={authorColumns}
-                  request={async (params) => {
-                    const data = authorStats || []
-                    const start = params.page * params.size
-                    return {
-                      content: data.slice(start, start + params.size),
-                      totalElements: data.length,
-                      totalPages: Math.ceil(data.length / params.size),
-                      size: params.size,
-                      number: params.page,
-                    }
-                  }}
+                  dataSource={authorStats || []}
                   rowKey="authorName"
                 />
               </div>

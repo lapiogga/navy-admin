@@ -179,13 +179,40 @@
 | 테스트 | 1195/1195 passed (42 test files) |
 | Git 커밋 수 | ~40 (세션 6-7) |
 
+---
+
+## 2026-04-09 (Day 7) - 세션 12~13
+
+| # | 시작일자 | 시작시간 | 종료일자 | 종료시간 | Duration | Phase | 작업명 | 내용 | 결과 |
+|---|---------|---------|---------|---------|----------|-------|--------|------|------|
+| 59 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS13 지식통계 데이터 미표시 수정 | KnowledgeStatsPage 3개 탭 DataTable closure capture → dataSource 전환 | KnowledgeStatsPage.tsx |
+| 60 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS14 제언 상세 콤팩트화 | Descriptions labelStyle whiteSpace:nowrap, width:80 | SuggestionListPage.tsx |
+| 61 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS16 회의예약신청 콤팩트화 | vertical→horizontal 폼, Row/Col 다열 배치, Card padding 축소 | MeetingReservePage.tsx |
+| 62 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS15 보안일일결산 6개 페이지 데이터 미표시 | DataTable queryKey/fetchFn → request prop 수정 | Personal/Office/Duty/SecurityLevel/Absence/SecurityEdu |
+| 63 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS17 검열부대 조직도 해군 확장 | UNIT_TREE 해군본부+해병대사령부 전체 조직도 (19개 부대) | sys17.ts |
+| 64 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS17 검열결과 4개 페이지 데이터 미표시 | DataTable queryKey/requestFn → request, SearchForm 분리 | Plan/PlanData/Approval/ResultData |
+| 65 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS15 보안점검 영역 콤팩트화 | 2열 체크박스, padding/margin 축소, 미실시자/부재자 2열 horizontal | PersonalSecDailyPage, OfficeSecDailyPage |
+| 66 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS17 추진현황 차트 세로막대 | Bar→Column, xField/yField 교체 | InspectionProgressPage.tsx |
+| 67 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS17/18 링크 스타일 수정 | Button type="link" → <a> 태그 (5개 컬럼 SYS17 + 1개 SYS18) | Plan/PlanData/Result/Approval/OrgDiagnosis |
+| 68 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS11/12 차트 레이아웃 수정 | ResearchMainPage, DirectiveProgressPage, ProposalProgressPage | 3개 파일 |
+| 69 | 2026-04-09 | - | 2026-04-09 | - | - | - | SYS13 기타 수정 | KnowledgeListPage, MyKnowledgePage 수정 | 2개 파일 |
+| 70 | 2026-04-09 | - | 2026-04-09 | - | - | - | 문서 현행화 + v1.3.0 배포 | CLAUDE.md/WORK-LOG/TERMINAL-LOG 업데이트, git tag v1.3.0 | GitHub push |
+
+### Day 7 세션 12~13 통계
+
+| 항목 | 값 |
+|------|-----|
+| 총 작업 수 | 12 |
+| 변경 파일 | 24개 (수정 24) |
+| 수정 서브시스템 | SYS11, SYS12, SYS13, SYS14, SYS15, SYS16, SYS17, SYS18 |
+
 ### 전체 누적 통계 (최종)
 
 | 항목 | 값 |
 |------|-----|
-| 총 작업 수 | 58 |
+| 총 작업 수 | 70 |
 | 총 소요 시간 | ~1547분+ (~25.8시간+) |
-| Phase 진행 | **Phase 0~7 전체 완료 + GAP 수정 + Mock 데이터 현행화 + 버그 수정 2차** |
+| Phase 진행 | **Phase 0~7 전체 완료 + GAP 수정 + Mock 데이터 현행화 + 버그 수정 3차** |
 | GAP 수정 | 18개 서브시스템 x 6 규칙 = 120+ 파일 수정 |
 | Mock 데이터 | 해군 군번 규칙 + 부대 조직도 반영 완료 |
 | UI 공통 | 7개 항목 개선 (검색영역/헤더/사이드바/태그/버튼/여백) |

@@ -6,6 +6,7 @@ import { useMutation, useQuery, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { StatusBadge } from '@/shared/ui/StatusBadge/StatusBadge'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { InspectionTask } from '@/shared/api/mocks/handlers/sys17'
@@ -254,16 +255,7 @@ export default function InspectionApprovalPage() {
       dataIndex: 'taskName',
       width: 200,
       render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => {
-            setSelectedTask(record)
-            setDetailOpen(true)
-          }}
-          style={{ padding: 0 }}
-        >
-          {text}
-        </Button>
+        <a onClick={() => { setSelectedTask(record); setDetailOpen(true) }}>{text}</a>
       ),
     },
     {
@@ -329,13 +321,18 @@ export default function InspectionApprovalPage() {
       key: '1',
       label: '접수대기',
       children: (
-        <DataTable<InspectionTask>
-          queryKey={['sys17', 'approval', 'pending']}
-          requestFn={fetchPendingTasks}
-          columns={pendingColumns}
-          rowKey="id"
-          searchFields={searchFields}
-        />
+        <div>
+          <SearchForm
+            fields={searchFields}
+            onSearch={() => {}}
+            onReset={() => {}}
+          />
+          <DataTable<InspectionTask>
+            request={fetchPendingTasks}
+            columns={pendingColumns}
+            rowKey="id"
+          />
+        </div>
       ),
     },
     {
@@ -343,8 +340,7 @@ export default function InspectionApprovalPage() {
       label: '접수완료',
       children: (
         <DataTable<InspectionTask>
-          queryKey={['sys17', 'approval', 'approved']}
-          requestFn={fetchApprovedTasks}
+          request={fetchApprovedTasks}
           columns={pendingColumns}
           rowKey="id"
         />

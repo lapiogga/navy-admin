@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Checkbox, Input, Button, Form, DatePicker, message, Divider, Tag, Alert } from 'antd'
+import { Checkbox, Input, Button, Form, DatePicker, message, Row, Col, Tag } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -172,89 +172,83 @@ export default function OfficeSecDailyPage() {
 
   return (
     <PageContainer title="사무실 보안일일결산">
-      <div style={{ background: '#fff', padding: 24, borderRadius: 8, marginBottom: 24 }}>
-        <h3 style={{ marginBottom: 16 }}>사무실 보안점검</h3>
+      <div style={{ background: '#fff', padding: '12px 16px', borderRadius: 8, marginBottom: 16 }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>사무실 보안점검</div>
 
-        <Form form={form} layout="vertical">
-          <h4>필수 점검항목</h4>
+        <Form form={form} layout="horizontal" size="small" labelCol={{ span: 6 }} wrapperCol={{ span: 18 }}>
+          <div style={{ marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#1890ff' }}>필수 점검항목</div>
           <Checkbox.Group
             value={checkedRequired}
             onChange={(vals) => setCheckedRequired(vals as string[])}
             style={{ display: 'block' }}
           >
-            {OFFICE_REQUIRED_ITEMS.map((item) => (
-              <div key={item.id} style={{ marginBottom: 8 }}>
-                <Checkbox value={item.id}>{item.label}</Checkbox>
-                {!checkedRequired.includes(item.id) && (
-                  <TextArea
-                    placeholder="미실시 사유를 입력하세요"
-                    rows={1}
-                    style={{ marginTop: 4, marginLeft: 24 }}
-                    value={uncheckedReasons[item.id] ?? ''}
-                    onChange={(e) => handleReasonChange(item.id, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
+            <Row gutter={[16, 2]}>
+              {OFFICE_REQUIRED_ITEMS.map((item) => (
+                <Col span={12} key={item.id}>
+                  <Checkbox value={item.id} style={{ fontSize: 13 }}>{item.label}</Checkbox>
+                  {!checkedRequired.includes(item.id) && (
+                    <Input
+                      placeholder="미실시 사유"
+                      size="small"
+                      style={{ marginTop: 2, marginLeft: 24, width: 'calc(100% - 24px)', marginBottom: 4 }}
+                      value={uncheckedReasons[item.id] ?? ''}
+                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                    />
+                  )}
+                </Col>
+              ))}
+            </Row>
           </Checkbox.Group>
 
-          <Divider />
-
-          <h4>선택 점검항목</h4>
+          <div style={{ marginTop: 8, marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#1890ff' }}>선택 점검항목</div>
           <Checkbox.Group
             value={checkedOptional}
             onChange={(vals) => setCheckedOptional(vals as string[])}
             style={{ display: 'block' }}
           >
-            {OFFICE_OPTIONAL_ITEMS.map((item) => (
-              <div key={item.id} style={{ marginBottom: 8 }}>
-                <Checkbox value={item.id}>{item.label}</Checkbox>
-              </div>
-            ))}
+            <Row gutter={[16, 2]}>
+              {OFFICE_OPTIONAL_ITEMS.map((item) => (
+                <Col span={8} key={item.id}>
+                  <Checkbox value={item.id} style={{ fontSize: 13 }}>{item.label}</Checkbox>
+                </Col>
+              ))}
+            </Row>
           </Checkbox.Group>
 
-          <Divider />
-
-          <h4>미실시자/부재자 관리</h4>
-          <p style={{ color: '#ff4d4f', fontSize: 12, marginBottom: 12 }}>
+          <div style={{ marginTop: 8, marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#1890ff', borderTop: '1px solid #f0f0f0', paddingTop: 6 }}>미실시자/부재자 관리</div>
+          <div style={{ color: '#ff4d4f', fontSize: 11, marginBottom: 6 }}>
             * 미실시자 또는 부재자가 있는 경우, 해당 사유를 입력해야만 결산 실시가 가능합니다.
-          </p>
-          <Form.Item
-            name="nonCompliantPersons"
-            label="미실시자 성명"
-            rules={[{ required: true, message: '미실시자 성명을 입력하세요 (없으면 "없음")' }]}
-          >
-            <Input placeholder="미실시자가 없으면 '없음'을 입력하세요" />
-          </Form.Item>
-          <Form.Item
-            name="nonCompliantReason"
-            label="미실시 사유"
-            rules={[{ required: false }]}
-            extra="미실시자가 있는 경우 필수 입력"
-          >
-            <TextArea rows={2} placeholder="미실시 사유를 입력하세요" />
-          </Form.Item>
-          <Form.Item
-            name="absentPersons"
-            label="부재자 성명"
-            rules={[{ required: true, message: '부재자 성명을 입력하세요 (없으면 "없음")' }]}
-          >
-            <Input placeholder="부재자가 없으면 '없음'을 입력하세요" />
-          </Form.Item>
-          <Form.Item
-            name="absentReason"
-            label="부재 사유"
-            rules={[{ required: false }]}
-            extra="부재자가 있는 경우 필수 입력"
-          >
-            <TextArea rows={2} placeholder="부재 사유를 입력하세요" />
-          </Form.Item>
+          </div>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="nonCompliantPersons" label="미실시자" rules={[{ required: true, message: '미실시자 성명 (없으면 "없음")' }]} style={{ marginBottom: 8 }}>
+                <Input placeholder="없으면 '없음'" size="small" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="nonCompliantReason" label="미실시 사유" style={{ marginBottom: 8 }}>
+                <Input placeholder="미실시 사유" size="small" />
+              </Form.Item>
+            </Col>
+          </Row>
+          <Row gutter={16}>
+            <Col span={12}>
+              <Form.Item name="absentPersons" label="부재자" rules={[{ required: true, message: '부재자 성명 (없으면 "없음")' }]} style={{ marginBottom: 8 }}>
+                <Input placeholder="없으면 '없음'" size="small" />
+              </Form.Item>
+            </Col>
+            <Col span={12}>
+              <Form.Item name="absentReason" label="부재 사유" style={{ marginBottom: 8 }}>
+                <Input placeholder="부재 사유" size="small" />
+              </Form.Item>
+            </Col>
+          </Row>
 
           <div style={{ display: 'flex', gap: 8 }}>
-            <Button onClick={handleSave} loading={saveMutation.isPending}>
+            <Button size="small" onClick={handleSave} loading={saveMutation.isPending}>
               임시저장
             </Button>
-            <Button type="primary" onClick={handleSubmit} loading={submitMutation.isPending}>
+            <Button size="small" type="primary" onClick={handleSubmit} loading={submitMutation.isPending}>
               제출 (결재요청)
             </Button>
           </div>
@@ -269,9 +263,9 @@ export default function OfficeSecDailyPage() {
           />
         </div>
         <DataTable<OfficeDailyRecord>
-          queryKey={['sys15-office-daily', startDate, endDate]}
-          fetchFn={(params) => fetchOfficeDailyHistory({ ...params, startDate, endDate })}
           columns={columns}
+          request={(params) => fetchOfficeDailyHistory({ ...params, startDate, endDate })}
+          rowKey="id"
         />
       </div>
     </PageContainer>

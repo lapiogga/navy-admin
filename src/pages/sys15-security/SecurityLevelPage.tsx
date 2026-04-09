@@ -275,9 +275,9 @@ function SecurityLevelEvalTab({ evalType }: { evalType: '수시' | '정기' }) {
       </div>
       <DataTable<SecurityLevelRecord>
         actionRef={actionRef}
-        queryKey={['sys15-security-level', evalType]}
-        fetchFn={(params) => fetchSecurityLevels({ ...params, evalType })}
         columns={columns}
+        request={(params) => fetchSecurityLevels({ ...params, evalType })}
+        rowKey="id"
       />
       <EvalModal
         open={modalOpen}

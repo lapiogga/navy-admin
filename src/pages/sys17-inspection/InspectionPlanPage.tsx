@@ -6,6 +6,7 @@ import { useMutation, useQueryClient } from '@tanstack/react-query'
 import type { ProColumns } from '@ant-design/pro-components'
 import { DataTable } from '@/shared/ui/DataTable/DataTable'
 import { CrudForm } from '@/shared/ui/CrudForm/CrudForm'
+import { SearchForm } from '@/shared/ui/SearchForm/SearchForm'
 import { apiClient } from '@/shared/api/client'
 import type { PageRequest, PageResponse, ApiResult } from '@/shared/api/types'
 import type { InspectionPlan } from '@/shared/api/mocks/handlers/sys17'
@@ -109,16 +110,7 @@ export default function InspectionPlanPage() {
       dataIndex: 'planName',
       width: 250,
       render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => {
-            setEditTarget(record)
-            setModalOpen(true)
-          }}
-          style={{ padding: 0 }}
-        >
-          {text}
-        </Button>
+        <a onClick={() => { setEditTarget(record); setModalOpen(true) }}>{text}</a>
       ),
     },
     {
@@ -254,13 +246,15 @@ export default function InspectionPlanPage() {
 
   return (
     <PageContainer title="검열계획">
+      <SearchForm
+        fields={searchFields}
+        onSearch={(values) => setSearchParams(values as SearchParams)}
+        onReset={() => setSearchParams({})}
+      />
       <DataTable<InspectionPlan>
-        queryKey={['sys17', 'plans', searchParams]}
-        requestFn={(params) => fetchPlans({ ...params, ...searchParams })}
+        request={(params) => fetchPlans({ ...params, ...searchParams })}
         columns={columns}
         rowKey="id"
-        searchFields={searchFields}
-        onSearch={(values) => setSearchParams(values as SearchParams)}
         toolBarRender={() => [
           <Button
             key="create"

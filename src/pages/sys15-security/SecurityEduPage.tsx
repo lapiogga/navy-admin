@@ -234,9 +234,9 @@ export default function SecurityEduPage() {
       </div>
       <DataTable<SecurityEduRecord>
         actionRef={actionRef}
-        queryKey={['sys15-security-edu', startDate, endDate, filterEduType]}
-        fetchFn={(params) => fetchSecurityEdu({ ...params, startDate, endDate, eduType: filterEduType })}
         columns={columns}
+        request={(params) => fetchSecurityEdu({ ...params, startDate, endDate, eduType: filterEduType })}
+        rowKey="id"
       />
       <EduFormModal
         open={modalOpen}

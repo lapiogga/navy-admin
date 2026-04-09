@@ -1142,4 +1142,59 @@ $ npx vitest run
 
 ---
 
+---
+
+## 세션 12~13 (2026-04-09)
+
+### 주요 명령어
+
+```
+npx tsc --noEmit        # 빌드 에러 체크 → 통과
+npx vite build          # 프로덕션 빌드 → ✓ built in 48.92s
+git diff --stat HEAD    # 24 files changed, 361 insertions, 476 deletions
+```
+
+### 수정 파일 목록 (24개)
+
+**DataTable 데이터 미표시 수정 (queryKey/fetchFn/requestFn → request):**
+- SYS15: PersonalSecDailyPage, OfficeSecDailyPage, DutyOfficerPage, SecurityLevelPage, AbsencePage, SecurityEduPage
+- SYS17: InspectionPlanPage, InspectionPlanDataPage, InspectionApprovalPage, InspectionResultDataPage
+
+**DataTable closure capture 수정 (request → dataSource):**
+- SYS13: KnowledgeStatsPage (3개 탭)
+
+**UI 콤팩트화:**
+- SYS14: SuggestionListPage — Descriptions labelStyle 1줄 표시
+- SYS15: PersonalSecDailyPage — 오늘의 보안점검 2열 체크박스, padding 축소
+- SYS15: OfficeSecDailyPage — 사무실 보안점검 2열 + 미실시자/부재자 2열 horizontal
+- SYS16: MeetingReservePage — vertical→horizontal 폼, Row/Col 다열 배치
+
+**차트/레이아웃:**
+- SYS11: ResearchMainPage — 차트 및 통계 카드 레이아웃
+- SYS12: DirectiveProgressPage, ProposalProgressPage — 차트 레이아웃
+- SYS17: InspectionProgressPage — Bar→Column 세로막대 차트
+
+**링크 스타일:**
+- SYS17: InspectionPlanPage, InspectionPlanDataPage, InspectionResultPage, InspectionApprovalPage — Button type="link" → <a>
+- SYS18: OrgDiagnosisPage — Button type="link" → <a>
+
+**Mock 데이터:**
+- SYS17: sys17.ts — UNIT_TREE 해군+해병대 전체 조직도 확장
+
+**기타:**
+- SYS13: KnowledgeListPage, MyKnowledgePage
+- package.json, package-lock.json
+
+### 세션 12~13 종료 시점 상태
+
+```
+TypeScript 빌드: 에러 0건
+Vite 빌드: 성공 (48.92s)
+수정 서브시스템: SYS11, SYS12, SYS13, SYS14, SYS15, SYS16, SYS17, SYS18 (8개)
+변경 파일: 24개
+GitHub: v1.3.0 태그 배포
+```
+
+---
+
 *이후 모든 터미널 출력은 이 파일에 append됩니다.*
