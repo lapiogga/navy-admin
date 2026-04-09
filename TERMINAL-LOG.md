@@ -1197,4 +1197,65 @@ GitHub: v1.3.0 태그 배포
 
 ---
 
+## 세션 14~15: SYS01/SYS02 프레젠테이션 산출물 생성 (2026-04-09)
+
+### SYS01 프레젠테이션 PPT 생성
+
+```
+$ cd spec-doc && python generate_sys01_fc_sb.py
+생성 완료: C:\Users\User\2nd_biz\navy-admin\spec-doc\ppt\SYS01_초과근무관리체계_FC_SB.pptx
+  슬라이드 1: 플로우차트 (신청→결재→당직확인→월말결산)
+  슬라이드 2: 스토리보드 (7메뉴, 27하위기능, 99프로세스)
+  슬라이드 3: 유스케이스 다이어그램 (5액터, 18UC)
+  슬라이드 4: 목표 모델 (목표·프로세스·참여주체)
+```
+
+### SYS02 프레젠테이션 PPT 생성
+
+```
+$ python generate_sys02_fc_sb.py
+생성 완료: C:\Users\User\2nd_biz\navy-admin\spec-doc\ppt\SYS02_설문종합관리체계.pptx
+  슬라이드 1: 목표 모델 (목표·프로세스·참여주체)
+  슬라이드 2: 플로우차트 (생성→승인→배포→응답→분석)
+  슬라이드 3: 스토리보드 (5개 메뉴, 31개 프로세스)
+  슬라이드 4: 유스케이스 다이어그램 (3개 액터, 18개 UC)
+```
+
+### 문서 현행화 + GitHub 배포
+
+```
+$ git add CLAUDE.md WORK-LOG.md spec-doc/generate_sys01_fc_sb.py spec-doc/generate_sys01_presentation.py spec-doc/generate_sys02_fc_sb.py spec-doc/ppt/*.pptx
+$ git commit -m "docs: SYS01/SYS02 프레젠테이션 산출물 4종 + 생성 스크립트 추가"
+[master e6ff185] docs: SYS01/SYS02 프레젠테이션 산출물 4종 + 생성 스크립트 추가
+ 9 files changed, 2428 insertions(+), 3 deletions(-)
+
+$ git push origin master
+To https://github.com/lapiogga/navy-admin.git
+   7caf252..e6ff185  master -> master
+
+$ git tag -a v1.3.1 -m "2026-04-09 수정 버전 및 산출물 작성 스크립트"
+$ git push origin v1.3.1
+To https://github.com/lapiogga/navy-admin.git
+ * [new tag]         v1.3.1 -> v1.3.1
+```
+
+### 산출물 목록
+
+| 파일 | 크기 | 내용 |
+|------|------|------|
+| `spec-doc/generate_sys01_fc_sb.py` | 900줄 | SYS01 PPT 생성 스크립트 (4장) |
+| `spec-doc/generate_sys02_fc_sb.py` | 580줄 | SYS02 PPT 생성 스크립트 (4장) |
+| `spec-doc/ppt/SYS01_초과근무관리체계_FC_SB.pptx` | 43KB | SYS01 프레젠테이션 4장 |
+| `spec-doc/ppt/SYS02_설문종합관리체계.pptx` | 42KB | SYS02 프레젠테이션 4장 |
+
+### 세션 14~15 종료 시점 상태
+
+```
+생성 PPT: SYS01 4장 + SYS02 4장 = 총 8장
+변경 파일: 9개 (스크립트 3 + PPTX 4 + 문서 2)
+GitHub: v1.3.1 태그 배포
+```
+
+---
+
 *이후 모든 터미널 출력은 이 파일에 append됩니다.*
