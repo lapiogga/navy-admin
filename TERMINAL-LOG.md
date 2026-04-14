@@ -1142,4 +1142,136 @@ $ npx vitest run
 
 ---
 
+## 2026-04-10 - 세션 12
+
+### #59 SYS03~18 4장 PPT 생성 (08:59~09:16)
+
+```
+$ pip show python-pptx
+Name: python-pptx / Version: 1.0.2 / INSTALLED
+
+$ python3 generate_4slide_ppt.py
+[생성중] SYS03_성과관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS04_인증서발급신청체계_산출물.pptx... 완료 (4장)
+[생성중] SYS05_행정규칙포탈체계_산출물.pptx... 완료 (4장)
+[생성중] SYS06_해병대규정관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS07_군사자료관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS08_부대계보관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS09_영현보훈체계_산출물.pptx... 완료 (4장)
+[생성중] SYS10_주말버스예약관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS11_연구자료종합관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS12_지시건의사항관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS13_지식관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS14_나의 제언_산출물.pptx... 완료 (4장)
+[생성중] SYS15_보안일일결산체계_산출물.pptx... 완료 (4장)
+[생성중] SYS16_회의실예약관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS17_검열결과관리체계_산출물.pptx... 완료 (4장)
+[생성중] SYS18_직무기술서관리체계_산출물.pptx... 완료 (4장)
+
+=== 총 16개 파일 생성 완료 ===
+출력 경로: C:\Users\User\2nd_biz\spec-doc\ppt
+```
+
+**생성 파일 (16개, 각 4장):**
+| 파일 | 크기 |
+|------|------|
+| SYS03_성과관리체계_산출물.pptx | 39KB |
+| SYS04_인증서발급신청체계_산출물.pptx | 38KB |
+| SYS05_행정규칙포탈체계_산출물.pptx | 38KB |
+| SYS06_해병대규정관리체계_산출물.pptx | 38KB |
+| SYS07_군사자료관리체계_산출물.pptx | 38KB |
+| SYS08_부대계보관리체계_산출물.pptx | 39KB |
+| SYS09_영현보훈체계_산출물.pptx | 38KB |
+| SYS10_주말버스예약관리체계_산출물.pptx | 39KB |
+| SYS11_연구자료종합관리체계_산출물.pptx | 37KB |
+| SYS12_지시건의사항관리체계_산출물.pptx | 38KB |
+| SYS13_지식관리체계_산출물.pptx | 38KB |
+| SYS14_나의 제언_산출물.pptx | 38KB |
+| SYS15_보안일일결산체계_산출물.pptx | 40KB |
+| SYS16_회의실예약관리체계_산출물.pptx | 38KB |
+| SYS17_검열결과관리체계_산출물.pptx | 38KB |
+| SYS18_직무기술서관리체계_산출물.pptx | 38KB |
+
+---
+
+### #60 PPT 템플릿 기반 재생성 SYS01~18 (2026-04-10 12:30~13:13)
+
+**문제 진단 (err-5.png / err-6.png):**
+- PPTX 파일 손상 → PowerPoint 복구 대화상자
+- 원인 1: `Presentation()` 신규 생성 (템플릿 미사용)
+- 원인 2: `no_shadow()` XML 직접 조작 → 잘못된 XML 구조
+- 원인 3: KoPub돋움체 미설치
+
+**수정 전략:**
+1. 26_27년_템플릿.pptx를 베이스로 사용 (`Presentation(TEMPLATE)`)
+2. 본문 영역 내부 배치: L=0.50", T=2.38", R=7.60", B=10.90"
+3. Freesentation 폰트 사용 (Freesentation 4 Regular / 7 Bold / 6 SemiBold)
+4. `clear_slide()` 패턴: 템플릿 첫 슬라이드 초기화 + 3장 추가
+5. `no_shadow()` 완전 제거, tailEnd만 안전하게 XML 조작
+6. SYS01(초과근무, 99 proc), SYS02(설문종합, 31 proc) 데이터 추가
+
+**실행:**
+```
+$ python3 generate_4slide_ppt.py
+[생성중] SYS01_초과근무관리체계_산출물.pptx ... 완료 (29418KB)
+[생성중] SYS02_설문종합관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS03_성과관리체계_산출물.pptx ... 완료 (29417KB)
+[생성중] SYS04_인증서발급신청체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS05_행정규칙포탈체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS06_해병대규정관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS07_군사자료관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS08_부대계보관리체계_산출물.pptx ... 완료 (29417KB)
+[생성중] SYS09_영현보훈체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS10_주말버스예약관리체계_산출물.pptx ... 완료 (29417KB)
+[생성중] SYS11_연구자료종합관리체계_산출물.pptx ... 완료 (29415KB)
+[생성중] SYS12_지시건의사항관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS13_지식관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS14_나의 제언_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS15_보안일일결산체계_산출물.pptx ... 완료 (29417KB)
+[생성중] SYS16_회의실예약관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS17_검열결과관리체계_산출물.pptx ... 완료 (29416KB)
+[생성중] SYS18_직무기술서관리체계_산출물.pptx ... 완료 (29416KB)
+
+총 18개 파일 생성 완료 → C:\Users\User\2nd_biz\spec-doc\ppt
+```
+
+**검증 (python-pptx 재파싱):**
+```
+SYS01 slides=4 shapes=[41, 33, 56, 66]
+SYS02 slides=4 shapes=[34, 33, 26, 48]
+SYS03 slides=4 shapes=[39, 39, 46, 58]
+SYS04 slides=4 shapes=[34, 37, 22, 44]
+SYS05 slides=4 shapes=[34, 33, 29, 42]
+SYS06 slides=4 shapes=[34, 31, 30, 44]
+SYS07 slides=4 shapes=[36, 31, 26, 54]
+SYS08 slides=4 shapes=[41, 37, 42, 58]
+SYS09 slides=4 shapes=[34, 31, 36, 44]
+SYS10 slides=4 shapes=[36, 41, 37, 57]
+SYS11 slides=4 shapes=[31, 24, 22, 42]
+SYS12 slides=4 shapes=[34, 31, 27, 42]
+SYS13 slides=4 shapes=[36, 31, 29, 54]
+SYS14 slides=4 shapes=[34, 33, 21, 44]
+SYS15 slides=4 shapes=[42, 33, 52, 60]
+SYS16 slides=4 shapes=[34, 31, 24, 44]
+SYS17 slides=4 shapes=[36, 33, 31, 54]
+SYS18 slides=4 shapes=[36, 33, 25, 56]
+errors: none
+```
+
+**생성 파일 (18개, 각 4장, ~29MB):**
+- SYS01_초과근무관리체계_산출물.pptx (신규)
+- SYS02_설문종합관리체계_산출물.pptx (신규)
+- SYS03~SYS18 16개 파일 (템플릿 기반으로 전면 재생성)
+
+**주요 변경 (generate_4slide_ppt.py):**
+- `TEMPLATE = 26_27년_템플릿.pptx` 상수 추가
+- A4 Portrait 좌표계 (8.267" × 11.693")
+- 본문 영역 내부 배치 상수 정의
+- `clear_slide()` 신규 함수 (spTree 정리)
+- `add_arrow()` lxml tailEnd 안전 조작으로 변경
+- `no_shadow()` 함수 및 호출부 전체 제거
+- 18개 시스템 데이터 블록 (SYS01/02 추가 + 16개 유지)
+
+---
+
 *이후 모든 터미널 출력은 이 파일에 append됩니다.*

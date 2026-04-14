@@ -22,3 +22,7 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# PPT 바이너리 (spec-doc 출력물 — GitHub 배포 제외)
+spec-doc/**/*.pptx
+spec-doc/**/*.ppt
