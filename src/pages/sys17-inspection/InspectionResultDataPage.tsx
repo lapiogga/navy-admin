@@ -118,8 +118,7 @@ export default function InspectionResultDataPage() {
   return (
     <PageContainer title="검열결과 정보">
       <DataTable<InspectionTask>
-        queryKey={['sys17', 'result-data']}
-        requestFn={fetchTasks}
+        request={fetchTasks}
         columns={columns}
         rowKey="id"
       />

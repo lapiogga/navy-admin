@@ -290,9 +290,9 @@ function DutyCalendarTab() {
       <div style={{ marginTop: 24 }}>
         <DataTable<DutySchedule>
           actionRef={actionRef}
-          queryKey={['sys15-duty-schedule', currentYear, currentMonth]}
-          fetchFn={fetchDutySchedules}
           columns={scheduleColumns}
+          request={fetchDutySchedules}
+          rowKey="id"
         />
       </div>
       <DutyScheduleModal
@@ -418,9 +418,9 @@ function DutyInspectionTab() {
       </div>
       <DataTable<DutyInspection>
         actionRef={actionRef}
-        queryKey={['sys15-duty-inspection']}
-        fetchFn={fetchDutyInspections}
         columns={inspectionColumns}
+        request={fetchDutyInspections}
+        rowKey="id"
       />
       <InspectionFormModal
         open={modalOpen}

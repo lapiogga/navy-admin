@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { Checkbox, Input, Button, Form, DatePicker, message, Divider, Tag } from 'antd'
+import { Checkbox, Input, Button, Form, DatePicker, message, Row, Col, Tag } from 'antd'
 import { PageContainer } from '@ant-design/pro-components'
 import type { ProColumns } from '@ant-design/pro-components'
 import { useMutation, useQueryClient } from '@tanstack/react-query'
@@ -151,59 +151,54 @@ export default function PersonalSecDailyPage() {
   return (
     <PageContainer title="개인 보안일일결산">
       {/* 체크리스트 입력 영역 */}
-      <div style={{ background: '#fff', padding: 24, borderRadius: 8, marginBottom: 24 }}>
-        <h3 style={{ marginBottom: 16 }}>오늘의 보안점검</h3>
+      <div style={{ background: '#fff', padding: '12px 16px', borderRadius: 8, marginBottom: 16 }}>
+        <div style={{ fontWeight: 600, fontSize: 14, marginBottom: 8, borderBottom: '1px solid #f0f0f0', paddingBottom: 4 }}>오늘의 보안점검</div>
 
-        <Form form={form} layout="vertical">
-          <h4>필수 점검항목</h4>
+        <Form form={form} size="small">
+          <div style={{ marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#1890ff' }}>필수 점검항목</div>
           <Checkbox.Group
             value={checkedRequired}
             onChange={(vals) => setCheckedRequired(vals as string[])}
             style={{ display: 'block' }}
           >
-            {REQUIRED_ITEMS.map((item) => (
-              <div key={item.id} style={{ marginBottom: 8 }}>
-                <Checkbox value={item.id}>{item.label}</Checkbox>
-                {!checkedRequired.includes(item.id) && (
-                  <TextArea
-                    placeholder="미실시 사유를 입력하세요"
-                    rows={1}
-                    style={{ marginTop: 4, marginLeft: 24 }}
-                    value={uncheckedReasons[item.id] ?? ''}
-                    onChange={(e) => handleReasonChange(item.id, e.target.value)}
-                  />
-                )}
-              </div>
-            ))}
+            <Row gutter={[16, 2]}>
+              {REQUIRED_ITEMS.map((item) => (
+                <Col span={12} key={item.id}>
+                  <Checkbox value={item.id} style={{ fontSize: 13 }}>{item.label}</Checkbox>
+                  {!checkedRequired.includes(item.id) && (
+                    <Input
+                      placeholder="미실시 사유"
+                      size="small"
+                      style={{ marginTop: 2, marginLeft: 24, width: 'calc(100% - 24px)', marginBottom: 4 }}
+                      value={uncheckedReasons[item.id] ?? ''}
+                      onChange={(e) => handleReasonChange(item.id, e.target.value)}
+                    />
+                  )}
+                </Col>
+              ))}
+            </Row>
           </Checkbox.Group>
 
-          <Divider />
-
-          <h4>선택 점검항목</h4>
+          <div style={{ marginTop: 8, marginBottom: 4, fontWeight: 600, fontSize: 13, color: '#1890ff' }}>선택 점검항목</div>
           <Checkbox.Group
             value={checkedOptional}
             onChange={(vals) => setCheckedOptional(vals as string[])}
             style={{ display: 'block' }}
           >
-            {OPTIONAL_ITEMS.map((item) => (
-              <div key={item.id} style={{ marginBottom: 8 }}>
-                <Checkbox value={item.id}>{item.label}</Checkbox>
-              </div>
-            ))}
+            <Row gutter={[16, 2]}>
+              {OPTIONAL_ITEMS.map((item) => (
+                <Col span={8} key={item.id}>
+                  <Checkbox value={item.id} style={{ fontSize: 13 }}>{item.label}</Checkbox>
+                </Col>
+              ))}
+            </Row>
           </Checkbox.Group>
 
-          <div style={{ marginTop: 16, display: 'flex', gap: 8 }}>
-            <Button
-              onClick={handleSave}
-              loading={saveMutation.isPending}
-            >
+          <div style={{ marginTop: 10, display: 'flex', gap: 8 }}>
+            <Button size="small" onClick={handleSave} loading={saveMutation.isPending}>
               임시저장
             </Button>
-            <Button
-              type="primary"
-              onClick={handleSubmit}
-              loading={submitMutation.isPending}
-            >
+            <Button size="small" type="primary" onClick={handleSubmit} loading={submitMutation.isPending}>
               제출 (결재요청)
             </Button>
           </div>
@@ -219,9 +214,9 @@ export default function PersonalSecDailyPage() {
           />
         </div>
         <DataTable<PersonalDailyRecord>
-          queryKey={['sys15-personal-daily', startDate, endDate]}
-          fetchFn={(params) => fetchPersonalDailyHistory({ ...params, startDate, endDate })}
           columns={columns}
+          request={(params) => fetchPersonalDailyHistory({ ...params, startDate, endDate })}
+          rowKey="id"
         />
       </div>
     </PageContainer>

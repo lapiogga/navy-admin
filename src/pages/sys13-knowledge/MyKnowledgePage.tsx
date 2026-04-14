@@ -183,9 +183,7 @@ export default function MyKnowledgePage() {
       dataIndex: 'title',
       width: 300,
       render: (_, record) => (
-        <Button type="link" style={{ padding: 0 }} onClick={() => handleEdit(record)}>
-          {record.title}
-        </Button>
+        <a onClick={() => handleEdit(record)}>{record.title}</a>
       ),
     },
     {

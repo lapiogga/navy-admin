@@ -192,9 +192,9 @@ export default function AbsencePage() {
     >
       <DataTable<AbsenceRecord>
         actionRef={actionRef}
-        queryKey={['sys15-absences']}
-        fetchFn={fetchAbsences}
         columns={columns}
+        request={fetchAbsences}
+        rowKey="id"
       />
       <AbsenceFormModal
         open={modalOpen}

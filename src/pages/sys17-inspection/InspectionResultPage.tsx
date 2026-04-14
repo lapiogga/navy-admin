@@ -332,16 +332,7 @@ export default function InspectionResultPage() {
       dataIndex: 'taskName',
       width: 250,
       render: (text, record) => (
-        <Button
-          type="link"
-          onClick={() => {
-            setDetailTask(record)
-            setDetailOpen(true)
-          }}
-          style={{ padding: 0 }}
-        >
-          {text}
-        </Button>
+        <a onClick={() => { setDetailTask(record); setDetailOpen(true) }}>{text}</a>
       ),
     },
     {
@@ -589,12 +580,9 @@ export default function InspectionResultPage() {
       label: '조치과제 목록',
       children: (
         <DataTable<InspectionTask>
-          queryKey={['sys17', 'tasks', searchParams]}
-          requestFn={(params) => fetchTasks({ ...params, ...searchParams })}
+          request={(params) => fetchTasks({ ...params, ...searchParams })}
           columns={taskColumns}
           rowKey="id"
-          searchFields={searchFields}
-          onSearch={(values) => setSearchParams(values as SearchParams)}
           toolBarRender={() => [
             <Button
               key="create"
@@ -625,8 +613,7 @@ export default function InspectionResultPage() {
             onReset={() => setSearchParams({})}
           />
           <DataTable<InspectionTask>
-            queryKey={['sys17', 'tasks', 'results', searchParams]}
-            requestFn={(params) => fetchTasks({ ...params, ...searchParams })}
+            request={(params) => fetchTasks({ ...params, ...searchParams })}
             columns={resultColumns}
             rowKey="id"
           />

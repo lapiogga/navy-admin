@@ -161,13 +161,8 @@ export default function ProposalProgressPage() {
         <DataTable<CategoryStat>
           rowKey="category"
           columns={columns}
-          request={async () => ({
-            content: categoryStats,
-            totalElements: categoryStats.length,
-            totalPages: 1,
-            size: categoryStats.length,
-            number: 0,
-          })}
+          dataSource={categoryStats}
+          loading={isLoading}
         />
       </Card>
     </PageContainer>

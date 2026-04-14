@@ -604,7 +604,7 @@ export default function SuggestionListPage() {
       >
         {detail && (
           <>
-            <Descriptions column={2} bordered size="small">
+            <Descriptions column={2} bordered size="small" labelStyle={{ whiteSpace: 'nowrap', width: 80 }} contentStyle={{ minWidth: 0 }}>
               <Descriptions.Item label="제목" span={2}>{detail.title}</Descriptions.Item>
               <Descriptions.Item label="작성자">{detail.authorName}</Descriptions.Item>
               <Descriptions.Item label="소속">{detail.authorUnit}</Descriptions.Item>

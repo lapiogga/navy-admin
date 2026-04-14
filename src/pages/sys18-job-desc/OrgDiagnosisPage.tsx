@@ -176,7 +176,7 @@ export default function OrgDiagnosisPage() {
       title: '조직진단명',
       dataIndex: 'diagnosisName',
       render: (text, record) => (
-        <Button type="link" onClick={() => handleOpenEdit(record)}>{text as string}</Button>
+        <a onClick={() => handleOpenEdit(record)}>{text as string}</a>
       ),
     },
     { title: '부대(서)', dataIndex: 'diagnosisUnit', width: 130 },

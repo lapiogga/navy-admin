@@ -169,15 +169,33 @@
 
 **기준점: v1.3.0 (2026-04-14) — 다음 작업 시 이 시점부터 시작**
 
-**현재 상태: 프론트엔드 개발 100% 완료 + 버그 수정 2차 완료**
+**현재 상태: 프론트엔드 개발 100% 완료 + 버그 수정 3차 완료 + 프레젠테이션 산출물 추가**
 
 - Phase 0~7: **전체 완료** + 검증 통과
 - GAP 수정: **18개 서브시스템 x 6규칙 전체 적용 완료**
 - 세션 9 버그 수정: **10개 항목 수정 완료** (SYS02/03/05/08/09/10/11/12/99)
 - 세션 10~11 버그 수정: **7개 항목 수정 완료** (SYS02/03/07/08/09 + 공통 DataTable/SearchForm)
+- 세션 12~13 버그 수정: **19개 항목 수정 완료** (SYS11/12/13/14/15/16/17/18)
 - spec-doc: **6개 문서 생성 완료** (조감도/업무분석서/다이어그램/메뉴구조도/상관관계도/GAP분석)
-- PPT: **18개 서브시스템별 분석/설계 자료 생성 완료**
+- PPT: **18개 서브시스템별 분석/설계 자료 + SYS01/SYS02 프레젠테이션 4종 생성 완료**
+- 프레젠테이션 산출물: **SYS01 4장 + SYS02 4장** (목표모델/플로우차트/스토리보드/유스케이스)
 - 마크다운 문서: **80+ 파일 최신 상태 업데이트 완료**
+
+### 세션 12~13 수정사항 (v1.3.0)
+- SYS11: ResearchMainPage 차트 및 통계 카드 레이아웃 수정
+- SYS12: DirectiveProgressPage, ProposalProgressPage 차트 레이아웃 수정
+- SYS13: KnowledgeStatsPage DataTable closure capture 버그 수정 (3개 탭 dataSource 전환)
+- SYS13: KnowledgeListPage, MyKnowledgePage 수정
+- SYS14: SuggestionListPage 제언 상세 Descriptions 콤팩트화 (라벨 1줄)
+- SYS15: PersonalSecDailyPage 오늘의 보안점검 콤팩트화 (2열 체크박스, padding/margin 축소)
+- SYS15: OfficeSecDailyPage 사무실 보안점검 콤팩트화 (2열 체크박스 + 미실시자/부재자 2열 배치)
+- SYS15: 6개 페이지 DataTable queryKey/fetchFn → request prop 수정 (데이터 표시 복구)
+- SYS16: MeetingReservePage 회의예약신청 폼 콤팩트화 (스크롤 없이 표시)
+- SYS17: UNIT_TREE 해군+해병대 전체 조직도로 확장 (검열부대 지정)
+- SYS17: 4개 페이지 DataTable queryKey/requestFn → request prop 수정 (데이터 표시 복구)
+- SYS17: InspectionProgressPage Bar→Column 세로막대 차트 변경
+- SYS17: 5개 컬럼 Button type="link" → <a> 태그 (박스 제거, 링크 유지)
+- SYS18: OrgDiagnosisPage 조직진단명 Button type="link" → <a> 태그
 
 ### 세션 10~11 수정사항 (v1.2.0)
 - SYS02: DataTable에 dataSource/loading props 추가 (설문 데이터 표시 복구)

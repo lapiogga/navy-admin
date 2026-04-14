@@ -66,22 +66,46 @@ const RANKS = ['대위', '소령', '중령', '대령', '상사', '중사']
 const PROGRESS_STATUSES: InspProgressStatus[] = ['notStarted', 'inProgress', 'completed', 'received']
 const APPROVAL_STATUSES: ApprovalStatus[] = ['pending', 'inReview', 'approved', 'rejected']
 
-// 부대 트리 데이터 (조직도)
+// 부대 트리 데이터 (해군 + 해병대 조직도)
 const UNIT_TREE = [
   {
-    key: 'hq',
+    key: 'navy-hq',
+    title: '해군본부',
+    children: [
+      {
+        key: 'navy-ops',
+        title: '해군작전사령부',
+        children: [
+          { key: 'fleet-1', title: '제1함대', children: [] },
+          { key: 'fleet-2', title: '제2함대', children: [] },
+          { key: 'fleet-3', title: '제3함대', children: [] },
+          { key: 'sub-cmd', title: '잠수함사령부', children: [] },
+        ],
+      },
+      { key: 'navy-air', title: '해군항공사령부', children: [] },
+      { key: 'navy-spec', title: '특수전전단', children: [] },
+      { key: 'navy-edu', title: '해군교육사령부', children: [] },
+      { key: 'navy-log', title: '해군군수사령부', children: [] },
+      { key: 'navy-academy', title: '해군사관학교', children: [] },
+    ],
+  },
+  {
+    key: 'marine-hq',
     title: '해병대사령부',
     children: [
-      { key: '1div', title: '1사단', children: [] },
-      { key: '2div', title: '2사단', children: [] },
-      { key: 'edu', title: '교육훈련단', children: [] },
-      { key: 'amph', title: '상륙기동단', children: [] },
+      { key: 'marine-1div', title: '제1해병사단', children: [] },
+      { key: 'marine-2div', title: '제2해병사단', children: [] },
+      { key: 'marine-6bde', title: '제6해병여단', children: [] },
+      { key: 'marine-9bde', title: '제9해병여단', children: [] },
+      { key: 'marine-yp', title: '연평부대', children: [] },
+      { key: 'marine-edu', title: '해병대교육훈련단', children: [] },
+      { key: 'marine-log', title: '해병대군수단', children: [] },
     ],
   },
 ]
 
 // 선택된 검열부대 저장
-let selectedUnitIds: string[] = ['1div', '2div']
+let selectedUnitIds: string[] = ['fleet-1', 'fleet-2', 'marine-1div', 'marine-2div']
 
 // Mock 데이터: 검열계획 10건
 let plans: InspectionPlan[] = Array.from({ length: 10 }, (_, i) => {
