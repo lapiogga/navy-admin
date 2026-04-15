@@ -1,0 +1,230 @@
+
+=== SYS01 (sys01-overtime) ===
+  req소메뉴: 25개, req프로세스: 95개
+  구현페이지: 22개
+  REQ: 신청서 관리 > 신청서 작성 [5]
+  REQ: 신청서 관리 > 신청서 결재 [4]
+  REQ: 신청서 관리 > 일괄처리 [5]
+  REQ: 신청서 관리 > 일괄처리 승인 [4]
+  REQ: 신청서 관리 > 월말결산 [9]
+  REQ: 현황조회 > 나의 근무현황 [2]
+  REQ: 현황조회 > 나의 부재관리 [4]
+  REQ: 현황조회 > 부대 근무 현황 [3]
+  REQ: 현황조회 > 부대 근무 통계 [2]
+  REQ: 현황조회 > 부대 부재 현황 [1]
+  REQ: 현황조회 > 월말결산 현황 [3]
+  REQ: 현황조회 > 자료 출력 [1]
+  REQ: 부대관리 > 부대인원 조회 [2]
+  REQ: 부대관리 > 최대인정시간 [12]
+  REQ: 부대관리 > 근무시간 관리 [8]
+  REQ: 부대관리 > 공휴일 관리 [4]
+  REQ: 부대관리 > 결재선 관리 [3]
+  REQ: 당직업무 > 초과근무자 관리 [5]
+  REQ: 당직업무 > 당직개소 관리 [4]
+  REQ: 당직업무 > 당직개소 변경 [2]
+  REQ: 당직업무 > 개인별 당직개소 승인 [3]
+  REQ: 당직업무 > 개인별 부서 이동 승인 [3]
+  REQ: 개인설정 > 개인설정 정보 [1]
+  REQ: 개인설정 > 개인별 당직개소 설정 [2]
+  REQ: 개인설정 > 개인별 부서 설정 [3]
+  IMPL: OtAbsencePage, OtApprovalLinePage, OtApprovalPage, OtBulkApprovalPage, OtBulkPage, OtDutyPostChangePage, OtDutyPostPage, OtDutyWorkerPage, OtHolidayPage, OtMaxHoursPage, OtMonthlyClosingPage, OtMonthlyStatusPage, OtMyStatusPage, OtPersonalDeptApprovalPage, OtPersonalDeptPage, OtPersonalDutyApprovalPage, OtPersonalDutyPage, OtPersonalSettingPage, OtRequestPage, OtUnitPersonnelPage, OtUnitStatusPage, OtWorkHoursPage
+
+=== SYS02 (sys02-survey) ===
+  req소메뉴: 4개, req프로세스: 27개
+  구현페이지: 7개
+  REQ: 설문관리 > 나의 설문관리 [8]
+  REQ: 설문관리 > 설문참여 [3]
+  REQ: 설문관리 > 지난 설문보기 [3]
+  REQ: 설문관리 > 체계관리 [13]
+  IMPL: MySurveyPage, PastSurveyPage, SurveyAdminPage, SurveyFormPage, SurveyParticipationPage, SurveyQuestionEditor, SurveyResultPage
+
+=== SYS03 (sys03-performance) ===
+  req소메뉴: 13개, req프로세스: 70개
+  구현페이지: 16개
+  REQ: 기준정보관리 > 시스템관리 [4]
+  REQ: 기준정보관리 > 평가조직 관리 [8]
+  REQ: 기준정보관리 > 업무실적(개인) [4]
+  REQ: 기준정보관리 > 과제관리 [14]
+  REQ: 연간과제관리 > 추진진도율 [6]
+  REQ: 연간과제관리 > 과제등록 [10]
+  REQ: 연간과제관리 > 업무실적 입력 [7]
+  REQ: 연간과제관리 > 과제실적 승인 [4]
+  REQ: 연간과제관리 > 과제실적 평가 [3]
+  REQ: 연간과제관리 > 업무실적(개인) 평가 [3]
+  REQ: 평가결과 > 평가결과 [3]
+  REQ: 평가결과 > 입력현황 [3]
+  REQ: 과제검색 > 과제검색 [1]
+  IMPL: PerfBaseYearPage, PerfDetailTaskPage, PerfEvalOrgPage, PerfEvalResultPage, PerfIndividualResultEvalPage, PerfIndividualTargetPage, PerfInputStatusPage, PerfMainPage, PerfMainTaskPage, PerfPolicyPage, PerfProgressRatePage, PerfSubTaskPage, PerfTaskResultApprovalPage, PerfTaskResultEvalPage, PerfTaskResultInputPage, PerfTaskSearchPage
+
+=== SYS04 (sys04-certificate) ===
+  req소메뉴: 3개, req프로세스: 10개
+  구현페이지: 3개
+  REQ: 인증서발급신청 > 인증서 신청 [3]
+  REQ: 인증서발급신청 > 인증서 승인/관리 [4]
+  REQ: 인증서발급신청 > 인증서 등록대장 [3]
+  IMPL: CertificateApplyPage, CertificateApprovalPage, CertificateRegisterPage
+
+=== SYS05 (sys05-admin-rules) ===
+  req소메뉴: 4개, req프로세스: 15개
+  구현페이지: 4개
+  REQ: 해군규정 > 현행규정 [6]
+  REQ: 예규 > 해군본부 [4]
+  REQ: 예규 > 예하부대 [1]
+  REQ: 지시 > 지시문서 [4]
+  IMPL: DirectiveListPage, PrecedentHQPage, PrecedentUnitPage, RegulationListPage
+
+=== SYS06 (sys06-regulations) ===
+  req소메뉴: 4개, req프로세스: 15개
+  구현페이지: 4개
+  REQ: 해병대규정 > 현행규정 [6]
+  REQ: 예규 > 해병대사령부 [4]
+  REQ: 예규 > 예하부대 [1]
+  REQ: 지시 > 지시문서 [4]
+  IMPL: DirectiveListPage, PrecedentHQPage, PrecedentUnitPage, RegulationListPage
+
+=== SYS07 (sys07-mil-data) ===
+  req소메뉴: 4개, req프로세스: 40개
+  구현페이지: 8개
+  REQ: 군사자료 관리 > 군사자료 관리 [12]
+  REQ: 군사자료 관리 > 군사자료 활용 [6]
+  REQ: 군사자료 관리 > 통계자료 [15]
+  REQ: 해기단자료 > 해기단자료 [7]
+  IMPL: HaegidanFormPage, HaegidanListPage, MilDataDetailPage, MilDataEvalPage, MilDataFormPage, MilDataListPage, MilDataStatsPage, MilDataUsagePage
+
+=== SYS08 (sys08-unit-lineage) ===
+  req소메뉴: 10개, req프로세스: 57개
+  구현페이지: 11개
+  REQ: 권한신청 > 권한신청 [2]
+  REQ: 권한신청 > 권한관리 [6]
+  REQ: 권한신청 > 권한조회 [2]
+  REQ: 주요활동 > 주요활동 관리 [8]
+  REQ: 주요활동 > 주요활동 결재 [4]
+  REQ: 주요직위자 > 주요직위자 관리 [7]
+  REQ: 제원/계승부대 > 제원/계승부대 관리 [7]
+  REQ: 부대기/부대마크 > 부대기/부대마크 관리 [7]
+  REQ: 통계 및 출력 > 입력 통계 [10]
+  REQ: 부대기록부 > 부대기록부 [4]
+  IMPL: PrintableReport, UnitActivityApprovalPage, UnitActivityPage, UnitAuthMgmtPage, UnitAuthRequestPage, UnitAuthViewPage, UnitFlagPage, UnitKeyPersonPage, UnitLineageTreePage, UnitRecordPage, UnitStatsPage
+
+=== SYS09 (sys09-memorial) ===
+  req소메뉴: 16개, req프로세스: 34개
+  구현페이지: 17개
+  REQ: 자료입력 > 사망자 관리 [5]
+  REQ: 자료입력 > 상이자 관리 [5]
+  REQ: 자료입력 > 전공사상심사 관리 [5]
+  REQ: 통계 및 자료 출력 > 국가유공자 요건 해당사실 확인서(사망자) [1]
+  REQ: 통계 및 자료 출력 > 국가유공자 요건 해당사실 확인서(상이자) [1]
+  REQ: 통계 및 자료 출력 > 전공사상심사결과 [1]
+  REQ: 통계 및 자료 출력 > 순직/사망확인서 [1]
+  REQ: 통계 및 자료 출력 > 사망자 현황 보고서 [1]
+  REQ: 통계 및 자료 출력 > 상이자 현황 보고서 [1]
+  REQ: 통계 및 자료 출력 > 신분별 사망자 현황 [2]
+  REQ: 통계 및 자료 출력 > 월별 사망자 현황 [2]
+  REQ: 통계 및 자료 출력 > 연도별 사망자 현황 [2]
+  REQ: 통계 및 자료 출력 > 부대별 사망자 현황 [2]
+  REQ: 통계 및 자료 출력 > 부대별 사망자 명부 [2]
+  REQ: 통계 및 자료 출력 > 전사망자 명부 [2]
+  REQ: 통계 및 자료 출력 > 전사망자 확인증 발급대장 [1]
+  IMPL: CertDeathPage, CertIssueLedgerPage, CertMeritDeathPage, CertMeritInjuredPage, CertReviewResultPage, DeceasedPage, InjuredPage, PrintableReport, ReportDeceasedPage, ReportInjuredPage, ReviewPage, StatsAllListPage, StatsMonthPage, StatsTypePage, StatsUnitListPage, StatsUnitPage, StatsYearPage
+
+=== SYS10 (sys10-weekend-bus) ===
+  req소메뉴: 8개, req프로세스: 42개
+  구현페이지: 12개
+  REQ: 주말버스 예약 > 주말버스 예약 [7]
+  REQ: 주말버스 예약 > 주말버스 대기자관리 [4]
+  REQ: 주말버스 예약 > 주말버스 예약현황 [5]
+  REQ: 주말버스 배차 > 주말버스 배차관리 [6]
+  REQ: 주말버스 배차 > 예약시간관리 [4]
+  REQ: 주말버스 배차 > 주말버스 사용현황 [2]
+  REQ: 주말버스 기타관리 > 주말버스 위규자관리 [5]
+  REQ: 주말버스 기타관리 > 타군 사용자 관리 [9]
+  IMPL: BusDispatchPage, BusReservationPage, BusReservationStatusPage, BusSchedulePage, BusUsagePage, BusViolatorPage, BusWaitlistPage, ExternalLoginPage, ExternalRegisterPage, ExternalUserPage, SeatGrid, TicketPrint
+
+=== SYS11 (sys11-research) ===
+  req소메뉴: 2개, req프로세스: 14개
+  구현페이지: 4개
+  REQ: 연구자료종합관리 > 연구자료 [8]
+  REQ: 연구자료종합관리 > 관리자 [6]
+  IMPL: ResearchAdminPage, ResearchFilePage, ResearchListPage, ResearchMainPage
+
+=== SYS12 (sys12-directives) ===
+  req소메뉴: 4개, req프로세스: 39개
+  구현페이지: 5개
+  REQ: 지시사항 > 대통령 지시사항 [10]
+  REQ: 지시사항 > 국방부장관 지시사항 [10]
+  REQ: 지시사항 > 지휘관 지시사항 [10]
+  REQ: 건의사항 > 지휘관 건의사항 [9]
+  IMPL: DirectiveAdminPage, DirectiveListPage, DirectiveProgressPage, ProposalListPage, ProposalProgressPage
+
+=== SYS13 (sys13-knowledge) ===
+  req소메뉴: 4개, req프로세스: 18개
+  구현페이지: 5개
+  REQ: 지식관리 > 나의 지식 관리 [4]
+  REQ: 지식관리 > 지식 관리 [2]
+  REQ: 지식열람 > 지식열람 [7]
+  REQ: 지식통계 > 지식통계 [5]
+  IMPL: KnowledgeAdminPage, KnowledgeDetailPage, KnowledgeListPage, KnowledgeStatsPage, MyKnowledgePage
+
+=== SYS14 (sys14-suggestion) ===
+  req소메뉴: 1개, req프로세스: 12개
+  구현페이지: 3개
+  REQ: 나의제언 > 제언확인 [12]
+  IMPL: SuggestionAdminPage, SuggestionListPage, SuggestionMainPage
+
+=== SYS15 (sys15-security) ===
+  req소메뉴: 23개, req프로세스: 132개
+  구현페이지: 26개
+  REQ: 비밀/매체관리 > 저장매체 관리 [8]
+  REQ: 비밀/매체관리 > 비밀 관리 [8]
+  REQ: 비밀/매체관리 > 비밀 예고문 관리 [1]
+  REQ: 비밀/매체관리 > 보안자재/암호장비 관리 [8]
+  REQ: 비밀/매체관리 > 비밀/매체 인계/인수 [7]
+  REQ: 보안일일결산 > 개인보안일일결산 [4]
+  REQ: 보안일일결산 > 사무실보안일일결산 [4]
+  REQ: 보안일일결산 > 일일보안점검관 [5]
+  REQ: 보안일일결산 > 개인보안수준평가 [9]
+  REQ: 보안일일결산 > 부재처리 [4]
+  REQ: 보안일일결산 > 보안교육 [5]
+  REQ: 결재 > 결재대기 [4]
+  REQ: 결재 > 결재완료 [1]
+  REQ: 결산종합현황 > 비밀/매체관리 [2]
+  REQ: 결산종합현황 > 개인보안일일결산 [2]
+  REQ: 결산종합현황 > 사무실보안일일결산 [2]
+  REQ: 결산종합현황 > 부재처리 [3]
+  REQ: 결산체계 관리 > 개인설정 관리 [2]
+  REQ: 결산체계 관리 > 점검항목관리 [21]
+  REQ: 결산체계 관리 > 휴무일 관리 [10]
+  REQ: 결산체계 관리 > 알림시간 관리 [4]
+  REQ: 결산체계 관리 > 로그이력 관리 [6]
+  REQ: 결산체계 관리 > 예외처리 관리 [12]
+  IMPL: AbsencePage, ApprovalCompletedPage, ApprovalPendingPage, CheckItemMgmtPage, DutyOfficerPage, EquipmentPage, ExceptionMgmtPage, HolidayMgmtPage, LogHistoryPage, MediaPage, NoticeDocPage, NotifyTimeMgmtPage, OfficeSecDailyPage, PersonalSecDailyPage, PersonalSettingPage, RelatedRegulationPage, SecMainPage, SecretMediaPage, SecretPage, SecurityEduPage, SecurityLevelPage, SummaryAbsencePage, SummaryOfficePage, SummaryPersonalPage, SummarySecretPage, TransferPage
+
+=== SYS16 (sys16-meeting-room) ===
+  req소메뉴: 5개, req프로세스: 18개
+  구현페이지: 5개
+  REQ: 회의실 예약관리 > 회의예약신청 [1]
+  REQ: 회의실 예약관리 > 내예약확인 [4]
+  REQ: 회의실 예약관리 > 회의현황 [1]
+  REQ: 회의실 예약관리 > 회의예약관리 [4]
+  REQ: 회의실 예약관리 > 회의실 관리 [8]
+  IMPL: MeetingReservePage, MeetingRoomMgmtPage, MeetingStatusPage, MyReservationPage, ReservationMgmtPage
+
+=== SYS17 (sys17-inspection) ===
+  req소메뉴: 5개, req프로세스: 17개
+  구현페이지: 8개
+  REQ: 검열결과 관리 > 검열부대 지정 [1]
+  REQ: 검열결과 관리 > 검열계획 [3]
+  REQ: 검열결과 관리 > 검열결과 [8]
+  REQ: 검열결과 관리 > 결재 [3]
+  REQ: 검열결과 관리 > 추진현황 [2]
+  IMPL: InspectionApprovalPage, InspectionPlanDataPage, InspectionPlanPage, InspectionProgressPage, InspectionResultDataPage, InspectionResultPage, InspectionUnitMgmtPage, InspectionUnitPage
+
+=== SYS18 (sys18-job-desc) ===
+  req소메뉴: 5개, req프로세스: 42개
+  구현페이지: 6개
+  REQ: 직무기술서 관리 > 조직진단 대상 관리 [5]
+  REQ: 직무기술서 관리 > 직무기술서 작성 [16]
+  REQ: 직무기술서 관리 > 결재 [9]
+  REQ: 직무기술서 관리 > 직무기술서 조회(관리자) [11]
+  REQ: 직무기술서 관리 > 표준업무시간관리 [1]
+  IMPL: JobDescAdminPage, JobDescApprovalPage, JobDescFormPage, JobDescListPage, OrgDiagnosisPage, StandardWorkTimePage
