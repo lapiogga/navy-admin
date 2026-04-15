@@ -1,0 +1,35 @@
+{
+  "version": "1.0",
+  "timestamp": "2026-04-15T04:01:14Z",
+  "phase": "post-v1.4.0",
+  "phase_name": "1440x900 레이아웃 재구성 준비",
+  "phase_dir": ".planning/",
+  "plan": null,
+  "task": null,
+  "total_tasks": null,
+  "status": "paused",
+  "completed_tasks": [
+    {"id": 1, "name": "1680x1050 전체 334페이지 캡처", "status": "done", "commit": "161b481"},
+    {"id": 2, "name": "1440x900 전체 334페이지 캡처", "status": "done", "commit": "161b481"},
+    {"id": 3, "name": "screenshots-*/ gitignore 제외 + WORK-LOG 세션 16 + v1.4.0 태그", "status": "done", "commit": "161b481"},
+    {"id": 4, "name": "다음 세션 작업 지시서 작성", "status": "done", "commit": "448041d"}
+  ],
+  "remaining_tasks": [
+    {"id": 5, "name": "Phase A: SearchForm/DataTable/CrudForm 반응형 수정", "status": "not_started"},
+    {"id": 6, "name": "Phase A 적용 후 1440 재캡처 및 1680 회귀 검증", "status": "not_started"},
+    {"id": 7, "name": "Phase B: 문제 페이지 식별 (캡처 기반 30~50개 예상)", "status": "not_started"},
+    {"id": 8, "name": "Phase B: 개별 페이지 컬럼 우선순위 적용 (Wave 병렬)", "status": "not_started"},
+    {"id": 9, "name": "최종 재캡처 및 v1.5.0 태그 배포", "status": "not_started"}
+  ],
+  "blockers": [],
+  "human_actions_pending": [
+    {"action": "백그라운드 dev 서버(ba3b007d6) 종료 또는 세션 재시작", "context": "새 세션에서 npm run dev 재실행 전 확인", "blocking": false}
+  ],
+  "decisions": [
+    {"decision": "전수 수정은 새 세션에서 Phase A+B 풀로 수행 (옵션 b 선택)", "rationale": "컨텍스트 제약 + 334 페이지 개별 수정 규모 고려", "phase": "post-v1.4.0"},
+    {"decision": "PNG 산출물은 gitignore 제외 (screenshots-*/)", "rationale": "668개 PNG, ~76MB 저장소 팽창 방지", "phase": "post-v1.4.0"}
+  ],
+  "uncommitted_files": [],
+  "next_action": "새 세션 시작 후 navy-admin/NEXT-SESSION-1440-LAYOUT.md 읽고 Phase A-1 (SearchForm.tsx 반응형 수정) 부터 시작",
+  "context_notes": "v1.4.0 배포 완료. 1440x900 캡처본(screenshots-1440/)이 문제 페이지 식별 기준. Phase A는 공통 컴포넌트 3개(SearchForm/DataTable/CrudForm) + index.css 수정으로 전역 영향. Phase B는 캡처 diff 기반 30~50 페이지 예상. 회귀 방지를 위해 1680 재캡처 비교 필수. antd Breakpoint xl(1200)/xxl(1600) 활용 권장."
+}
